@@ -9,7 +9,7 @@ Site institucional e funcional de agendamento online para salões de beleza, des
 - **Dashboard Admin**: CRUD para serviços, profissionais e visualização de agendamentos
 - **Perfil do Usuário**: Histórico de agendamentos e gerenciamento de dados
 - **Design Responsivo**: Otimizado para desktop e mobile
-- **Paleta de Cores**: Azul-marinho (#0B2340) e branco (#FFFFFF)
+- **Paleta de Cores**: Azul-marinho (#153360) e branco (#FFFFFF)
 
 ## 📱 Páginas
 
@@ -141,7 +141,7 @@ src/
 ## 🎨 Design System
 
 ### Cores
-- **Primary**: #0B2340 (Azul-marinho)
+- **Primary**: #153360 (Azul-marinho)
 - **Secondary**: #FFFFFF (Branco)
 - **Text**: #333333
 
@@ -151,7 +151,7 @@ src/
 
 ### Componentes
 - **Border Radius**: 8px
-- **Shadow**: 0 2px 8px rgba(11, 35, 64, 0.1)
+- **Shadow**: 0 2px 8px rgba(21, 51, 96, 0.1)
 - **Breakpoints**: Mobile-first design
 
 ## ✅ Checklist de QA

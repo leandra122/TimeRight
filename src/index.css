@@ -5,11 +5,11 @@
 }
 
 :root {
-  --primary-color: #0B2340;
+  --primary-color: #153360;
   --secondary-color: #FFFFFF;
   --text-color: #333;
   --border-radius: 8px;
-  --shadow: 0 2px 8px rgba(11, 35, 64, 0.1);
+  --shadow: 0 2px 8px rgba(21, 51, 96, 0.1);
 }
 
 body {
