@@ -5,15 +5,15 @@
 }
 
 :root {
-  --primary-color: #8fa3b8;
-  --secondary-color: #fef0ef;
-  --accent-color: #efdefb;
-  --success-color: #a4d7bd;
-  --warning-color: #ffd1d4;
-  --danger-color: #fccfce;
+  --primary-color: #c8a8e9;
+  --secondary-color: #f8e8ff;
+  --accent-color: #e8c5f0;
+  --success-color: #b8d4f0;
+  --warning-color: #f5c2c7;
+  --danger-color: #f8d7da;
   --text-color: #333;
   --border-radius: 8px;
-  --shadow: 0 2px 8px rgba(143, 163, 184, 0.3);
+  --shadow: 0 2px 8px rgba(200, 168, 233, 0.3);
 }
 
 body {
@@ -47,7 +47,7 @@ body {
 }
 
 .btn-primary:hover {
-  background-color: #7a91a8;
+  background-color: #b896d9;
 }
 
 .card {
@@ -99,7 +99,7 @@ body {
 
 .service-card:hover {
   transform: scale(1.05);
-  box-shadow: 0 8px 25px rgba(143, 163, 184, 0.4);
+  box-shadow: 0 8px 25px rgba(200, 168, 233, 0.4);
 }
 
 .promotion-badge {
@@ -167,7 +167,7 @@ body {
 .hero-section {
   position: relative;
   min-height: 100vh;
-  background: linear-gradient(rgba(143, 163, 184, 0.8), rgba(239, 222, 251, 0.8)), 
+  background: linear-gradient(rgba(200, 168, 233, 0.8), rgba(184, 212, 240, 0.8)), 
               url('https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1920&h=1080&fit=crop') center/cover;
   display: flex;
   align-items: center;
@@ -202,12 +202,12 @@ body {
   text-decoration: none;
   display: inline-block;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(143, 163, 184, 0.5);
+  box-shadow: 0 4px 15px rgba(200, 168, 233, 0.5);
 }
 
 .cta-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(143, 163, 184, 0.6);
+  box-shadow: 0 8px 25px rgba(200, 168, 233, 0.6);
 }
 
 /* Seção de destaques */
@@ -246,7 +246,7 @@ body {
 /* Seção de promoções */
 .promotions-section {
   padding: 80px 0;
-  background: linear-gradient(135deg, var(--success-color) 0%, var(--warning-color) 100%);
+  background: linear-gradient(135deg, var(--success-color) 0%, var(--accent-color) 100%);
   color: #333;
 }
 
