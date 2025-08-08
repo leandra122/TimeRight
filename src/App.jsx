@@ -1,7 +1,9 @@
 // Componente principal da aplicação - configura roteamento e layout geral
+// Componente principal da aplicação - configura roteamento e layout geral
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './hooks/useAuth';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import PrivateRoute from './routes/PrivateRoute';
 import AdminRoute from './routes/AdminRoute';
 
@@ -61,17 +63,8 @@ function App() {
             </Routes>
           </main>
           
-          {/* Rodapé */}
-          <footer style={{ 
-            backgroundColor: 'var(--primary-color)', 
-            color: 'white', 
-            textAlign: 'center', 
-            padding: '2rem 0' 
-          }}>
-            <div className="container">
-              <p>&copy; 2024 La Belle Vie. Todos os direitos reservados.</p>
-            </div>
-          </footer>
+          {/* Rodapé estilizado */}
+          <Footer />
         </div>
       </Router>
     </AuthProvider>

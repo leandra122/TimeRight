@@ -1,9 +1,9 @@
-// Página inicial - landing page com hero section e cards interativos de serviços
+// Página inicial premium - hero section elegante e seções de destaque
 import { Link } from 'react-router-dom';
 import ServiceCard from '../components/ServiceCard';
 
 const Home = () => {
-  // Serviços em destaque para a home
+  // Serviços em destaque
   const featuredServices = [
     {
       id: 1,
@@ -28,54 +28,67 @@ const Home = () => {
       description: 'Unhas perfeitas e duradouras com técnicas modernas de alongamento',
       category: 'Alongamento',
       image: 'https://images.unsplash.com/photo-1610992015732-2449b76344bc?w=400&h=300&fit=crop'
+    }
+  ];
+
+  // Profissionais em destaque
+  const topProfessionals = [
+    {
+      id: 1,
+      name: 'Ana Costa',
+      specialty: 'Especialista em manicure artística',
+      rating: 5,
+      image: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face'
     },
     {
+      id: 2,
+      name: 'Carla Santos',
+      specialty: 'Expert em cuidados para os pés',
+      rating: 5,
+      image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face'
+    },
+    {
+      id: 3,
+      name: 'Juliana Lima',
+      specialty: 'Mestre em alongamento de unhas',
+      rating: 5,
+      image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face'
+    }
+  ];
+
+  // Promoções atuais
+  const currentPromotions = [
+    {
       id: 6,
-      title: 'Promoção: Mão + Pé',
+      title: 'Combo Mão + Pé',
       price: '65,00',
-      description: 'Combo especial: manicure + pedicure com desconto exclusivo',
-      category: 'Promoções',
+      originalPrice: '75,00',
+      description: 'Manicure + Pedicure com desconto especial',
       image: 'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=400&h=300&fit=crop'
     }
   ];
 
   return (
     <div>
-      {/* Seção hero - destaque principal da página */}
-      <section style={{ 
-        background: 'linear-gradient(135deg, var(--primary-color) 0%, #1a3a5c 100%)',
-        color: 'white',
-        padding: '80px 0',
-        textAlign: 'center'
-      }}>
+      {/* Hero Section Premium */}
+      <section className="hero-section">
         <div className="container">
-          {/* Título principal */}
-          <h1 style={{ fontSize: '3rem', marginBottom: '1rem', fontWeight: '700' }}>
-            La Belle Vie
-          </h1>
-          {/* Subtítulo descritivo */}
-          <p style={{ fontSize: '1.2rem', marginBottom: '2rem', opacity: '0.9' }}>
-            Seu salão de beleza premium. Cuidados especializados para suas mãos e pés.
-          </p>
-          {/* Botão CTA principal */}
-          <Link to="/agendamento" className="btn btn-primary" style={{ 
-            fontSize: '1.1rem', 
-            padding: '16px 32px',
-            backgroundColor: 'white',
-            color: 'var(--primary-color)'
-          }}>
-            Agende Agora
-          </Link>
+          <div className="hero-content">
+            <h1>Sua beleza, nosso compromisso</h1>
+            <p>Agende seu horário com os melhores profissionais e viva uma nova experiência</p>
+            <Link to="/agendamento" className="cta-button">
+              Agende Agora
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Seção de cards interativos de serviços */}
-      <section style={{ padding: '60px 0' }}>
+      {/* Seção de Serviços */}
+      <section style={{ padding: '80px 0' }}>
         <div className="container">
-          <h2 style={{ textAlign: 'center', marginBottom: '3rem', color: 'var(--primary-color)' }}>
+          <h2 style={{ textAlign: 'center', marginBottom: '3rem', color: 'var(--primary-color)', fontSize: '2.5rem' }}>
             Nossos Serviços
           </h2>
-          {/* Grid de cards de serviços */}
           <div className="services-grid">
             {featuredServices.map(service => (
               <ServiceCard key={service.id} service={service} />
@@ -84,19 +97,64 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Seção CTA secundária */}
-      <section style={{ backgroundColor: '#f8f9fa', padding: '60px 0', textAlign: 'center' }}>
+      {/* Seção de Profissionais em Destaque */}
+      <section className="highlights-section">
         <div className="container">
-          <h2 style={{ marginBottom: '1rem', color: 'var(--primary-color)' }}>
-            Pronta para se cuidar?
+          <h2 style={{ textAlign: 'center', marginBottom: '3rem', color: 'var(--primary-color)', fontSize: '2.5rem' }}>
+            Nossos Especialistas
           </h2>
-          <p style={{ marginBottom: '2rem', fontSize: '1.1rem' }}>
-            Agende seu horário com nossos profissionais especializados
-          </p>
-          {/* Botão CTA secundário */}
-          <Link to="/agendamento" className="btn btn-primary" style={{ fontSize: '1.1rem', padding: '16px 32px' }}>
-            Fazer Agendamento
-          </Link>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem' }}>
+            {topProfessionals.map(professional => (
+              <div key={professional.id} className="professional-highlight">
+                <img src={professional.image} alt={professional.name} />
+                <h3 style={{ color: 'var(--primary-color)', marginBottom: '0.5rem' }}>
+                  {professional.name}
+                </h3>
+                <div className="stars">
+                  {'★'.repeat(professional.rating)}
+                </div>
+                <p style={{ color: '#666', fontSize: '0.9rem' }}>
+                  {professional.specialty}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Seção de Promoções */}
+      <section className="promotions-section">
+        <div className="container">
+          <h2 style={{ textAlign: 'center', marginBottom: '3rem', fontSize: '2.5rem' }}>
+            Promoções Especiais
+          </h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+            {currentPromotions.map(promo => (
+              <div key={promo.id} className="promotion-card">
+                <div className="promotion-badge-large">PROMOÇÃO</div>
+                <img 
+                  src={promo.image} 
+                  alt={promo.title}
+                  style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '8px', marginBottom: '1rem' }}
+                />
+                <h3 style={{ color: 'var(--primary-color)', marginBottom: '1rem' }}>
+                  {promo.title}
+                </h3>
+                <div style={{ marginBottom: '1rem' }}>
+                  <span style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--primary-color)' }}>
+                    R$ {promo.price}
+                  </span>
+                  <span style={{ textDecoration: 'line-through', color: '#999', marginLeft: '0.5rem' }}>
+                    R$ {promo.originalPrice}
+                  </span>
+                </div>
+                <p style={{ marginBottom: '1.5rem' }}>{promo.description}</p>
+                <Link to={`/agendamento?service=${promo.id}`} className="btn btn-primary" style={{ width: '100%' }}>
+                  Aproveitar Oferta
+                </Link>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     </div>
