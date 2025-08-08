@@ -1,3 +1,4 @@
+// Componente de loading - exibe spinner animado durante carregamentos
 const Loading = ({ message = "Carregando..." }) => {
   return (
     <div style={{
@@ -8,6 +9,7 @@ const Loading = ({ message = "Carregando..." }) => {
       padding: '2rem',
       minHeight: '200px'
     }}>
+      {/* Spinner animado */}
       <div style={{
         width: '40px',
         height: '40px',
@@ -17,6 +19,7 @@ const Loading = ({ message = "Carregando..." }) => {
         animation: 'spin 1s linear infinite',
         marginBottom: '1rem'
       }}></div>
+      {/* Mensagem de carregamento */}
       <p style={{ color: 'var(--primary-color)' }}>{message}</p>
       <style jsx>{`
         @keyframes spin {

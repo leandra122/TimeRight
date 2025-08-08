@@ -1,10 +1,11 @@
+// Componente principal da aplicação - configura roteamento e layout geral
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './hooks/useAuth';
 import Navbar from './components/Navbar';
 import PrivateRoute from './routes/PrivateRoute';
 import AdminRoute from './routes/AdminRoute';
 
-// Pages
+// Importação de todas as páginas
 import Home from './pages/Home';
 import About from './pages/About';
 import Services from './pages/Services';
@@ -18,12 +19,18 @@ import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   return (
+    // Provider de autenticação envolve toda a aplicação
     <AuthProvider>
       <Router>
+        {/* Layout principal com header, main e footer */}
         <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+          {/* Barra de navegação */}
           <Navbar />
+          
+          {/* Conteúdo principal */}
           <main style={{ flex: 1 }}>
             <Routes>
+              {/* Rotas públicas */}
               <Route path="/" element={<Home />} />
               <Route path="/sobre" element={<About />} />
               <Route path="/servicos" element={<Services />} />
@@ -32,6 +39,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/cadastro" element={<Register />} />
               
+              {/* Rotas protegidas - requerem login */}
               <Route path="/agendamento" element={
                 <PrivateRoute>
                   <Booking />
@@ -44,6 +52,7 @@ function App() {
                 </PrivateRoute>
               } />
               
+              {/* Rota administrativa - apenas para admins */}
               <Route path="/admin" element={
                 <AdminRoute>
                   <AdminDashboard />
@@ -52,6 +61,7 @@ function App() {
             </Routes>
           </main>
           
+          {/* Rodapé */}
           <footer style={{ 
             backgroundColor: 'var(--primary-color)', 
             color: 'white', 

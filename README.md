@@ -146,7 +146,7 @@ src/
 - **Text**: #333333
 
 ### Tipografia
-- **Font Family**: Inter
+- **Font Family**: system-ui, Avenir, Helvetica, Arial, sans-serif
 - **Weights**: 300, 400, 500, 600, 700
 
 ### Componentes

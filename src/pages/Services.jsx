@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { servicesAPI } from '../api/services';
+import ServiceCard from '../components/ServiceCard';
 
 const Services = () => {
   const [services, setServices] = useState([]);
@@ -9,8 +10,70 @@ const Services = () => {
 
   const categories = ['all', 'Manicure', 'Pedicure', 'Alongamento', 'Skincare', 'Promoções'];
 
+  // Serviços mockados com dados completos
+  const mockServices = [
+    {
+      id: 1,
+      title: 'Manicure Simples',
+      price: '35,00',
+      description: 'Cuidados completos para suas unhas das mãos com esmaltação tradicional',
+      category: 'Manicure',
+      durationMin: 60,
+      image: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400&h=300&fit=crop'
+    },
+    {
+      id: 2,
+      title: 'Pedicure',
+      price: '40,00',
+      description: 'Relaxamento e beleza para seus pés com tratamento completo e hidratação',
+      category: 'Pedicure',
+      durationMin: 90,
+      image: 'https://images.unsplash.com/photo-1560750588-73207b1ef5b8?w=400&h=300&fit=crop'
+    },
+    {
+      id: 3,
+      title: 'Alongamento de Unha',
+      price: '120,00',
+      description: 'Unhas perfeitas e duradouras com técnicas modernas de alongamento em gel',
+      category: 'Alongamento',
+      durationMin: 120,
+      image: 'https://images.unsplash.com/photo-1610992015732-2449b76344bc?w=400&h=300&fit=crop'
+    },
+    {
+      id: 4,
+      title: 'Skincare para Pés',
+      price: '60,00',
+      description: 'Tratamento especializado para hidratação e rejuvenescimento da pele dos pés',
+      category: 'Skincare',
+      durationMin: 45,
+      image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop'
+    },
+    {
+      id: 5,
+      title: 'Skincare para Mãos',
+      price: '60,00',
+      description: 'Tratamento hidratante e rejuvenescedor para as mãos com produtos premium',
+      category: 'Skincare',
+      durationMin: 45,
+      image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=400&h=300&fit=crop'
+    },
+    {
+      id: 6,
+      title: 'Promoção: Mão + Pé',
+      price: '65,00',
+      description: 'Combo especial: manicure completa + pedicure com desconto exclusivo',
+      category: 'Promoções',
+      durationMin: 150,
+      image: 'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=400&h=300&fit=crop'
+    }
+  ];
+
   useEffect(() => {
-    fetchServices();
+    // Simula carregamento da API
+    setTimeout(() => {
+      setServices(mockServices);
+      setLoading(false);
+    }, 500);
   }, []);
 
   useEffect(() => {
@@ -21,17 +84,6 @@ const Services = () => {
     }
   }, [services, selectedCategory]);
 
-  const fetchServices = async () => {
-    try {
-      const response = await servicesAPI.getAll();
-      setServices(response.data);
-    } catch (error) {
-      console.error('Erro ao carregar serviços:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   if (loading) return <div className="container">Carregando...</div>;
 
   return (
@@ -40,7 +92,7 @@ const Services = () => {
         Nossos Serviços
       </h1>
 
-      {/* Category Filter */}
+      {/* Filtros de categoria */}
       <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
         {categories.map(category => (
           <button
@@ -61,23 +113,10 @@ const Services = () => {
         ))}
       </div>
 
-      {/* Services Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+      {/* Grid de cards de serviços */}
+      <div className="services-grid">
         {filteredServices.map(service => (
-          <div key={service.id} className="card">
-            <h3 style={{ color: 'var(--primary-color)', marginBottom: '1rem' }}>
-              {service.title}
-            </h3>
-            <p style={{ marginBottom: '1rem' }}>{service.description}</p>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontWeight: '600', color: 'var(--primary-color)' }}>
-                R$ {service.price}
-              </span>
-              <span style={{ color: '#666' }}>
-                {service.durationMin} min
-              </span>
-            </div>
-          </div>
+          <ServiceCard key={service.id} service={service} />
         ))}
       </div>
 

@@ -21,7 +21,17 @@ const Booking = () => {
 
   useEffect(() => {
     fetchServices();
-  }, []);
+    // Verifica se há serviço pré-selecionado via URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const serviceId = urlParams.get('service');
+    if (serviceId && services.length > 0) {
+      const preSelectedService = services.find(s => s.id === parseInt(serviceId));
+      if (preSelectedService) {
+        setSelectedService(preSelectedService);
+        setStep(2); // Pula para seleção de profissional
+      }
+    }
+  }, [services]);
 
   useEffect(() => {
     if (selectedService) {
@@ -41,6 +51,15 @@ const Booking = () => {
       setServices(response.data);
     } catch (error) {
       console.error('Erro ao carregar serviços:', error);
+      // Fallback para serviços mockados se API falhar
+      setServices([
+        { id: 1, title: 'Manicure Simples', price: '35,00', description: 'Cuidados completos para suas unhas', category: 'Manicure' },
+        { id: 2, title: 'Pedicure', price: '40,00', description: 'Relaxamento e beleza para seus pés', category: 'Pedicure' },
+        { id: 3, title: 'Alongamento', price: '120,00', description: 'Unhas perfeitas e duradouras', category: 'Alongamento' },
+        { id: 4, title: 'Skincare Pés', price: '60,00', description: 'Tratamento para pele dos pés', category: 'Skincare' },
+        { id: 5, title: 'Skincare Mãos', price: '60,00', description: 'Tratamento para pele das mãos', category: 'Skincare' },
+        { id: 6, title: 'Combo Mão + Pé', price: '65,00', description: 'Promoção especial', category: 'Promoções' }
+      ]);
     }
   };
 
