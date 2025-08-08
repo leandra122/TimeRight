@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "rebuild": "rm -rf node_modules dist && npm install && npm run build",
     "start": "vite preview",
     "test": "jest",
     "server": "node server.js",
