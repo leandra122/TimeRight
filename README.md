@@ -170,6 +170,7 @@ src/
 
 - `npm run dev` - Servidor de desenvolvimento
 - `npm run build` - Build para produção
+- `npm run rebuild` - Limpa e reconstrói o projeto
 - `npm run start` - Preview do build
 - `npm run server` - Servidor mock (JSON Server)
 - `npm run dev:full` - Frontend + Backend mock
