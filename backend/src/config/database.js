@@ -1,4 +1,5 @@
 const sqlite3 = require('sqlite3').verbose();
+const bcrypt = require('bcryptjs');
 const path = require('path');
 
 const dbPath = path.join(__dirname, '../../database.sqlite');
@@ -53,9 +54,15 @@ db.serialize(() => {
     FOREIGN KEY (professionalId) REFERENCES professionals (id)
   )`);
 
-  // Insert default admin user
+  // Insert default admin user (password: admin123)
+  const adminPassword = bcrypt.hashSync('admin123', 10);
   db.run(`INSERT OR IGNORE INTO users (name, email, passwordHash, role) 
-          VALUES ('Admin', 'admin@timeright.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin')`);
+          VALUES ('Admin', 'admin@timeright.com', ?, 'admin')`, [adminPassword]);
+  
+  // Insert default user (password: 123456)
+  const userPassword = bcrypt.hashSync('123456', 10);
+  db.run(`INSERT OR IGNORE INTO users (name, email, passwordHash, role) 
+          VALUES ('Maria Silva', 'maria@email.com', ?, 'user')`, [userPassword]);
   
   // Insert default services
   const services = [
