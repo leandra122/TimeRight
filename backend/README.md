@@ -1,88 +1,67 @@
-# TimeRight Backend API
+# TimeRight Backend - Sistema de Login e Cadastro
 
-Backend Node.js + Express + SQLite para sistema de agendamento de salão de beleza.
+Backend completo com autenticação JWT para o sistema TimeRight.
 
-## 🚀 Tecnologias
+## 🚀 Como usar
 
-- Node.js 18+
-- Express.js
-- SQLite3
-- JWT Authentication
-- bcryptjs
-- CORS
-
-## 📦 Instalação
-
+1. **Instalar dependências:**
 ```bash
 cd backend
 npm install
 ```
 
-## 🔧 Configuração
-
-1. Configure as variáveis de ambiente no `.env`:
-```
-PORT=5000
-JWT_SECRET=timeright_jwt_secret_key_2024
-NODE_ENV=development
-```
-
-## 🏃‍♂️ Executar
-
+2. **Iniciar servidor:**
 ```bash
-# Desenvolvimento
-npm run dev
-
-# Produção
 npm start
 ```
 
+3. **Servidor rodará em:** http://localhost:5000
+
+## 🔐 Credenciais de Teste
+
+- **Admin:** admin@timeright.com / admin123
+- **Usuário:** maria@email.com / 123456
+
+## 📡 Endpoints da API
+
+### Autenticação
+- `POST /api/auth/register` - Cadastro de usuário
+- `POST /api/auth/login` - Login
+- `GET /api/auth/me` - Dados do usuário logado
+
+### Saúde da API
+- `GET /api/health` - Status do servidor
+
+## 📝 Exemplo de Uso
+
+### Cadastro:
+```bash
+curl -X POST http://localhost:5000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"name":"João Silva","email":"joao@email.com","password":"123456"}'
+```
+
+### Login:
+```bash
+curl -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@timeright.com","password":"admin123"}'
+```
+
+## 🛠️ Tecnologias
+
+- Node.js + Express
+- SQLite3 (banco local)
+- JWT (autenticação)
+- bcryptjs (criptografia)
+- CORS (cross-origin)
+
 ## 📊 Banco de Dados
 
-SQLite com tabelas:
-- `users` - Usuários e admins
-- `services` - Serviços do salão
-- `professionals` - Profissionais
-- `bookings` - Agendamentos
-
-## 🔐 Autenticação
-
-- **Admin padrão**: admin@timeright.com / password
-- JWT token válido por 7 dias
-- Middleware de autenticação para rotas protegidas
-
-## 📡 API Endpoints
-
-### Auth
-- `POST /api/auth/register` - Cadastro
-- `POST /api/auth/login` - Login
-
-### Services
-- `GET /api/services` - Listar serviços
-- `POST /api/services` - Criar serviço (admin)
-- `PUT /api/services/:id` - Atualizar serviço (admin)
-- `DELETE /api/services/:id` - Deletar serviço (admin)
-
-### Professionals
-- `GET /api/professionals` - Listar profissionais
-- `GET /api/professionals/:id/availability` - Disponibilidade
-- `POST /api/professionals` - Criar profissional (admin)
-
-### Bookings
-- `POST /api/bookings` - Criar agendamento
-- `GET /api/bookings` - Agendamentos do usuário
-- `GET /api/bookings/admin` - Todos agendamentos (admin)
-- `PUT /api/bookings/:id/cancel` - Cancelar agendamento
-
-## 🚀 Deploy
-
-### Railway
-1. Conecte o repositório
-2. Configure variáveis de ambiente
-3. Deploy automático
-
-### Render
-1. Conecte o repositório
-2. Configure build command: `npm install`
-3. Configure start command: `npm start`
-4. Configure variáveis de ambiente
+SQLite com tabela `users`:
+- id (PRIMARY KEY)
+- name (TEXT)
+- email (UNIQUE)
+- password (HASH)
+- role (user/admin)
+- created_at (TIMESTAMP)

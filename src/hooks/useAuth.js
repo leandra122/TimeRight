@@ -12,39 +12,63 @@ export const AuthProvider = ({ children }) => {
 
   // Verifica se há usuário logado ao inicializar
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
-    if (token && userData) {
-      setUser(JSON.parse(userData));
-    }
-    setLoading(false);
+    const initializeAuth = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const response = await authAPI.validateToken();
+          if (response.data.success) {
+            setUser(response.data.user);
+          } else {
+            // Token inválido, limpar dados
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+          }
+        } catch (error) {
+          // Token inválido ou expirado
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+        }
+      }
+      setLoading(false);
+    };
+    
+    initializeAuth();
   }, []);
 
   // Função de login
   const login = async (credentials) => {
     const response = await authAPI.login(credentials);
-    const { token, user } = response.data;
-    // Salva token e dados do usuário
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
-    setUser(user);
-    return user;
+    if (response.data.success) {
+      const { token, user } = response.data;
+      // Salva token e dados do usuário
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      setUser(user);
+      return user;
+    } else {
+      throw new Error(response.data.message || 'Erro no login');
+    }
   };
 
   // Função de registro
   const register = async (userData) => {
     const response = await authAPI.register(userData);
-    const { token, user } = response.data;
-    // Salva token e dados do usuário
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
-    setUser(user);
-    return user;
+    if (response.data.success) {
+      const { token, user } = response.data;
+      // Salva token e dados do usuário
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      setUser(user);
+      return user;
+    } else {
+      throw new Error(response.data.message || 'Erro no cadastro');
+    }
   };
 
   // Função de logout
-  const logout = () => {
-    authAPI.logout();
+  const logout = async () => {
+    await authAPI.logout();
     setUser(null);
   };
 

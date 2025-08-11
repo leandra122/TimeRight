@@ -9,11 +9,5 @@ export const professionalsAPI = {
   getAvailability: (id, date) => apiClient.get(`/professionals/${id}/availability`, { params: { date } }),
   
   // Cria novo profissional (admin)
-  create: (professional) => apiClient.post('/professionals', professional),
-  
-  // Atualiza profissional existente (admin)
-  update: (id, professional) => apiClient.put(`/professionals/${id}`, professional),
-  
-  // Remove profissional (admin)
-  delete: (id) => apiClient.delete(`/professionals/${id}`)
+  create: (professional) => apiClient.post('/professionals', professional)
 };

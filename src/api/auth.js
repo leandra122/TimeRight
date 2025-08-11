@@ -8,9 +8,18 @@ export const authAPI = {
   // Registra novo usuário
   register: (userData) => apiClient.post('/auth/register', userData),
   
-  // Faz logout removendo dados do localStorage
-  logout: () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+  // Valida token e obtém dados do usuário
+  validateToken: () => apiClient.get('/auth/me'),
+  
+  // Faz logout removendo dados do localStorage e invalidando sessão
+  logout: async () => {
+    try {
+      await apiClient.post('/auth/logout');
+    } catch (error) {
+      console.error('Erro no logout:', error);
+    } finally {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    }
   }
 };

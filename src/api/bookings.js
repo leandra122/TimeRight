@@ -5,12 +5,9 @@ export const bookingsAPI = {
   // Cria novo agendamento
   create: (booking) => apiClient.post('/bookings', booking),
   
-  // Lista agendamentos de um usuário específico
-  getUserBookings: (userId) => apiClient.get('/bookings', { params: { userId } }),
+  // Lista agendamentos do usuário logado
+  getUserBookings: () => apiClient.get('/bookings'),
   
   // Lista todos os agendamentos (admin)
-  getAllBookings: () => apiClient.get('/admin/bookings'),
-  
-  // Cancela um agendamento
-  cancel: (id) => apiClient.put(`/bookings/${id}/cancel`)
+  getAllBookings: () => apiClient.get('/admin/bookings')
 };
