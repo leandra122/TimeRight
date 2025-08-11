@@ -9,7 +9,6 @@ const Footer = () => {
         <div className="footer-links">
           <Link to="/">Home</Link>
           <Link to="/servicos">Serviços</Link>
-          <Link to="/profissionais">Profissionais</Link>
           <Link to="/contato">Contato</Link>
         </div>
         

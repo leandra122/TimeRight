@@ -23,9 +23,7 @@ const Navbar = () => {
         {/* Menu de navegação */}
         <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
           <Link to="/" style={{ color: 'white', textDecoration: 'none' }}>Home</Link>
-          <Link to="/sobre" style={{ color: 'white', textDecoration: 'none' }}>Sobre</Link>
           <Link to="/servicos" style={{ color: 'white', textDecoration: 'none' }}>Serviços</Link>
-          <Link to="/profissionais" style={{ color: 'white', textDecoration: 'none' }}>Profissionais</Link>
           <Link to="/contato" style={{ color: 'white', textDecoration: 'none' }}>Contato</Link>
           
           {/* Menu condicional baseado no estado de autenticação */}
