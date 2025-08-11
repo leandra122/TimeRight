@@ -130,24 +130,7 @@ const Contact = () => {
             </div>
           </div>
 
-          {/* Map Placeholder */}
-          <div className="card">
-            <h3 style={{ color: 'var(--primary-color)', marginBottom: '1rem' }}>
-              Localização
-            </h3>
-            <div style={{
-              width: '100%',
-              height: '200px',
-              backgroundColor: '#f0f0f0',
-              borderRadius: 'var(--border-radius)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#666'
-            }}>
-              Mapa do Google Maps
-            </div>
-          </div>
+
         </div>
       </div>
     </div>
