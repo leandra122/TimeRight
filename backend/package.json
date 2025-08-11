@@ -1,7 +1,6 @@
 {
   "name": "timeright-backend",
   "version": "1.0.0",
-  "description": "Backend API for TimeRight beauty salon booking system",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
