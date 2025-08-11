@@ -24,7 +24,7 @@ const Footer = () => {
         
         {/* Copyright */}
         <div className="footer-copyright">
-          <p>&copy; 2024 La Belle Vie. Todos os direitos reservados.</p>
+          <p>&copy; 2024 TimeRight. Todos os direitos reservados.</p>
         </div>
       </div>
     </footer>

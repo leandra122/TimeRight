@@ -17,7 +17,7 @@ const Navbar = () => {
       <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         {/* Logo/Título do site */}
         <Link to="/" style={{ color: 'white', textDecoration: 'none', fontSize: '1.5rem', fontWeight: '600', fontFamily: 'Voga, serif' }}>
-          La Belle Vie
+          TimeRight
         </Link>
         
         {/* Menu de navegação */}

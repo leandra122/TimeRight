@@ -89,7 +89,7 @@ const Services = () => {
   return (
     <div className="container" style={{ padding: '2rem 0' }}>
       <h1 style={{ textAlign: 'center', marginBottom: '2rem', color: 'var(--primary-color)' }}>
-        Nossos Serviços
+        Nossos Serviços - TimeRight
       </h1>
 
       {/* Filtros de categoria */}

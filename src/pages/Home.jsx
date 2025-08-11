@@ -74,7 +74,7 @@ const Home = () => {
       <section className="hero-section">
         <div className="container">
           <div className="hero-content">
-            <h1>Sua beleza, nosso compromisso</h1>
+            <h1>Seu tempo, nossa prioridade</h1>
             <p>Agende seu horário com os melhores profissionais e viva uma nova experiência</p>
             <Link to="/agendamento" className="cta-button">
               Agende Agora
