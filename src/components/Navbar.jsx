@@ -16,7 +16,7 @@ const Navbar = () => {
     <nav style={{ backgroundColor: 'var(--primary-color)', padding: '1rem 0' }}>
       <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         {/* Logo/Título do site */}
-        <Link to="/" style={{ color: 'white', textDecoration: 'none', fontSize: '1.5rem', fontWeight: '600' }}>
+        <Link to="/" style={{ color: 'white', textDecoration: 'none', fontSize: '1.5rem', fontWeight: '600', fontFamily: 'Voga, serif' }}>
           La Belle Vie
         </Link>
         
