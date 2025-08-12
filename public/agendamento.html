@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendamento - TimeRight</title>
+    <link href="https://fonts.googleapis.com/css2?family=Audrey:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="/" class="logo">TimeRight</a>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/servicos.html">Serviços</a>
+                <a href="/sobre.html">Sobre</a>
+                <a href="/contato.html">Contato</a>
+                <div id="user-menu">
+                    <span id="user-name"></span>
+                    <a href="/perfil.html">Perfil</a>
+                    <button onclick="logout()">Sair</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="booking-page">
+        <div class="container">
+            <h2>Agendar Serviço</h2>
+            <div id="message" class="message"></div>
+            
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label for="service">Serviço:</label>
+                    <select id="service" name="service" required>
+                        <option value="">Selecione um serviço</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="professional">Profissional:</label>
+                    <select id="professional" name="professional" required>
+                        <option value="">Selecione um profissional</option>
+                        <option value="Ana Costa">Ana Costa</option>
+                        <option value="Carla Santos">Carla Santos</option>
+                        <option value="Juliana Lima">Juliana Lima</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="date">Data:</label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="time">Horário:</label>
+                    <select id="time" name="time" required>
+                        <option value="">Selecione um horário</option>
+                        <option value="09:00">09:00</option>
+                        <option value="10:00">10:00</option>
+                        <option value="11:00">11:00</option>
+                        <option value="14:00">14:00</option>
+                        <option value="15:00">15:00</option>
+                        <option value="16:00">16:00</option>
+                        <option value="17:00">17:00</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Confirmar Agendamento</button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        // Check authentication
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/user');
+                const data = await response.json();
+                
+                if (!data.success) {
+                    window.location.href = '/login.html';
+                    return;
+                }
+                
+                document.getElementById('user-name').textContent = data.user.name;
+                loadServices();
+            } catch (error) {
+                window.location.href = '/login.html';
+            }
+        }
+        
+        async function loadServices() {
+            try {
+                const response = await fetch('/api/services');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const serviceSelect = document.getElementById('service');
+                    data.data.forEach(service => {
+                        const option = document.createElement('option');
+                        option.value = service.id;
+                        option.textContent = `${service.title} - R$ ${service.price}`;
+                        serviceSelect.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Erro ao carregar serviços:', error);
+            }
+        }
+        
+        document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const service_id = document.getElementById('service').value;
+            const professional_name = document.getElementById('professional').value;
+            const booking_date = document.getElementById('date').value;
+            const booking_time = document.getElementById('time').value;
+            const messageDiv = document.getElementById('message');
+            
+            try {
+                const response = await fetch('/api/bookings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ service_id, professional_name, booking_date, booking_time })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    messageDiv.innerHTML = '<div class="success">Agendamento realizado com sucesso!</div>';
+                    document.getElementById('bookingForm').reset();
+                    setTimeout(() => {
+                        window.location.href = '/perfil.html';
+                    }, 2000);
+                } else {
+                    messageDiv.innerHTML = `<div class="error">${data.message}</div>`;
+                }
+            } catch (error) {
+                messageDiv.innerHTML = '<div class="error">Erro de conexão</div>';
+            }
+        });
+        
+        async function logout() {
+            try {
+                await fetch('/api/logout', { method: 'POST' });
+                window.location.href = '/';
+            } catch (error) {
+                window.location.href = '/';
+            }
+        }
+        
+        // Set minimum date to today
+        document.getElementById('date').min = new Date().toISOString().split('T')[0];
+        
+        checkAuth();
+    </script>
+</body>
+</html>

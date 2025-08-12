@@ -1,70 +1,34 @@
-// Componente principal da aplicação - configura roteamento e layout geral
-// Componente principal da aplicação - configura roteamento e layout geral
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './hooks/useAuth';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import PrivateRoute from './routes/PrivateRoute';
-import AdminRoute from './routes/AdminRoute';
-
-// Importação de todas as páginas
-import Home from './pages/Home';
-import About from './pages/About';
-import Services from './pages/Services';
-import Professionals from './pages/Professionals';
-import Booking from './pages/Booking';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Profile from './pages/Profile';
-import Contact from './pages/Contact';
-import AdminDashboard from './pages/AdminDashboard';
+import { AuthProvider } from './context/AuthContext.jsx';
+import Navbar from './components/Navbar.jsx';
+import PrivateRoute from './components/PrivateRoute.jsx';
+import Home from './pages/Home.jsx';
+import Login from './pages/Login.jsx';
+import Register from './pages/Register.jsx';
+import Dashboard from './pages/Dashboard.jsx';
+import './App.css';
 
 function App() {
   return (
-    // Provider de autenticação envolve toda a aplicação
     <AuthProvider>
       <Router>
-        {/* Layout principal com header, main e footer */}
-        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-          {/* Barra de navegação */}
+        <div className="App">
           <Navbar />
-          
-          {/* Conteúdo principal */}
-          <main style={{ flex: 1 }}>
+          <main>
             <Routes>
-              {/* Rotas públicas */}
               <Route path="/" element={<Home />} />
-              <Route path="/sobre" element={<About />} />
-              <Route path="/servicos" element={<Services />} />
-              <Route path="/profissionais" element={<Professionals />} />
-              <Route path="/contato" element={<Contact />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/cadastro" element={<Register />} />
-              
-              {/* Rotas protegidas - requerem login */}
-              <Route path="/agendamento" element={
-                <PrivateRoute>
-                  <Booking />
-                </PrivateRoute>
-              } />
-              
-              <Route path="/perfil" element={
-                <PrivateRoute>
-                  <Profile />
-                </PrivateRoute>
-              } />
-              
-              {/* Rota administrativa - apenas para admins */}
-              <Route path="/admin" element={
-                <AdminRoute>
-                  <AdminDashboard />
-                </AdminRoute>
-              } />
+              <Route path="/register" element={<Register />} />
+              <Route 
+                path="/dashboard" 
+                element={
+                  <PrivateRoute>
+                    <Dashboard />
+                  </PrivateRoute>
+                } 
+              />
             </Routes>
           </main>
-          
-          {/* Rodapé estilizado */}
-          <Footer />
         </div>
       </Router>
     </AuthProvider>

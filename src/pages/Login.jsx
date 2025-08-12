@@ -1,78 +1,78 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.jsx';
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, loading } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
 
     try {
       await login(formData);
-      navigate('/');
+      navigate('/dashboard');
     } catch (err) {
-      setError('Email ou senha inválidos');
-    } finally {
-      setLoading(false);
+      setError(err.message || 'Erro no login');
     }
   };
 
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
   return (
-    <div className="container" style={{ maxWidth: '400px', margin: '4rem auto' }}>
-      <div className="card">
-        <h2 style={{ textAlign: 'center', marginBottom: '2rem', color: 'var(--primary-color)' }}>
-          Login
-        </h2>
-        
-        {error && (
-          <div style={{ color: 'red', textAlign: 'center', marginBottom: '1rem' }}>
-            {error}
-          </div>
-        )}
+    <div className="auth-page">
+      <div className="container">
+        <div className="auth-form">
+          <h2>Login</h2>
+          
+          {error && <div className="error">{error}</div>}
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label">Email</label>
-            <input
-              type="email"
-              className="form-input"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              required
-            />
-          </div>
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label htmlFor="email">Email:</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-          <div className="form-group">
-            <label className="form-label">Senha</label>
-            <input
-              type="password"
-              className="form-input"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              required
-            />
-          </div>
+            <div className="form-group">
+              <label htmlFor="password">Senha:</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-          <button 
-            type="submit" 
-            className="btn btn-primary" 
-            style={{ width: '100%' }}
-            disabled={loading}
-          >
-            {loading ? 'Entrando...' : 'Entrar'}
-          </button>
-        </form>
+            <button 
+              type="submit" 
+              className="btn btn-primary"
+              disabled={loading}
+            >
+              {loading ? 'Entrando...' : 'Entrar'}
+            </button>
+          </form>
 
-        <p style={{ textAlign: 'center', marginTop: '1rem' }}>
-          Não tem conta? <Link to="/cadastro">Cadastre-se</Link>
-        </p>
+          <p className="auth-link">
+            Não tem conta? <Link to="/register">Cadastre-se</Link>
+          </p>
+        </div>
       </div>
     </div>
   );
