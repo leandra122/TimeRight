@@ -35,7 +35,6 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
-  font-family: 'Audrey', system-ui, Arial, sans-serif;
 }
 
 .navbar .container {
@@ -44,26 +43,32 @@ body {
   align-items: center;
 }
 
+.navbar,
+.navbar *,
+.logo,
+.nav-links,
+.nav-links a,
+.btn-logout {
+  font-family: 'Audrey', system-ui, Arial, sans-serif !important;
+}
+
 .logo {
   font-size: 1.5rem;
   font-weight: 600;
   color: #333;
   text-decoration: none;
-  font-family: 'Audrey', system-ui, Arial, sans-serif;
 }
 
 .nav-links {
   display: flex;
   gap: 2rem;
   align-items: center;
-  font-family: 'Audrey', system-ui, Arial, sans-serif;
 }
 
 .nav-links a {
   color: #333;
   text-decoration: none;
   transition: opacity 0.3s;
-  font-family: 'Audrey', system-ui, Arial, sans-serif;
 }
 
 .nav-links a:hover {
@@ -78,6 +83,7 @@ body {
   border-radius: var(--border-radius);
   cursor: pointer;
   transition: all 0.3s;
+  font-family: 'Audrey', system-ui, Arial, sans-serif !important;
 }
 
 .btn-logout:hover {
