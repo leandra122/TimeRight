@@ -1,12 +1,10 @@
-const { Category } = require('../models');
+const { data, nextId } = require('../data/mockData');
 
 class CategoryController {
   // Listar todas as categorias
   async index(req, res, next) {
     try {
-      const categories = await Category.findAll({
-        order: [['name', 'ASC']]
-      });
+      const categories = data.categories.sort((a, b) => a.name.localeCompare(b.name));
       res.json({ categories });
     } catch (error) {
       next(error);
@@ -17,7 +15,7 @@ class CategoryController {
   async show(req, res, next) {
     try {
       const { id } = req.params;
-      const category = await Category.findByPk(id);
+      const category = data.categories.find(c => c.id === parseInt(id));
       
       if (!category) {
         return res.status(404).json({ error: 'Categoria não encontrada' });
@@ -32,7 +30,12 @@ class CategoryController {
   // Criar nova categoria
   async store(req, res, next) {
     try {
-      const category = await Category.create(req.body);
+      const category = {
+        id: nextId.categories++,
+        ...req.body,
+        active: req.body.active !== undefined ? req.body.active : true
+      };
+      data.categories.push(category);
       res.status(201).json({ 
         message: 'Categoria criada com sucesso',
         category 
@@ -46,16 +49,16 @@ class CategoryController {
   async update(req, res, next) {
     try {
       const { id } = req.params;
-      const category = await Category.findByPk(id);
+      const categoryIndex = data.categories.findIndex(c => c.id === parseInt(id));
       
-      if (!category) {
+      if (categoryIndex === -1) {
         return res.status(404).json({ error: 'Categoria não encontrada' });
       }
 
-      await category.update(req.body);
+      data.categories[categoryIndex] = { ...data.categories[categoryIndex], ...req.body };
       res.json({ 
         message: 'Categoria atualizada com sucesso',
-        category 
+        category: data.categories[categoryIndex] 
       });
     } catch (error) {
       next(error);
@@ -66,13 +69,13 @@ class CategoryController {
   async destroy(req, res, next) {
     try {
       const { id } = req.params;
-      const category = await Category.findByPk(id);
+      const categoryIndex = data.categories.findIndex(c => c.id === parseInt(id));
       
-      if (!category) {
+      if (categoryIndex === -1) {
         return res.status(404).json({ error: 'Categoria não encontrada' });
       }
 
-      await category.destroy();
+      data.categories.splice(categoryIndex, 1);
       res.json({ message: 'Categoria excluída com sucesso' });
     } catch (error) {
       next(error);

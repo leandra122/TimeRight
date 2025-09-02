@@ -1,4 +1,4 @@
-const { Schedule, Professional } = require('../models');
+const { data, nextId } = require('../data/mockData');
 const emailService = require('../services/emailService');
 
 class ScheduleController {
@@ -6,19 +6,21 @@ class ScheduleController {
   async index(req, res, next) {
     try {
       const { professionalId, date, available } = req.query;
-      const where = {};
+      let schedules = data.schedules;
       
-      if (professionalId) where.professionalId = professionalId;
-      if (date) where.date = date;
-      if (available !== undefined) where.available = available === 'true';
+      if (professionalId) schedules = schedules.filter(s => s.professionalId === parseInt(professionalId));
+      if (date) schedules = schedules.filter(s => s.date === date);
+      if (available !== undefined) schedules = schedules.filter(s => s.available === (available === 'true'));
 
-      const schedules = await Schedule.findAll({
-        where,
-        include: [{ model: Professional, as: 'professional' }],
-        order: [['date', 'ASC'], ['startTime', 'ASC']]
+      const schedulesWithProfessional = schedules.map(s => ({
+        ...s,
+        professional: data.professionals.find(p => p.id === s.professionalId)
+      })).sort((a, b) => {
+        if (a.date !== b.date) return a.date.localeCompare(b.date);
+        return a.startTime.localeCompare(b.startTime);
       });
 
-      res.json({ schedules });
+      res.json({ schedules: schedulesWithProfessional });
     } catch (error) {
       next(error);
     }
@@ -28,15 +30,18 @@ class ScheduleController {
   async show(req, res, next) {
     try {
       const { id } = req.params;
-      const schedule = await Schedule.findByPk(id, {
-        include: [{ model: Professional, as: 'professional' }]
-      });
+      const schedule = data.schedules.find(s => s.id === parseInt(id));
       
       if (!schedule) {
         return res.status(404).json({ error: 'Horário não encontrado' });
       }
 
-      res.json({ schedule });
+      const scheduleWithProfessional = {
+        ...schedule,
+        professional: data.professionals.find(p => p.id === schedule.professionalId)
+      };
+
+      res.json({ schedule: scheduleWithProfessional });
     } catch (error) {
       next(error);
     }
@@ -45,10 +50,17 @@ class ScheduleController {
   // Criar novo horário
   async store(req, res, next) {
     try {
-      const schedule = await Schedule.create(req.body);
-      const scheduleWithProfessional = await Schedule.findByPk(schedule.id, {
-        include: [{ model: Professional, as: 'professional' }]
-      });
+      const schedule = {
+        id: nextId.schedules++,
+        ...req.body,
+        available: req.body.available !== undefined ? req.body.available : true
+      };
+      data.schedules.push(schedule);
+
+      const scheduleWithProfessional = {
+        ...schedule,
+        professional: data.professionals.find(p => p.id === schedule.professionalId)
+      };
 
       // Enviar notificação por email
       await emailService.sendNotification('schedule_created', scheduleWithProfessional);
@@ -66,16 +78,17 @@ class ScheduleController {
   async update(req, res, next) {
     try {
       const { id } = req.params;
-      const schedule = await Schedule.findByPk(id);
+      const scheduleIndex = data.schedules.findIndex(s => s.id === parseInt(id));
       
-      if (!schedule) {
+      if (scheduleIndex === -1) {
         return res.status(404).json({ error: 'Horário não encontrado' });
       }
 
-      await schedule.update(req.body);
-      const updatedSchedule = await Schedule.findByPk(id, {
-        include: [{ model: Professional, as: 'professional' }]
-      });
+      data.schedules[scheduleIndex] = { ...data.schedules[scheduleIndex], ...req.body };
+      const updatedSchedule = {
+        ...data.schedules[scheduleIndex],
+        professional: data.professionals.find(p => p.id === data.schedules[scheduleIndex].professionalId)
+      };
 
       // Enviar notificação por email
       await emailService.sendNotification('schedule_updated', updatedSchedule);
@@ -93,13 +106,13 @@ class ScheduleController {
   async destroy(req, res, next) {
     try {
       const { id } = req.params;
-      const schedule = await Schedule.findByPk(id);
+      const scheduleIndex = data.schedules.findIndex(s => s.id === parseInt(id));
       
-      if (!schedule) {
+      if (scheduleIndex === -1) {
         return res.status(404).json({ error: 'Horário não encontrado' });
       }
 
-      await schedule.destroy();
+      data.schedules.splice(scheduleIndex, 1);
       res.json({ message: 'Horário excluído com sucesso' });
     } catch (error) {
       next(error);

@@ -1,14 +1,14 @@
-const { Professional, Category } = require('../models');
+const { data, nextId } = require('../data/mockData');
 const emailService = require('../services/emailService');
 
 class ProfessionalController {
   // Listar todos os profissionais
   async index(req, res, next) {
     try {
-      const professionals = await Professional.findAll({
-        include: [{ model: Category, as: 'category' }],
-        order: [['name', 'ASC']]
-      });
+      const professionals = data.professionals.map(p => ({
+        ...p,
+        category: data.categories.find(c => c.id === p.categoryId)
+      })).sort((a, b) => a.name.localeCompare(b.name));
       res.json({ professionals });
     } catch (error) {
       next(error);
@@ -19,15 +19,18 @@ class ProfessionalController {
   async show(req, res, next) {
     try {
       const { id } = req.params;
-      const professional = await Professional.findByPk(id, {
-        include: [{ model: Category, as: 'category' }]
-      });
+      const professional = data.professionals.find(p => p.id === parseInt(id));
       
       if (!professional) {
         return res.status(404).json({ error: 'Profissional não encontrado' });
       }
 
-      res.json({ professional });
+      const professionalWithCategory = {
+        ...professional,
+        category: data.categories.find(c => c.id === professional.categoryId)
+      };
+
+      res.json({ professional: professionalWithCategory });
     } catch (error) {
       next(error);
     }
@@ -36,10 +39,17 @@ class ProfessionalController {
   // Criar novo profissional
   async store(req, res, next) {
     try {
-      const professional = await Professional.create(req.body);
-      const professionalWithCategory = await Professional.findByPk(professional.id, {
-        include: [{ model: Category, as: 'category' }]
-      });
+      const professional = {
+        id: nextId.professionals++,
+        ...req.body,
+        active: req.body.active !== undefined ? req.body.active : true
+      };
+      data.professionals.push(professional);
+      
+      const professionalWithCategory = {
+        ...professional,
+        category: data.categories.find(c => c.id === professional.categoryId)
+      };
       
       // Enviar notificação por email
       await emailService.sendNotification('professional_created', professionalWithCategory);
@@ -57,16 +67,17 @@ class ProfessionalController {
   async update(req, res, next) {
     try {
       const { id } = req.params;
-      const professional = await Professional.findByPk(id);
+      const professionalIndex = data.professionals.findIndex(p => p.id === parseInt(id));
       
-      if (!professional) {
+      if (professionalIndex === -1) {
         return res.status(404).json({ error: 'Profissional não encontrado' });
       }
 
-      await professional.update(req.body);
-      const updatedProfessional = await Professional.findByPk(id, {
-        include: [{ model: Category, as: 'category' }]
-      });
+      data.professionals[professionalIndex] = { ...data.professionals[professionalIndex], ...req.body };
+      const updatedProfessional = {
+        ...data.professionals[professionalIndex],
+        category: data.categories.find(c => c.id === data.professionals[professionalIndex].categoryId)
+      };
 
       // Enviar notificação por email
       await emailService.sendNotification('professional_updated', updatedProfessional);
@@ -84,13 +95,13 @@ class ProfessionalController {
   async destroy(req, res, next) {
     try {
       const { id } = req.params;
-      const professional = await Professional.findByPk(id);
+      const professionalIndex = data.professionals.findIndex(p => p.id === parseInt(id));
       
-      if (!professional) {
+      if (professionalIndex === -1) {
         return res.status(404).json({ error: 'Profissional não encontrado' });
       }
 
-      await professional.destroy();
+      data.professionals.splice(professionalIndex, 1);
       res.json({ message: 'Profissional excluído com sucesso' });
     } catch (error) {
       next(error);

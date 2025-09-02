@@ -1,13 +1,11 @@
-const { Promotion } = require('../models');
+const { data, nextId } = require('../data/mockData');
 const emailService = require('../services/emailService');
 
 class PromotionController {
   // Listar todas as promoções
   async index(req, res, next) {
     try {
-      const promotions = await Promotion.findAll({
-        order: [['createdAt', 'DESC']]
-      });
+      const promotions = [...data.promotions].sort((a, b) => b.id - a.id);
       res.json({ promotions });
     } catch (error) {
       next(error);
@@ -18,7 +16,7 @@ class PromotionController {
   async show(req, res, next) {
     try {
       const { id } = req.params;
-      const promotion = await Promotion.findByPk(id);
+      const promotion = data.promotions.find(p => p.id === parseInt(id));
       
       if (!promotion) {
         return res.status(404).json({ error: 'Promoção não encontrada' });
@@ -33,7 +31,12 @@ class PromotionController {
   // Criar nova promoção
   async store(req, res, next) {
     try {
-      const promotion = await Promotion.create(req.body);
+      const promotion = {
+        id: nextId.promotions++,
+        ...req.body,
+        active: req.body.active !== undefined ? req.body.active : true
+      };
+      data.promotions.push(promotion);
       
       // Enviar notificação por email
       await emailService.sendNotification('promotion_created', promotion);
@@ -51,20 +54,20 @@ class PromotionController {
   async update(req, res, next) {
     try {
       const { id } = req.params;
-      const promotion = await Promotion.findByPk(id);
+      const promotionIndex = data.promotions.findIndex(p => p.id === parseInt(id));
       
-      if (!promotion) {
+      if (promotionIndex === -1) {
         return res.status(404).json({ error: 'Promoção não encontrada' });
       }
 
-      await promotion.update(req.body);
+      data.promotions[promotionIndex] = { ...data.promotions[promotionIndex], ...req.body };
 
       // Enviar notificação por email
-      await emailService.sendNotification('promotion_updated', promotion);
+      await emailService.sendNotification('promotion_updated', data.promotions[promotionIndex]);
 
       res.json({ 
         message: 'Promoção atualizada com sucesso',
-        promotion 
+        promotion: data.promotions[promotionIndex] 
       });
     } catch (error) {
       next(error);
@@ -75,13 +78,13 @@ class PromotionController {
   async destroy(req, res, next) {
     try {
       const { id } = req.params;
-      const promotion = await Promotion.findByPk(id);
+      const promotionIndex = data.promotions.findIndex(p => p.id === parseInt(id));
       
-      if (!promotion) {
+      if (promotionIndex === -1) {
         return res.status(404).json({ error: 'Promoção não encontrada' });
       }
 
-      await promotion.destroy();
+      data.promotions.splice(promotionIndex, 1);
       res.json({ message: 'Promoção excluída com sucesso' });
     } catch (error) {
       next(error);

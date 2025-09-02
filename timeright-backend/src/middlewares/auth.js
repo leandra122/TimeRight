@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { Admin } = require('../models');
+const { data } = require('../data/mockData');
 
 const authMiddleware = async (req, res, next) => {
   try {
@@ -10,7 +10,7 @@ const authMiddleware = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const admin = await Admin.findByPk(decoded.id);
+    const admin = data.admins.find(a => a.id === decoded.id);
 
     if (!admin || !admin.active) {
       return res.status(401).json({ error: 'Token inválido ou usuário inativo' });

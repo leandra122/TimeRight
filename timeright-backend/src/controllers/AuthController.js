@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { Admin } = require('../models');
+const { data } = require('../data/mockData');
 
 class AuthController {
   // Login do administrador
@@ -9,7 +9,7 @@ class AuthController {
       const { email, password } = req.body;
 
       // Buscar admin por email
-      const admin = await Admin.findOne({ where: { email, active: true } });
+      const admin = data.admins.find(a => a.email === email && a.active);
       if (!admin) {
         return res.status(401).json({ error: 'Credenciais inválidas' });
       }
