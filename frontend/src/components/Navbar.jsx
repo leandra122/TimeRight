@@ -12,7 +12,7 @@ const Navbar = () => {
   }
 
   return (
-    <BSNavbar style={{background: 'linear-gradient(90deg, #fef0ef, #bee2ff)'}} expand="lg" className="shadow-sm">
+    <BSNavbar style={{background: 'linear-gradient(90deg, #fef0ef, #efdefb)'}} expand="lg" className="shadow-sm">
       <Container>
         <BSNavbar.Brand as={Link} to="/">
           La Belle Vie

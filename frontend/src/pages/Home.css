@@ -1,6 +1,6 @@
 /* Hero Section */
 .hero-section {
-  background: linear-gradient(135deg, #bee2ff 0%, #efdefb 50%, #fef0ef 100%);
+  background: linear-gradient(135deg, #fef0ef 0%, #bee2ff 50%, #efdefb 100%);
   background-size: cover;
   background-position: center;
   min-height: 100vh;
@@ -72,7 +72,7 @@
 
 /* Services Section */
 .services-section {
-  background: linear-gradient(135deg, #fef0ef 0%, #bee2ff 100%);
+  background: linear-gradient(135deg, #bee2ff 0%, #efdefb 100%);
 }
 
 .service-card {
@@ -95,7 +95,7 @@
 
 /* Professionals Section */
 .professionals-section {
-  background: linear-gradient(135deg, #efdefb 0%, #a4d7bd 100%);
+  background: linear-gradient(135deg, #a4d7bd 0%, #fef0ef 100%);
 }
 
 .professional-card {
@@ -122,7 +122,7 @@
 
 /* Promotions Section */
 .promotions-section {
-  background: linear-gradient(135deg, #ffd1d4 0%, #fccfce 100%);
+  background: linear-gradient(135deg, #ffd1d4 0%, #efdefb 100%);
 }
 
 .promotion-card {
@@ -139,7 +139,7 @@
 }
 
 .promotion-badge {
-  background: linear-gradient(45deg, #ffd1d4, #fccfce);
+  background: linear-gradient(45deg, #ffd1d4, #bee2ff);
   color: #333333;
   padding: 8px 20px;
   border-radius: 25px;
