@@ -17,9 +17,6 @@ const Home = () => {
               <p className="hero-subtitle">
                 Agende seu horário com os melhores profissionais e viva uma nova experiência
               </p>
-              <Button className="cta-button" size="lg">
-                Agende Agora
-              </Button>
             </Col>
           </Row>
         </Container>
