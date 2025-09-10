@@ -31,4 +31,8 @@ export const professionalsAPI = {
   delete: (id) => api.delete(`/professionals/${id}`)
 }
 
+export const dashboardAPI = {
+  getStats: () => api.get('/dashboard/stats')
+}
+
 export default api

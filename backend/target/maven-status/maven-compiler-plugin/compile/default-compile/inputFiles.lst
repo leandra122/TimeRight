@@ -15,4 +15,5 @@
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/entity/Professional.java
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/dto/LoginResponse.java
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/repository/ProfessionalRepository.java
+/workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/controller/DashboardController.java
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/dto/LoginRequest.java

@@ -9,6 +9,7 @@ com/alimentandoofuturo/controller/AuthController$ErrorResponse.class
 com/alimentandoofuturo/config/DataInitializer.class
 com/alimentandoofuturo/entity/Admin.class
 com/alimentandoofuturo/dto/LoginRequest.class
+com/alimentandoofuturo/controller/DashboardController.class
 com/alimentandoofuturo/controller/ProfessionalController.class
 com/alimentandoofuturo/controller/AuthController.class
 com/alimentandoofuturo/config/CorsConfig.class
