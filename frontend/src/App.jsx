@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './hooks/useAuth'
 import Navbar from './components/Navbar'
+import Footer from './components/Footer'
 import Home from './pages/Home'
 import About from './pages/About'
 import Services from './pages/Services'
@@ -59,6 +60,7 @@ function App() {
               </ProtectedRoute>
             } />
           </Routes>
+          <Footer />
         </div>
       </Router>
     </AuthProvider>

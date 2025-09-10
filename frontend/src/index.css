@@ -1,7 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
 :root {
-  --primary-color: #153360;
-  --secondary-color: #ffffff;
+  --primary-color: #fef0ef;
+  --secondary-color: #bee2ff;
+  --accent-color: #efdefb;
+  --success-color: #a4d7bd;
+  --danger-color: #ffd1d4;
+  --warning-color: #fccfce;
   --text-color: #333333;
+  --light-gray: #f8f9fa;
+  --border-color: #e9ecef;
 }
 
 * {
@@ -11,48 +19,56 @@
 }
 
 body {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+  color: var(--text-color);
+  background-color: var(--secondary-color);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
   color: var(--text-color);
 }
 
 .btn-primary {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+  color: var(--text-color);
 }
 
 .btn-primary:hover {
-  background-color: #0f2749;
-  border-color: #0f2749;
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
 }
 
-.navbar-brand {
-  color: var(--primary-color) !important;
-  font-weight: 600;
+.text-primary {
+  color: var(--secondary-color) !important;
 }
 
-.hero-section {
-  background: linear-gradient(135deg, var(--primary-color), #1e4a7a);
-  color: white;
-  padding: 100px 0;
+.bg-primary {
+  background-color: var(--secondary-color) !important;
 }
 
-.card {
-  border: none;
-  box-shadow: 0 2px 8px rgba(21, 51, 96, 0.1);
-  border-radius: 8px;
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
 }
 
-.admin-sidebar {
-  background-color: var(--primary-color);
-  min-height: 100vh;
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
 }
 
-.admin-sidebar .nav-link {
-  color: white;
-  padding: 15px 20px;
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
 }
 
-.admin-sidebar .nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: white;
+::-webkit-scrollbar-thumb {
+  background: var(--secondary-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-color);
 }

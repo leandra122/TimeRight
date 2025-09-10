@@ -40,8 +40,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/login").permitAll()
                 .requestMatchers("/health").permitAll()
                 .requestMatchers("/").permitAll()
-                .requestMatchers("/api/categories").permitAll()
-                .requestMatchers("/api/professionals").permitAll()
+                .requestMatchers("/api/categories/**").permitAll()
+                .requestMatchers("/api/professionals/**").permitAll()
                 .anyRequest().authenticated()
             );
         
