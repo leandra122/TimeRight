@@ -50,8 +50,9 @@
 
 ## 🚀 Como Usar
 
-1. Execute `labellevie_complete.sql` para criar tabelas e dados
+1. Execute apenas `labellevie_complete.sql` no SQL Server
 2. Configure a conexão no `application.yml`
+3. Inicie o backend Spring Boot
 
 ## 🔧 Configuração
 
