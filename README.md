@@ -1,197 +1,219 @@
-# La Belle Vie - Salão de Beleza
+# La Belle Vie - Sistema Completo de Salão de Beleza
 
-Site institucional e funcional de agendamento online para salões de beleza, desenvolvido em React com Vite.
-
-## 🚀 Funcionalidades
-
-- **Sistema de Agendamento**: Seleção de serviço → profissional → data/horário → confirmação
-- **Autenticação**: Login e cadastro para clientes e administradores
-- **Dashboard Admin**: CRUD para serviços, profissionais e visualização de agendamentos
-- **Perfil do Usuário**: Histórico de agendamentos e gerenciamento de dados
-- **Design Responsivo**: Otimizado para desktop e mobile
-- **Paleta de Cores**: Azul-marinho (#153360) e branco (#FFFFFF)
-
-## 📱 Páginas
-
-1. **Home** - Landing page com hero section e CTAs
-2. **Sobre** - Informações sobre o salão
-3. **Serviços** - Lista de serviços com filtros por categoria
-4. **Profissionais** - Lista de profissionais com especialidades
-5. **Agendamento** - Sistema de booking em 4 etapas
-6. **Login/Cadastro** - Autenticação de usuários
-7. **Dashboard Admin** - Painel administrativo completo
-8. **Perfil** - Área do usuário com histórico
-9. **Contato** - Formulário de contato e informações
-
-## 🛠️ Tecnologias
-
-- **Frontend**: React 18 + Vite
-- **Roteamento**: React Router DOM
-- **HTTP Client**: Axios
-- **Datas**: Day.js
-- **Estilização**: CSS personalizado com variáveis
-- **Mock Server**: JSON Server (desenvolvimento)
-- **Testes**: Jest + React Testing Library
-
-## 📦 Instalação
-
-1. Clone o repositório:
-```bash
-git clone <repository-url>
-cd La-Belle-Vie
-```
-
-2. Instale as dependências:
-```bash
-npm install
-```
-
-3. Configure as variáveis de ambiente:
-```bash
-cp .env.example .env
-```
-
-4. Inicie o servidor de desenvolvimento:
-```bash
-# Inicia apenas o frontend
-npm run dev
-
-# Inicia frontend + backend mock
-npm run dev:full
-```
-
-## 🚀 Deploy no Vercel
-
-1. **Build do projeto**:
-```bash
-npm run build
-```
-
-2. **Deploy via Vercel CLI**:
-```bash
-npm i -g vercel
-vercel --prod
-```
-
-3. **Configurar variáveis de ambiente no Vercel**:
-   - `VITE_API_BASE_URL`: URL da API de produção
-
-4. **Deploy via GitHub**:
-   - Conecte o repositório ao Vercel
-   - Configure as variáveis de ambiente
-   - Deploy automático a cada push
-
-## 🧪 Testes
-
-```bash
-# Executar testes
-npm test
-
-# Executar testes em modo watch
-npm test -- --watch
-```
+Plataforma completa para gerenciamento de salão de beleza com sistema administrativo e portal do cliente.
 
 ## 📁 Estrutura do Projeto
 
 ```
-src/
-├── api/           # Configuração Axios e endpoints
-├── assets/        # Imagens e recursos estáticos
-├── components/    # Componentes reutilizáveis
-├── hooks/         # Custom hooks (useAuth)
-├── pages/         # Páginas da aplicação
-├── routes/        # Componentes de rota (PrivateRoute, AdminRoute)
-├── utils/         # Funções utilitárias
-└── __tests__/     # Testes unitários
+La-Belle-Vie/
+├── frontend/          # React + Vite (localhost:5173)
+│   ├── src/
+│   ├── public/
+│   ├── package.json
+│   └── vite.config.js
+└── backend/           # Spring Boot Java (localhost:8080)
+    ├── src/main/java/
+    ├── src/main/resources/
+    └── pom.xml
 ```
 
-## 🔐 Autenticação
+## 🎨 Frontend (React + Vite)
 
-### Usuários de Teste:
-- **Admin**: admin@labellevie.com / admin123
-- **Cliente**: maria@email.com / 123456
+**Porta:** `localhost:5173`
 
-### Fluxo de Autenticação:
-1. Login/Cadastro via formulário
-2. JWT token armazenado no localStorage
-3. Interceptor Axios adiciona token automaticamente
-4. Rotas protegidas verificam autenticação
+### Executar Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-## 📊 API Endpoints
+### Funcionalidades
+- ✅ Sistema de autenticação admin
+- ✅ Dashboard administrativo completo
+- ✅ CRUD de categorias de serviços
+- ✅ Gerenciamento de profissionais
+- ✅ Sistema de promoções
+- ✅ Controle de agendas
+- ✅ Portal institucional
+- ✅ Design responsivo Bootstrap
 
-### Autenticação
-- `POST /auth/login` - Login do usuário
-- `POST /auth/register` - Cadastro de usuário
+## ⚙️ Backend (Spring Boot Java)
 
-### Serviços
-- `GET /services` - Listar serviços
-- `POST /services` - Criar serviço (admin)
+**Porta:** `localhost:8080`
 
-### Profissionais
-- `GET /professionals` - Listar profissionais
-- `GET /professionals/:id/availability` - Disponibilidade
-- `POST /professionals` - Criar profissional (admin)
+### Executar Backend
+```bash
+cd backend
+mvn spring-boot:run
+```
 
-### Agendamentos
-- `POST /bookings` - Criar agendamento
-- `GET /bookings` - Listar agendamentos do usuário
-- `GET /admin/bookings` - Listar todos (admin)
-- `PUT /bookings/:id/cancel` - Cancelar agendamento
+### API Endpoints
 
-## 🎨 Design System
+#### Autenticação
+- `POST /api/auth/login` - Login administrativo
+- `GET /api/auth/me` - Dados do admin logado
 
-### Cores
-- **Primary**: #153360 (Azul-marinho)
-- **Secondary**: #FFFFFF (Branco)
-- **Text**: #333333
+#### Categorias
+- `GET /api/categories` - Listar categorias
+- `POST /api/categories` - Criar categoria
+- `PUT /api/categories/{id}` - Atualizar categoria
+- `DELETE /api/categories/{id}` - Excluir categoria
 
-### Tipografia
-- **Font Family**: system-ui, Avenir, Helvetica, Arial, sans-serif
-- **Weights**: 300, 400, 500, 600, 700
+#### Profissionais
+- `GET /api/professionals` - Listar profissionais
+- `POST /api/professionals` - Criar profissional
+- `PUT /api/professionals/{id}` - Atualizar profissional
+- `DELETE /api/professionals/{id}` - Excluir profissional
 
-### Componentes
-- **Border Radius**: 8px
-- **Shadow**: 0 2px 8px rgba(21, 51, 96, 0.1)
-- **Breakpoints**: Mobile-first design
+#### Promoções
+- `GET /api/promotions` - Listar promoções
+- `POST /api/promotions` - Criar promoção
+- `PUT /api/promotions/{id}` - Atualizar promoção
+- `DELETE /api/promotions/{id}` - Excluir promoção
 
-## ✅ Checklist de QA
+#### Agendas
+- `GET /api/schedules` - Listar horários
+- `POST /api/schedules` - Criar horário
+- `PUT /api/schedules/{id}` - Atualizar horário
+- `DELETE /api/schedules/{id}` - Excluir horário
 
-- [ ] Build `npm run build` gera bundle sem erros
-- [ ] Navegação entre todas as páginas funciona
-- [ ] Login/Cadastro funcionam corretamente
-- [ ] Sistema de agendamento completo
-- [ ] Dashboard admin operacional
-- [ ] Layout responsivo em mobile e desktop
-- [ ] Paleta de cores aplicada consistentemente
-- [ ] Formulários com validação
-- [ ] Autenticação e autorização funcionando
+## 🗄️ Banco de Dados
 
-## 🔧 Scripts Disponíveis
+- **H2 Database** (desenvolvimento)
+- **JPA/Hibernate**
+- **Configuração:** `application.yml`
+- **Console H2:** `http://localhost:8080/h2-console`
 
-- `npm run dev` - Servidor de desenvolvimento
-- `npm run build` - Build para produção
-- `npm run rebuild` - Limpa e reconstrói o projeto
-- `npm run start` - Preview do build
-- `npm run server` - Servidor mock (JSON Server)
-- `npm run dev:full` - Frontend + Backend mock
-- `npm test` - Executar testes
+### Credenciais H2
+- **URL:** `jdbc:h2:mem:labellevie`
+- **User:** `sa`
+- **Password:** (vazio)
 
-## 📝 Próximos Passos
+## 🔐 Credenciais de Acesso
 
-1. **Integração com Backend Real**
-   - Substituir JSON Server por API real
-   - Implementar autenticação JWT completa
-   - Adicionar validações server-side
+### Admin Padrão
+- **Email:** `admin@labellevie.com`
+- **Senha:** `admin123`
 
-2. **Melhorias de UX**
-   - Notificações push
-   - Integração com calendário
-   - Sistema de avaliações
+## 🛠️ Tecnologias
 
-3. **Funcionalidades Avançadas**
-   - Pagamento online
-   - Notificações por email/SMS
-   - Relatórios avançados
+### Frontend
+- **React 18**
+- **Vite 4**
+- **Bootstrap 5**
+- **React Router DOM**
+- **React Bootstrap**
+- **Axios**
+
+### Backend
+- **Spring Boot 3.2**
+- **Spring Data JPA**
+- **Spring Security**
+- **JWT Authentication**
+- **H2 Database**
+- **Maven**
+- **Swagger/OpenAPI**
+
+## 🚀 Deploy
+
+### Frontend
+- **Vercel** (configurado)
+- **Build:** `npm run build`
+- **Porta produção:** Configurável
+
+### Backend
+- **Heroku/AWS**
+- **Build:** `mvn clean package`
+- **JAR:** `target/timeright-backend-1.0.0.jar`
+
+## 📋 Funcionalidades Implementadas
+
+### ✅ Sistema Administrativo
+- Login seguro com JWT
+- Dashboard com métricas
+- CRUD completo de categorias
+- Gerenciamento de profissionais
+- Sistema de promoções
+- Controle de horários/agendas
+
+### ✅ Portal Institucional
+- Página inicial atrativa
+- Sobre o salão
+- Lista de serviços
+- Equipe de profissionais
+- Formulário de contato
+
+### ✅ Segurança
+- Autenticação JWT
+- Rotas protegidas
+- Criptografia de senhas
+- CORS configurado
+- Validação de dados
+
+## 🎯 Paleta de Cores
+
+- **Primary:** `#153360` (Azul-marinho)
+- **Secondary:** `#FFFFFF` (Branco)
+- **Text:** `#333333` (Cinza escuro)
+
+## 📱 Design Responsivo
+
+- Mobile-first approach
+- Bootstrap 5 components
+- Layout adaptativo
+- Navegação otimizada
+
+## 🔧 Configuração de Desenvolvimento
+
+### Variáveis de Ambiente
+
+#### Frontend (.env)
+```
+VITE_API_BASE_URL=http://localhost:8080/api
+```
+
+#### Backend (application.yml)
+```yaml
+server:
+  port: 8080
+jwt:
+  secret: labellevie_super_secret_jwt_key_2024
+  expiration: 86400000
+```
+
+## 📖 Documentação da API
+
+- **Swagger UI:** `http://localhost:8080/swagger-ui.html`
+- **OpenAPI Docs:** `http://localhost:8080/v3/api-docs`
+
+## 🧪 Testes
+
+### Frontend
+```bash
+cd frontend
+npm test
+```
+
+### Backend
+```bash
+cd backend
+mvn test
+```
+
+## 📦 Build para Produção
+
+### Frontend
+```bash
+cd frontend
+npm run build
+```
+
+### Backend
+```bash
+cd backend
+mvn clean package
+```
 
 ## 🤝 Contribuição
 
@@ -204,3 +226,7 @@ src/
 ## 📄 Licença
 
 Este projeto está sob a licença MIT.
+
+---
+
+**La Belle Vie** - Sistema completo de gerenciamento para salões de beleza 💄✨
