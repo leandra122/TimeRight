@@ -1,0 +1,12 @@
+/workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/AlimentandoOFuturoApplication.java
+/workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/controller/AuthController.java
+/workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/controller/HomeController.java
+/workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/service/AdminService.java
+/workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/dto/LoginResponse.java
+/workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/security/JwtUtil.java
+/workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/config/SecurityConfig.java
+/workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/entity/Admin.java
+/workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/repository/AdminRepository.java
+/workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/config/DataInitializer.java
+/workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/config/CorsConfig.java
+/workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/dto/LoginRequest.java

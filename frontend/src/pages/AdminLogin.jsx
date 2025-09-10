@@ -22,12 +22,11 @@ const AdminLogin = () => {
     setLoading(true)
     setError('')
 
-    const result = await login(formData)
-    
-    if (result.success) {
+    try {
+      await login(formData)
       navigate('/admin')
-    } else {
-      setError(result.error)
+    } catch (error) {
+      setError(error.message || 'Erro no login')
     }
     
     setLoading(false)
@@ -78,7 +77,7 @@ const AdminLogin = () => {
               
               <div className="text-center mt-3">
                 <small className="text-muted">
-                  Credenciais: admin@timeright.com / admin123
+                  Credenciais: admin@labellevie.com / admin123
                 </small>
               </div>
             </Card.Body>

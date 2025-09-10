@@ -12,20 +12,14 @@ export const AuthProvider = ({ children }) => {
 
   // Verifica se há usuário logado ao inicializar
   useEffect(() => {
-    const initializeAuth = async () => {
+    const initializeAuth = () => {
       const token = localStorage.getItem('token');
-      if (token) {
+      const userData = localStorage.getItem('user');
+      
+      if (token && userData) {
         try {
-          const response = await authAPI.validateToken();
-          if (response.data.success) {
-            setUser(response.data.user);
-          } else {
-            // Token inválido, limpar dados
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-          }
+          setUser(JSON.parse(userData));
         } catch (error) {
-          // Token inválido ou expirado
           localStorage.removeItem('token');
           localStorage.removeItem('user');
         }
@@ -39,15 +33,15 @@ export const AuthProvider = ({ children }) => {
   // Função de login
   const login = async (credentials) => {
     const response = await authAPI.login(credentials);
-    if (response.data.success) {
-      const { token, user } = response.data;
+    if (response.data.token) {
+      const { token, admin } = response.data;
       // Salva token e dados do usuário
       localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-      setUser(user);
-      return user;
+      localStorage.setItem('user', JSON.stringify(admin));
+      setUser(admin);
+      return admin;
     } else {
-      throw new Error(response.data.message || 'Erro no login');
+      throw new Error(response.data.error || 'Erro no login');
     }
   };
 
@@ -67,8 +61,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Função de logout
-  const logout = async () => {
-    await authAPI.logout();
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setUser(null);
   };
 

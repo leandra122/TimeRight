@@ -12,13 +12,13 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.labellevie</groupId>
-    <artifactId>labellevie-backend</artifactId>
+    <groupId>com.alimentandoofuturo</groupId>
+    <artifactId>alimentandoofuturo-backend</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>La Belle Vie Backend</name>
-    <description>Backend para sistema de salão de beleza</description>
+    <name>Alimentando O Futuro Backend</name>
+    <description>Backend para sistema de agricultura urbana</description>
 
     <properties>
         <java.version>17</java.version>
@@ -64,8 +64,8 @@
         </dependency>
 
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>mssql-jdbc</artifactId>
             <scope>runtime</scope>
         </dependency>
 

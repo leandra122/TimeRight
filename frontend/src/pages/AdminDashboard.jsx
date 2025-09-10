@@ -2,14 +2,14 @@ import { Container, Row, Col, Card } from 'react-bootstrap'
 import { useAuth } from '../hooks/useAuth'
 
 const AdminDashboard = () => {
-  const { admin } = useAuth()
+  const { user } = useAuth()
 
   return (
     <Container className="py-4">
       <Row>
         <Col lg={12}>
           <h1 className="mb-4">Dashboard Administrativo</h1>
-          <p className="text-muted">Bem-vindo, {admin?.name}!</p>
+          <p className="text-muted">Bem-vindo, {user?.name}!</p>
         </Col>
       </Row>
       

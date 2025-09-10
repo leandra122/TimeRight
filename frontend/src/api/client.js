@@ -1,37 +1,34 @@
-// Configuração centralizada do cliente HTTP Axios
-import axios from 'axios';
+import axios from 'axios'
 
-// URL base da API obtida das variáveis de ambiente
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'
 
-// Criação da instância do Axios com configurações padrão
-const apiClient = axios.create({
+const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
-  },
-});
+    'Content-Type': 'application/json'
+  }
+})
 
-// Interceptor de requisição: adiciona token JWT automaticamente
-apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token')
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    config.headers.Authorization = `Bearer ${token}`
   }
-  return config;
-});
+  return config
+})
 
-// Interceptor de resposta: trata erros de autenticação
-apiClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    // Se token inválido, remove e redireciona para login
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
+export const categoriesAPI = {
+  getAll: () => api.get('/categories'),
+  create: (data) => api.post('/categories', data),
+  update: (id, data) => api.put(`/categories/${id}`, data),
+  delete: (id) => api.delete(`/categories/${id}`)
+}
 
-export default apiClient;
+export const professionalsAPI = {
+  getAll: () => api.get('/professionals'),
+  create: (data) => api.post('/professionals', data),
+  update: (id, data) => api.put(`/professionals/${id}`, data),
+  delete: (id) => api.delete(`/professionals/${id}`)
+}
+
+export default api

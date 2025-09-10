@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 
 const Navbar = () => {
-  const { admin, logout } = useAuth()
+  const { user, logout } = useAuth()
   const navigate = useNavigate()
 
   const handleLogout = () => {
@@ -30,8 +30,8 @@ const Navbar = () => {
           </Nav>
           
           <Nav>
-            {admin ? (
-              <NavDropdown title={`Admin: ${admin.name}`} id="admin-dropdown">
+            {user ? (
+              <NavDropdown title={`Admin: ${user.name}`} id="admin-dropdown">
                 <NavDropdown.Item as={Link} to="/admin">Dashboard</NavDropdown.Item>
                 <NavDropdown.Item as={Link} to="/admin/categorias">Categorias</NavDropdown.Item>
                 <NavDropdown.Item as={Link} to="/admin/profissionais">Profissionais</NavDropdown.Item>
@@ -41,7 +41,7 @@ const Navbar = () => {
                 <NavDropdown.Item onClick={handleLogout}>Sair</NavDropdown.Item>
               </NavDropdown>
             ) : (
-              <Nav.Link as={Link} to="/admin/login">Admin</Nav.Link>
+              <Nav.Link as={Link} to="/login">Admin</Nav.Link>
             )}
           </Nav>
         </BSNavbar.Collapse>

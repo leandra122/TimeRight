@@ -17,7 +17,12 @@ import ProtectedRoute from './components/ProtectedRoute'
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <Router
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true
+        }}
+      >
         <div className="App">
           <Navbar />
           <Routes>
@@ -26,6 +31,7 @@ function App() {
             <Route path="/servicos" element={<Services />} />
             <Route path="/profissionais" element={<Professionals />} />
             <Route path="/contato" element={<Contact />} />
+            <Route path="/login" element={<AdminLogin />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={
               <ProtectedRoute>

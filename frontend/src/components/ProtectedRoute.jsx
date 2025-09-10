@@ -3,7 +3,7 @@ import { useAuth } from '../hooks/useAuth'
 import { Spinner } from 'react-bootstrap'
 
 const ProtectedRoute = ({ children }) => {
-  const { admin, loading } = useAuth()
+  const { user, loading } = useAuth()
 
   if (loading) {
     return (
@@ -13,8 +13,8 @@ const ProtectedRoute = ({ children }) => {
     )
   }
 
-  if (!admin) {
-    return <Navigate to="/admin/login" replace />
+  if (!user) {
+    return <Navigate to="/login" replace />
   }
 
   return children
