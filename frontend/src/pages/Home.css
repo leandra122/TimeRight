@@ -1,6 +1,7 @@
 .hero-carousel-section {
   height: 100vh;
   overflow: hidden;
+  position: relative;
 }
 
 .hero-carousel {
@@ -10,6 +11,9 @@
 .carousel-image {
   height: 100vh;
   width: 100%;
+  background-size: cover;
+  background-position: center;
+  position: relative;
 }
 
 .carousel-overlay {
@@ -18,7 +22,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(34, 139, 34, 0.7) 0%, rgba(0, 100, 0, 0.6) 100%);
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.7) 0%, rgba(168, 85, 247, 0.6) 100%);
   z-index: 1;
 }
 
@@ -35,42 +39,101 @@
 }
 
 .welcome-animation {
-  animation: fadeInUp 1.5s ease-out;
+  animation: fadeInUp 1.2s ease-out;
+  text-align: center;
 }
 
 .animated-title {
-  font-size: 3.5rem;
-  font-weight: 700;
+  font-size: 4rem;
+  font-weight: 800;
   color: white;
   margin-bottom: 1.5rem;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   animation: slideInDown 1s ease-out;
+  letter-spacing: -0.03em;
+  font-family: 'Playfair Display', serif;
 }
 
 .animated-subtitle {
   font-size: 1.4rem;
   color: rgba(255, 255, 255, 0.95);
-  margin-bottom: 2rem;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  margin-bottom: 2.5rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   animation: slideInUp 1s ease-out 0.3s both;
+  font-weight: 400;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  font-family: 'Playfair Display', serif;
 }
 
 .hero-buttons {
   animation: fadeIn 1s ease-out 0.6s both;
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
-.feature-icon img {
+.feature-section {
+  padding: 80px 0;
+  background: linear-gradient(180deg, var(--light-gray) 0%, var(--white) 100%);
+}
+
+.feature-card {
+  text-align: center;
+  padding: 40px 20px;
+  border-radius: 20px;
+  background: var(--white);
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.feature-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg);
+}
+
+.feature-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 24px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: var(--shadow);
   transition: transform 0.3s ease;
 }
 
-.feature-icon img:hover {
+.feature-icon:hover {
   transform: scale(1.1);
+}
+
+.feature-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.feature-card h4 {
+  color: var(--text-dark);
+  font-weight: 700;
+  margin-bottom: 16px;
+  font-size: 1.4rem;
+  font-family: 'Playfair Display', serif;
+  letter-spacing: -0.01em;
+}
+
+.feature-card p {
+  color: var(--dark-gray);
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(40px);
   }
   to {
     opacity: 1;
@@ -81,7 +144,7 @@
 @keyframes slideInDown {
   from {
     opacity: 0;
-    transform: translateY(-50px);
+    transform: translateY(-60px);
   }
   to {
     opacity: 1;
@@ -92,7 +155,7 @@
 @keyframes slideInUp {
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(40px);
   }
   to {
     opacity: 1;
@@ -115,12 +178,22 @@
   }
   
   .animated-subtitle {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
+    padding: 0 20px;
+  }
+  
+  .hero-buttons {
+    flex-direction: column;
+    align-items: center;
+    padding: 0 20px;
   }
   
   .hero-buttons .btn {
-    display: block;
     width: 100%;
-    margin-bottom: 10px;
+    max-width: 280px;
+  }
+  
+  .feature-section {
+    padding: 60px 0;
   }
 }

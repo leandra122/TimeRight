@@ -83,7 +83,7 @@ const AdminLogin = () => {
               
               <div className="text-center mt-2">
                 <small className="text-muted">
-                  Credenciais: admin@alimentandoofuturo.com / admin123
+                  Credenciais: admin@timeright.com / admin123
                 </small>
               </div>
             </Card.Body>

@@ -12,16 +12,16 @@ const Home = () => {
 
   const carouselImages = [
     {
-      src: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=1200&h=600&fit=crop',
-      alt: 'Horta urbana sustentável'
+      src: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1200&h=600&fit=crop',
+      alt: 'Salão de beleza moderno'
     },
     {
-      src: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=1200&h=600&fit=crop',
-      alt: 'Cultivo de vegetais frescos'
+      src: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1200&h=600&fit=crop',
+      alt: 'Tratamentos de beleza profissionais'
     },
     {
-      src: 'https://images.unsplash.com/photo-1592419044706-39796d40f98c?w=1200&h=600&fit=crop',
-      alt: 'Agricultura urbana moderna'
+      src: 'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=1200&h=600&fit=crop',
+      alt: 'Ambiente relaxante e acolhedor'
     }
   ]
 
@@ -62,16 +62,16 @@ const Home = () => {
               <Col lg={10}>
                 <div className="welcome-animation">
                   <h1 className="hero-title animated-title">
-                    Seja bem-vindo ao Alimentando o Futuro
+                    Sua beleza, nosso compromisso
                   </h1>
                   <p className="hero-subtitle animated-subtitle">
-                    Cultive sua própria alimentação saudável e sustentável
+                    Agende seu horário com os melhores profissionais e viva uma nova experiência
                   </p>
                   <div className="hero-buttons mt-4">
                     <Button 
                       as={Link} 
                       to="/sobre" 
-                      variant="success" 
+                      variant="primary" 
                       size="lg" 
                       className="me-3 mb-2"
                     >
@@ -79,12 +79,12 @@ const Home = () => {
                     </Button>
                     <Button 
                       as={Link} 
-                      to="/suporte" 
+                      to="/servicos" 
                       variant="outline-light" 
                       size="lg" 
                       className="mb-2"
                     >
-                      Precisa de Ajuda?
+                      Nossos Serviços
                     </Button>
                   </div>
                 </div>
@@ -95,43 +95,43 @@ const Home = () => {
       </section>
       
       {/* Features Section */}
-      <section className="py-5 bg-light">
+      <section className="feature-section">
         <Container>
           <Row className="text-center mb-5">
             <Col>
-              <h2>Por que escolher o Alimentando o Futuro?</h2>
-              <p className="lead">Soluções práticas para uma vida mais saudável e sustentável</p>
+              <h2 className="mb-3" style={{fontWeight: 600, color: 'var(--text-dark)'}}>Por que escolher o Time Right?</h2>
+              <p className="lead" style={{color: 'var(--dark-gray)', fontSize: '1.1rem'}}>Praticidade, eficiência e agendamento inteligente para seu tempo</p>
             </Col>
           </Row>
           <Row>
             <Col md={4} className="mb-4">
-              <div className="text-center">
-                <div className="feature-icon mb-3">
-                  <img src="https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=100&h=100&fit=crop&crop=center" 
-                       alt="Educação" className="rounded-circle" width="80" height="80" />
+              <div className="feature-card">
+                <div className="feature-icon">
+                  <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=100&h=100&fit=crop&crop=center" 
+                       alt="Profissionais Qualificados" />
                 </div>
-                <h4>Educação Prática</h4>
-                <p>Aprenda técnicas de cultivo em pequenos espaços com tutoriais detalhados</p>
+                <h4>Profissionais Qualificados</h4>
+                <p>Rede de profissionais especializados em diversas áreas</p>
               </div>
             </Col>
             <Col md={4} className="mb-4">
-              <div className="text-center">
-                <div className="feature-icon mb-3">
-                  <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?w=100&h=100&fit=crop&crop=center" 
-                       alt="Sustentabilidade" className="rounded-circle" width="80" height="80" />
+              <div className="feature-card">
+                <div className="feature-icon">
+                  <img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=100&h=100&fit=crop&crop=center" 
+                       alt="Ambiente Moderno" />
                 </div>
-                <h4>Sustentabilidade</h4>
-                <p>Promovemos práticas ecológicas e reaproveitamento de recursos</p>
+                <h4>Plataforma Moderna</h4>
+                <p>Interface intuitiva e tecnologia avançada para sua comodidade</p>
               </div>
             </Col>
             <Col md={4} className="mb-4">
-              <div className="text-center">
-                <div className="feature-icon mb-3">
-                  <img src="https://images.unsplash.com/photo-1498837167922-ddd27525d352?w=100&h=100&fit=crop&crop=center" 
-                       alt="Saúde" className="rounded-circle" width="80" height="80" />
+              <div className="feature-card">
+                <div className="feature-icon">
+                  <img src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=100&h=100&fit=crop&crop=center" 
+                       alt="Agendamento Fácil" />
                 </div>
-                <h4>Alimentação Saudável</h4>
-                <p>Acesso a alimentos frescos e nutritivos cultivados por você mesmo</p>
+                <h4>Agendamento Inteligente</h4>
+                <p>Sistema online prático para agendar seus horários quando quiser</p>
               </div>
             </Col>
           </Row>

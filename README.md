@@ -1,6 +1,6 @@
-# La Belle Vie - Sistema Completo de Salão de Beleza
+# Time Right - Sistema de Agendamento
 
-Plataforma completa para gerenciamento de salão de beleza com sistema administrativo e portal do cliente.
+Plataforma completa para gerenciamento de agendamentos com sistema administrativo e portal do cliente.
 
 ## 📁 Estrutura do Projeto
 
@@ -86,14 +86,14 @@ mvn spring-boot:run
 - **Console H2:** `http://localhost:8080/h2-console`
 
 ### Credenciais H2
-- **URL:** `jdbc:h2:mem:labellevie`
+- **URL:** `jdbc:h2:mem:timeright`
 - **User:** `sa`
 - **Password:** (vazio)
 
 ## 🔐 Credenciais de Acesso
 
 ### Admin Padrão
-- **Email:** `admin@labellevie.com`
+- **Email:** `admin@timeright.com`
 - **Senha:** `admin123`
 
 ## 🛠️ Tecnologias
@@ -178,7 +178,7 @@ VITE_API_BASE_URL=http://localhost:8080/api
 server:
   port: 8080
 jwt:
-  secret: labellevie_super_secret_jwt_key_2024
+  secret: timeright_super_secret_jwt_key_2024
   expiration: 86400000
 ```
 
@@ -229,4 +229,4 @@ Este projeto está sob a licença MIT.
 
 ---
 
-**La Belle Vie** - Sistema completo de gerenciamento para salões de beleza 💄✨
+**Time Right** - Sistema completo de agendamento online ⏰✨

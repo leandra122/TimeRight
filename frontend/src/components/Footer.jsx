@@ -3,32 +3,32 @@ import { Link } from 'react-router-dom'
 
 const Footer = () => {
   return (
-    <footer style={{background: 'linear-gradient(135deg, #a4d7bd, #bee2ff)'}} className="text-dark py-5">
+    <footer style={{background: 'linear-gradient(135deg, var(--primary-color), var(--secondary-color))'}} className="text-white py-5">
       <Container>
         <Row>
           <Col md={4} className="mb-4">
-            <h5 className="mb-3">La Belle Vie</h5>
-            <p className="text-secondary">
-              Seu salão de beleza de confiança, oferecendo os melhores 
-              tratamentos com profissionais qualificados.
+            <h5 className="mb-3">Time Right</h5>
+            <p style={{color: 'rgba(255, 255, 255, 0.8)'}}>
+              Sua plataforma de agendamento de confiança, 
+              conectando você aos melhores profissionais.
             </p>
           </Col>
           
           <Col md={4} className="mb-4">
             <h6 className="mb-3">Links Rápidos</h6>
             <ul className="list-unstyled">
-              <li><Link to="/" className="text-secondary text-decoration-none">Home</Link></li>
-              <li><Link to="/servicos" className="text-secondary text-decoration-none">Serviços</Link></li>
-              <li><Link to="/profissionais" className="text-secondary text-decoration-none">Profissionais</Link></li>
-              <li><Link to="/contato" className="text-secondary text-decoration-none">Contato</Link></li>
+              <li><Link to="/" style={{color: 'rgba(255, 255, 255, 0.8)'}} className="text-decoration-none">Home</Link></li>
+              <li><Link to="/servicos" style={{color: 'rgba(255, 255, 255, 0.8)'}} className="text-decoration-none">Serviços</Link></li>
+              <li><Link to="/profissionais" style={{color: 'rgba(255, 255, 255, 0.8)'}} className="text-decoration-none">Profissionais</Link></li>
+              <li><Link to="/contato" style={{color: 'rgba(255, 255, 255, 0.8)'}} className="text-decoration-none">Contato</Link></li>
             </ul>
           </Col>
           
           <Col md={4} className="mb-4">
             <h6 className="mb-3">Redes Sociais</h6>
             <div className="d-flex gap-3">
-              <a href="#" className="text-secondary fs-4">📱</a>
-              <a href="#" className="text-secondary fs-4">📞</a>
+              <a href="#" style={{color: 'rgba(255, 255, 255, 0.8)'}} className="fs-4"><i className="fab fa-instagram"></i></a>
+              <a href="#" style={{color: 'rgba(255, 255, 255, 0.8)'}} className="fs-4"><i className="fab fa-whatsapp"></i></a>
             </div>
           </Col>
         </Row>
@@ -37,8 +37,8 @@ const Footer = () => {
         
         <Row>
           <Col className="text-center">
-            <p className="mb-0 text-secondary">
-              © 2024 La Belle Vie. Todos os direitos reservados.
+            <p className="mb-0" style={{color: 'rgba(255, 255, 255, 0.8)'}}>
+              © 2025 Time Right. Todos os direitos reservados.
             </p>
           </Col>
         </Row>

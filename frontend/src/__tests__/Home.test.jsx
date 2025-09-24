@@ -20,7 +20,7 @@ describe('Home Component', () => {
   // Testa se o título principal é renderizado
   test('renders main heading', () => {
     renderWithProviders(<Home />);
-    expect(screen.getByText('La Belle Vie')).toBeInTheDocument();
+    expect(screen.getByText('Time Right')).toBeInTheDocument();
   });
 
   // Testa se o botão CTA é renderizado

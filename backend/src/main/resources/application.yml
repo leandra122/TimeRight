@@ -40,7 +40,7 @@ spring:
             trust: smtp.office365.com
 
 jwt:
-  secret: labellevie_super_secret_jwt_key_2024
+  secret: timeright_super_secret_jwt_key_2024
   expiration: 86400000
 
 admin:
@@ -48,5 +48,5 @@ admin:
 
 logging:
   level:
-    com.labellevie: DEBUG
+    com.timeright: DEBUG
     org.springframework.security: DEBUG

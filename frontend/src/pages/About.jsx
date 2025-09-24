@@ -5,33 +5,39 @@ const About = () => {
     <Container className="py-5">
       <Row>
         <Col lg={8} className="mx-auto">
-          <h1 className="text-center mb-5">Sobre o Alimentando o Futuro</h1>
+          <h1 className="text-center mb-5">Sobre o Time Right</h1>
           
-          <Card className="mb-4 border-0 shadow">
-            <Card.Body className="p-4">
-              <h3 className="mb-3">Quem Somos</h3>
-              <p>O <strong>Alimentando o Futuro</strong> é uma plataforma inovadora que revoluciona o acesso a alimentos saudáveis e conhecimento sobre cultivo sustentável. Criamos um ambiente digital educativo que capacita pessoas a desenvolverem autonomia alimentar através de práticas acessíveis e sustentáveis.</p>
+          <Card className="mb-4" style={{padding: '32px'}}>
+            <Card.Body>
+              <h3 className="mb-3" style={{fontWeight: 600, color: 'var(--primary-color)'}}>Quem Somos</h3>
+              <p>O <strong>Time Right</strong> nasceu com o propósito de otimizar seu tempo e conectar você aos melhores profissionais. Sabemos que, na correria do dia a dia, encontrar horários disponíveis pode ser desafiador, e é por isso que desenvolvemos uma plataforma digital que simplifica o agendamento e maximiza sua produtividade.</p>
             </Card.Body>
           </Card>
           
-          <Card className="mb-4 border-0 shadow">
-            <Card.Body className="p-4">
-              <h3 className="mb-3">O Problema que Resolvemos</h3>
-              <p>Milhões de pessoas enfrentam barreiras no acesso a alimentos frescos e nutritivos devido a limitações financeiras e falta de conhecimento sobre cultivo. O consumo excessivo de produtos industrializados impacta diretamente a saúde, contribuindo para o aumento de doenças crônicas como obesidade e diabetes. Dados do IBGE (2020) e estudos do Ministério da Saúde (2021) confirmam que essa realidade afeta diretamente a qualidade de vida da população.</p>
+          <Card className="mb-4" style={{padding: '32px'}}>
+            <Card.Body>
+              <h3 className="mb-3" style={{fontWeight: 600, color: 'var(--primary-color)'}}>Nossa Missão</h3>
+              <p>Nossa missão é transformar o agendamento em algo prático, acessível e inovador. Conectamos profissionais qualificados com clientes que valorizam seu tempo, oferecendo uma experiência personalizada e eficiente.</p>
             </Card.Body>
           </Card>
           
-          <Card className="mb-4 border-0 shadow">
-            <Card.Body className="p-4">
-              <h3 className="mb-3">Nossa Missão e Impacto</h3>
-              <p>Oferecemos ferramentas educativas, tutoriais de nutrição, técnicas de reaproveitamento de alimentos e métodos de cultivo doméstico. Nosso objetivo é tornar as pessoas mais autossuficientes, saudáveis e conscientes, promovendo sustentabilidade e segurança alimentar em pequenos espaços urbanos.</p>
+          <Card className="mb-4" style={{padding: '32px'}}>
+            <Card.Body>
+              <h3 className="mb-3" style={{fontWeight: 600, color: 'var(--primary-color)'}}>Nossa Diferença</h3>
+              <p>Combinamos tecnologia, praticidade e eficiência para que cada agendamento seja perfeito. O Time Right é mais do que uma plataforma: é seu parceiro para otimizar tempo e conectar com os melhores profissionais.</p>
             </Card.Body>
           </Card>
           
-          <Card className="mb-4 border-0 shadow">
-            <Card.Body className="p-4">
-              <h3 className="mb-3">Por que Somos Essenciais</h3>
-              <p>Em um cenário onde bilhões enfrentam insegurança alimentar globalmente, nossa plataforma oferece soluções práticas e acessíveis. Combinamos tecnologia, educação e sustentabilidade para criar um futuro onde cada pessoa pode cultivar sua própria alimentação saudável, independentemente do espaço disponível. Somos a ponte entre o conhecimento tradicional e a inovação digital para alimentar o futuro de forma sustentável.</p>
+          <Card className="mb-4" style={{padding: '32px'}}>
+            <Card.Body>
+              <h3 className="mb-3" style={{fontWeight: 600, color: 'var(--primary-color)'}}>Nossos Valores</h3>
+              <ul className="list-unstyled">
+                <li className="mb-2"><i className="fas fa-clock text-primary me-2"></i>Otimização do seu tempo</li>
+                <li className="mb-2"><i className="fas fa-star text-primary me-2"></i>Excelência em conectividade</li>
+                <li className="mb-2"><i className="fas fa-mobile-alt text-primary me-2"></i>Tecnologia intuitiva</li>
+                <li className="mb-2"><i className="fas fa-users text-primary me-2"></i>Rede de profissionais qualificados</li>
+                <li className="mb-2"><i className="fas fa-calendar text-primary me-2"></i>Agendamento inteligente</li>
+              </ul>
             </Card.Body>
           </Card>
         </Col>

@@ -1,4 +1,4 @@
-# Banco de Dados - La Belle Vie
+# Banco de Dados - Time Right
 
 ## 📊 Estrutura do Banco
 
@@ -50,7 +50,7 @@
 
 ## 🚀 Como Usar
 
-1. Execute apenas `labellevie_complete.sql` no SQL Server
+1. Execute apenas `timeright_complete.sql` no SQL Server
 2. Configure a conexão no `application.yml`
 3. Inicie o backend Spring Boot
 
@@ -59,7 +59,7 @@
 ```yaml
 spring:
   datasource:
-    url: jdbc:sqlserver://servidor:porta;databaseName=labellevie
+    url: jdbc:sqlserver://servidor:porta;databaseName=timeright
     username: seu_usuario
     password: sua_senha
 ```

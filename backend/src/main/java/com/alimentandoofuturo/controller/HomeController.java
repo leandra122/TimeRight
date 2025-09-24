@@ -12,7 +12,7 @@ public class HomeController {
     @GetMapping("/")
     public Map<String, Object> home() {
         return Map.of(
-            "message", "La Belle Vie API funcionando!",
+            "message", "Time Right API funcionando!",
             "documentation", "/swagger-ui.html",
             "health", "/health"
         );

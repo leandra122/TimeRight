@@ -62,7 +62,7 @@ const Contact = () => {
                   
                   <div className="mb-3">
                     <h6>📧 Email</h6>
-                    <p className="text-muted">contato@labellevie.com</p>
+                    <p className="text-muted">contato@timeright.com</p>
                   </div>
                   
                   <div className="mb-3">

@@ -1,4 +1,4 @@
-import { Navbar as BSNavbar, Nav, Container, NavDropdown } from 'react-bootstrap'
+import { Navbar as BSNavbar, Nav, Container, Button } from 'react-bootstrap'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 
@@ -12,37 +12,56 @@ const Navbar = () => {
   }
 
   return (
-    <BSNavbar style={{background: 'linear-gradient(90deg, #fef0ef, #efdefb)'}} expand="lg" className="shadow-sm">
+    <BSNavbar expand="lg" className="navbar">
       <Container>
         <BSNavbar.Brand as={Link} to="/">
-          La Belle Vie
+          TimeRight
         </BSNavbar.Brand>
         
         <BSNavbar.Toggle aria-controls="basic-navbar-nav" />
         
         <BSNavbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link as={Link} to="/">Home</Nav.Link>
-            <Nav.Link as={Link} to="/sobre">Sobre</Nav.Link>
-            <Nav.Link as={Link} to="/servicos">Serviços</Nav.Link>
-            <Nav.Link as={Link} to="/profissionais">Profissionais</Nav.Link>
-            <Nav.Link as={Link} to="/contato">Contato</Nav.Link>
-            <Nav.Link as={Link} to="/suporte">Suporte</Nav.Link>
+            <Nav.Link as={Link} to="/">
+              <i className="fas fa-home nav-icon"></i>
+              Início
+            </Nav.Link>
+            <Nav.Link as={Link} to="/sobre">
+              <i className="fas fa-star nav-icon"></i>
+              Benefícios
+            </Nav.Link>
+            <Nav.Link as={Link} to="/servicos">
+              <i className="fas fa-concierge-bell nav-icon"></i>
+              Serviços
+            </Nav.Link>
+            <Nav.Link as={Link} to="/profissionais">
+              <i className="fas fa-images nav-icon"></i>
+              Galeria
+            </Nav.Link>
+            <Nav.Link as={Link} to="/contato">
+              <i className="fas fa-envelope nav-icon"></i>
+              Contato
+            </Nav.Link>
           </Nav>
           
-          <Nav>
+          <Nav className="align-items-center">
             {user ? (
-              <NavDropdown title={`Admin: ${user.name}`} id="admin-dropdown">
-                <NavDropdown.Item as={Link} to="/admin">Dashboard</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/admin/categorias">Categorias</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/admin/profissionais">Profissionais</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/admin/promocoes">Promoções</NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/admin/agendas">Agendas</NavDropdown.Item>
-                <NavDropdown.Divider />
-                <NavDropdown.Item onClick={handleLogout}>Sair</NavDropdown.Item>
-              </NavDropdown>
+              <>
+                <span className="text-white me-3">Olá, {user.name}</span>
+                <Button variant="outline-light" size="sm" onClick={handleLogout}>
+                  Sair
+                </Button>
+              </>
             ) : (
-              <Nav.Link as={Link} to="/login">Admin</Nav.Link>
+              <>
+                <Nav.Link as={Link} to="/login" className="me-2">
+                  <i className="fas fa-user nav-icon"></i>
+                  Login
+                </Nav.Link>
+                <Button as={Link} to="/client/register" className="btn-cta">
+                  Cadastre-se
+                </Button>
+              </>
             )}
           </Nav>
         </BSNavbar.Collapse>

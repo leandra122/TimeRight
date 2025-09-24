@@ -111,7 +111,7 @@ const Booking = () => {
   return (
     <div className="container" style={{ padding: '2rem 0', maxWidth: '600px' }}>
       <h1 style={{ textAlign: 'center', marginBottom: '2rem', color: 'var(--primary-color)' }}>
-        Agendamento - TimeRight
+        Agendamento - Time Right
       </h1>
 
       {/* Progress Bar */}

@@ -10,6 +10,9 @@ import Contact from './pages/Contact'
 import Support from './pages/Support'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
+import ClientRegister from './pages/ClientRegister'
+import ClientLogin from './pages/ClientLogin'
+import ClientDashboard from './pages/ClientDashboard'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminCategories from './pages/AdminCategories'
@@ -38,6 +41,9 @@ function App() {
             <Route path="/suporte" element={<Support />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/client-register" element={<ClientRegister />} />
+            <Route path="/client-login" element={<ClientLogin />} />
+            <Route path="/client-dashboard" element={<ClientDashboard />} />
             <Route path="/login" element={<AdminLogin />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={

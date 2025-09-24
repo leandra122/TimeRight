@@ -45,6 +45,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/dashboard/**").permitAll()
                 .requestMatchers("/api/support/**").permitAll()
                 .requestMatchers("/api/password/**").permitAll()
+                .requestMatchers("/api/client/register").permitAll()
+                .requestMatchers("/api/client/login").permitAll()
+                .requestMatchers("/api/appointments/**").permitAll()
                 .anyRequest().authenticated()
             );
         
