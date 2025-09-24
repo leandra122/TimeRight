@@ -4,7 +4,6 @@ import com.alimentandoofuturo.dto.LoginRequest;
 import com.alimentandoofuturo.dto.LoginResponse;
 import com.alimentandoofuturo.entity.Admin;
 import com.alimentandoofuturo.security.JwtUtil;
-import com.alimentandoofuturo.service.AdminService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +22,6 @@ public class AuthController {
     
     @Autowired
     private JwtUtil jwtUtil;
-    
-    @Autowired
-    private AdminService adminService;
     
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {

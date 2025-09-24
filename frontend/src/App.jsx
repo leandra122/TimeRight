@@ -7,6 +7,9 @@ import About from './pages/About'
 import Services from './pages/Services'
 import Professionals from './pages/Professionals'
 import Contact from './pages/Contact'
+import Support from './pages/Support'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminCategories from './pages/AdminCategories'
@@ -32,6 +35,9 @@ function App() {
             <Route path="/servicos" element={<Services />} />
             <Route path="/profissionais" element={<Professionals />} />
             <Route path="/contato" element={<Contact />} />
+            <Route path="/suporte" element={<Support />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/login" element={<AdminLogin />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={

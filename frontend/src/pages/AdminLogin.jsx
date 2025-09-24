@@ -76,8 +76,14 @@ const AdminLogin = () => {
               </Form>
               
               <div className="text-center mt-3">
+                <a href="/forgot-password" className="text-decoration-none">
+                  Esqueceu sua senha?
+                </a>
+              </div>
+              
+              <div className="text-center mt-2">
                 <small className="text-muted">
-                  Credenciais: admin@labellevie.com / admin123
+                  Credenciais: admin@alimentandoofuturo.com / admin123
                 </small>
               </div>
             </Card.Body>

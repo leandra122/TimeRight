@@ -25,6 +25,27 @@ spring:
       allowed-headers: "*"
       allow-credentials: false
 
+  mail:
+    host: smtp.office365.com
+    port: 587
+    username: rm94720@estudante.fieb.edu.br
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            trust: smtp.office365.com
+
+jwt:
+  secret: labellevie_super_secret_jwt_key_2024
+  expiration: 86400000
+
+admin:
+  email: rm94720@estudante.fieb.edu.br
+
 logging:
   level:
     com.labellevie: DEBUG

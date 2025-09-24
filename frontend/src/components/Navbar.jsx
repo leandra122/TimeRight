@@ -27,6 +27,7 @@ const Navbar = () => {
             <Nav.Link as={Link} to="/servicos">Serviços</Nav.Link>
             <Nav.Link as={Link} to="/profissionais">Profissionais</Nav.Link>
             <Nav.Link as={Link} to="/contato">Contato</Nav.Link>
+            <Nav.Link as={Link} to="/suporte">Suporte</Nav.Link>
           </Nav>
           
           <Nav>

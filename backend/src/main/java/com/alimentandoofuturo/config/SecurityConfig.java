@@ -43,6 +43,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/categories/**").permitAll()
                 .requestMatchers("/api/professionals/**").permitAll()
                 .requestMatchers("/api/dashboard/**").permitAll()
+                .requestMatchers("/api/support/**").permitAll()
+                .requestMatchers("/api/password/**").permitAll()
                 .anyRequest().authenticated()
             );
         
