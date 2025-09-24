@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
   }, [])
 
   const login = async (credentials) => {
-    const response = await axios.post('http://localhost:8080/api/auth/login', credentials)
+    const response = await axios.post('/api/auth/login', credentials)
     const { token, admin } = response.data
     
     localStorage.setItem('token', token)

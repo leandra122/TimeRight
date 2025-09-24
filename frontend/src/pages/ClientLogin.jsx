@@ -24,7 +24,7 @@ const ClientLogin = () => {
         setLoading(true);
         
         try {
-            const response = await axios.post('http://localhost:8080/api/client/login', formData);
+            const response = await axios.post('/api/client/login', formData);
             
             // Salvar dados do cliente no localStorage
             localStorage.setItem('clientToken', response.data.token);
@@ -41,10 +41,18 @@ const ClientLogin = () => {
             }, 1500);
             
         } catch (error) {
+            let errorMessage = 'Erro ao fazer login';
+            
+            if (error.code === 'ERR_NETWORK' || error.message.includes('ERR_CONNECTION_REFUSED')) {
+                errorMessage = 'Servidor indisponível. Tente novamente em alguns instantes.';
+            } else if (error.response?.data?.error) {
+                errorMessage = error.response.data.error;
+            }
+            
             setAlert({
                 show: true,
                 type: 'danger',
-                message: error.response?.data?.error || 'Erro ao fazer login'
+                message: errorMessage
             });
         } finally {
             setLoading(false);

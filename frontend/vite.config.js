@@ -5,7 +5,10 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
-    host: true,
+    host: '0.0.0.0',
+    historyApiFallback: {
+      index: '/index.html'
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:8080',
@@ -13,5 +16,9 @@ export default defineConfig({
         secure: false
       }
     }
+  },
+  preview: {
+    port: 5173,
+    host: '0.0.0.0'
   }
 })

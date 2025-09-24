@@ -1,5 +1,5 @@
 .hero-carousel-section {
-  height: calc(100vh - 90px);
+  height: 100vh;
   overflow: hidden;
   position: relative;
   margin-top: -90px;
@@ -7,7 +7,11 @@
 }
 
 .hero-carousel {
-  height: calc(100vh - 90px);
+  height: 100vh;
+}
+
+.hero-carousel .carousel-item {
+  height: 100vh;
 }
 
 .carousel-image {
@@ -24,7 +28,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.7) 0%, rgba(168, 85, 247, 0.6) 100%);
+  background: linear-gradient(135deg, rgba(255, 182, 193, 0.8) 0%, rgba(138, 43, 226, 0.7) 50%, rgba(174, 198, 207, 0.6) 100%);
   z-index: 1;
 }
 
@@ -79,7 +83,7 @@
 
 .feature-section {
   padding: 80px 0;
-  background: linear-gradient(180deg, var(--light-gray) 0%, var(--white) 100%);
+  background: linear-gradient(180deg, var(--light-blue) 0%, var(--light-pink) 50%, var(--white) 100%);
 }
 
 .feature-card {
@@ -174,6 +178,62 @@
   }
 }
 
+/* Estilos personalizados do carrossel */
+.hero-carousel .carousel-control-prev,
+.hero-carousel .carousel-control-next {
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 182, 193, 0.8);
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.hero-carousel .carousel-control-prev {
+  left: 30px;
+}
+
+.hero-carousel .carousel-control-next {
+  right: 30px;
+}
+
+.hero-carousel .carousel-control-prev:hover,
+.hero-carousel .carousel-control-next:hover {
+  background: rgba(138, 43, 226, 0.9);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.hero-carousel .carousel-control-prev-icon,
+.hero-carousel .carousel-control-next-icon {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1);
+}
+
+.hero-carousel .carousel-indicators {
+  bottom: 30px;
+  margin-bottom: 0;
+}
+
+.hero-carousel .carousel-indicators [data-bs-target] {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.5);
+  border: 2px solid rgba(255, 182, 193, 0.8);
+  margin: 0 6px;
+  transition: all 0.3s ease;
+}
+
+.hero-carousel .carousel-indicators .active {
+  background-color: #FFB6C1;
+  border-color: #8A2BE2;
+  transform: scale(1.2);
+}
+
 @media (max-width: 768px) {
   .animated-title {
     font-size: 2.5rem;
@@ -197,5 +257,23 @@
   
   .feature-section {
     padding: 60px 0;
+  }
+  
+  .hero-carousel .carousel-control-prev,
+  .hero-carousel .carousel-control-next {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .hero-carousel .carousel-control-prev {
+    left: 15px;
+  }
+  
+  .hero-carousel .carousel-control-next {
+    right: 15px;
+  }
+  
+  .hero-carousel .carousel-indicators {
+    bottom: 20px;
   }
 }

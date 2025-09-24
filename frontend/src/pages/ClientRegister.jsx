@@ -37,7 +37,7 @@ const ClientRegister = () => {
         setLoading(true);
         
         try {
-            await axios.post('http://localhost:8080/api/client/register', {
+            await axios.post('/api/client/register', {
                 name: formData.name,
                 email: formData.email,
                 password: formData.password,
@@ -55,10 +55,18 @@ const ClientRegister = () => {
             }, 2000);
             
         } catch (error) {
+            let errorMessage = 'Erro ao realizar cadastro';
+            
+            if (error.code === 'ERR_NETWORK' || error.message.includes('ERR_CONNECTION_REFUSED')) {
+                errorMessage = 'Servidor indisponível. Tente novamente em alguns instantes.';
+            } else if (error.response?.data?.error) {
+                errorMessage = error.response.data.error;
+            }
+            
             setAlert({
                 show: true,
                 type: 'danger',
-                message: error.response?.data?.error || 'Erro ao realizar cadastro'
+                message: errorMessage
             });
         } finally {
             setLoading(false);

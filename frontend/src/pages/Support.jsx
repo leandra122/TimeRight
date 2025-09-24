@@ -24,7 +24,7 @@ const Support = () => {
         setLoading(true);
         
         try {
-            await axios.post('http://localhost:8080/api/support', formData);
+            await axios.post('/api/support', formData);
             setAlert({
                 show: true,
                 type: 'success',

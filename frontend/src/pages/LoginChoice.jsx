@@ -16,7 +16,7 @@ const LoginChoice = () => {
               <Card className="h-100 shadow-lg border-0 text-center login-choice-card">
                 <Card.Body className="d-flex flex-column justify-content-center" style={{padding: '40px'}}>
                   <div className="mb-4">
-                    <i className="fas fa-user fa-4x text-primary"></i>
+                    <i className="fas fa-user fa-4x" style={{color: '#FFB6C1'}}></i>
                   </div>
                   <h4 className="mb-3">Cliente</h4>
                   <p className="text-muted mb-4">
@@ -45,7 +45,7 @@ const LoginChoice = () => {
               <Card className="h-100 shadow-lg border-0 text-center login-choice-card">
                 <Card.Body className="d-flex flex-column justify-content-center" style={{padding: '40px'}}>
                   <div className="mb-4">
-                    <i className="fas fa-user-shield fa-4x text-secondary"></i>
+                    <i className="fas fa-user-shield fa-4x" style={{color: '#8A2BE2'}}></i>
                   </div>
                   <h4 className="mb-3">Administrador</h4>
                   <p className="text-muted mb-4">
@@ -58,6 +58,7 @@ const LoginChoice = () => {
                       variant="secondary" 
                       size="lg" 
                       className="w-100 mb-2"
+                      style={{background: 'linear-gradient(135deg, #8A2BE2, #AEC6CF)', border: 'none', color: 'white'}}
                     >
                       <i className="fas fa-shield-alt me-2"></i>
                       Login Admin
