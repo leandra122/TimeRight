@@ -1,7 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './hooks/useAuth'
 import Navbar from './components/Navbar'
+import AdminNavbar from './components/AdminNavbar'
+import ClientNavbar from './components/ClientNavbar'
 import Footer from './components/Footer'
+import { useLocation } from 'react-router-dom'
 import Home from './pages/Home'
 import About from './pages/About'
 import Services from './pages/Services'
@@ -19,7 +22,9 @@ import AdminCategories from './pages/AdminCategories'
 import AdminProfessionals from './pages/AdminProfessionals'
 import AdminPromotions from './pages/AdminPromotions'
 import AdminSchedules from './pages/AdminSchedules'
+import LoginChoice from './pages/LoginChoice'
 import ProtectedRoute from './components/ProtectedRoute'
+import ClientProtectedRoute from './components/ClientProtectedRoute'
 
 function App() {
   return (
@@ -30,23 +35,51 @@ function App() {
           v7_relativeSplatPath: true
         }}
       >
-        <div className="App">
-          <Navbar />
+        <AppContent />
+      </Router>
+    </AuthProvider>
+  )
+}
+
+function AppContent() {
+  const location = useLocation()
+  
+  const getNavbar = () => {
+    if (location.pathname.startsWith('/admin')) {
+      return <AdminNavbar />
+    }
+    if (location.pathname.startsWith('/cliente')) {
+      return <ClientNavbar />
+    }
+    return <Navbar />
+  }
+  
+  return (
+    <div className="App">
+      {getNavbar()}
           <Routes>
+            {/* Páginas Públicas */}
             <Route path="/" element={<Home />} />
             <Route path="/sobre" element={<About />} />
             <Route path="/servicos" element={<Services />} />
             <Route path="/profissionais" element={<Professionals />} />
             <Route path="/contato" element={<Contact />} />
             <Route path="/suporte" element={<Support />} />
+            <Route path="/login" element={<LoginChoice />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/client-register" element={<ClientRegister />} />
-            <Route path="/client-login" element={<ClientLogin />} />
-            <Route path="/client-dashboard" element={<ClientDashboard />} />
-            <Route path="/login" element={<AdminLogin />} />
+            
+            {/* Área do Cliente */}
+            <Route path="/cliente/cadastro" element={<ClientRegister />} />
+            <Route path="/cliente/login" element={<ClientLogin />} />
+            <Route path="/cliente/dashboard" element={
+              <ClientProtectedRoute>
+                <ClientDashboard />
+              </ClientProtectedRoute>
+            } />
+            
+            {/* Área Administrativa */}
             <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin" element={
+            <Route path="/admin/dashboard" element={
               <ProtectedRoute>
                 <AdminDashboard />
               </ProtectedRoute>
@@ -71,11 +104,20 @@ function App() {
                 <AdminSchedules />
               </ProtectedRoute>
             } />
+            
+            {/* Redirecionamentos para compatibilidade */}
+            <Route path="/client-register" element={<ClientRegister />} />
+            <Route path="/client-login" element={<ClientLogin />} />
+            <Route path="/client-dashboard" element={<ClientDashboard />} />
+            <Route path="/login" element={<AdminLogin />} />
+            <Route path="/admin" element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } />
           </Routes>
           <Footer />
         </div>
-      </Router>
-    </AuthProvider>
   )
 }
 

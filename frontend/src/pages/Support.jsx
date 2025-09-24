@@ -24,18 +24,18 @@ const Support = () => {
         setLoading(true);
         
         try {
-            await axios.post(`${import.meta.env.VITE_API_BASE_URL}/support`, formData);
+            await axios.post('http://localhost:8080/api/support', formData);
             setAlert({
                 show: true,
                 type: 'success',
-                message: 'Solicitação enviada com sucesso! Entraremos em contato em breve.'
+                message: '✅ Recebemos sua solicitação! Nossa equipe analisará e retornará em breve.'
             });
             setFormData({ name: '', email: '', subject: '', message: '' });
         } catch (error) {
             setAlert({
                 show: true,
                 type: 'danger',
-                message: 'Erro ao enviar solicitação. Tente novamente.'
+                message: '❌ Erro ao enviar solicitação. Verifique sua conexão e tente novamente.'
             });
         } finally {
             setLoading(false);
@@ -47,8 +47,8 @@ const Support = () => {
             <Row className="justify-content-center">
                 <Col md={8}>
                     <Card>
-                        <Card.Header className="bg-primary text-white">
-                            <h4 className="mb-0">Suporte Técnico</h4>
+                        <Card.Header className="text-white text-center">
+                            <h4 className="mb-0">📞 Suporte TimeRight</h4>
                         </Card.Header>
                         <Card.Body>
                             {alert.show && (
@@ -113,8 +113,9 @@ const Support = () => {
                                     variant="primary" 
                                     disabled={loading}
                                     className="w-100"
+                                    size="lg"
                                 >
-                                    {loading ? 'Enviando...' : 'Enviar Solicitação'}
+                                    {loading ? '📧 Enviando...' : '🚀 Enviar Solicitação'}
                                 </Button>
                             </Form>
                         </Card.Body>

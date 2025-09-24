@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/password")
+@RequestMapping("/api/auth")
 @CrossOrigin(origins = "*")
 public class PasswordResetController {
     
     @Autowired
     private PasswordResetService passwordResetService;
     
-    @PostMapping("/forgot")
+    @PostMapping("/forgot-password")
     public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         try {
             boolean success = passwordResetService.requestPasswordReset(request.getEmail());
@@ -33,7 +33,7 @@ public class PasswordResetController {
         }
     }
     
-    @PostMapping("/reset")
+    @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         try {
             boolean success = passwordResetService.resetPassword(request.getToken(), request.getNewPassword());

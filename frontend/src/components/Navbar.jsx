@@ -54,11 +54,11 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <Nav.Link as={Link} to="/login" className="me-2">
-                  <i className="fas fa-user nav-icon"></i>
-                  Login
-                </Nav.Link>
-                <Button as={Link} to="/client/register" className="btn-cta">
+                <Button as={Link} to="/login" variant="outline-light" size="sm" className="me-2">
+                  <i className="fas fa-sign-in-alt me-1"></i>
+                  Entrar
+                </Button>
+                <Button as={Link} to="/cliente/cadastro" className="btn-cta">
                   Cadastre-se
                 </Button>
               </>

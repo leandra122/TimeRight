@@ -1,35 +1,29 @@
 server:
   port: 8080
-  address: 0.0.0.0
 
 spring:
   datasource:
-    url: jdbc:sqlserver://bancoia.mssql.somee.com;databaseName=bancoia;encrypt=true;trustServerCertificate=true
-    username: Isabelly
-    password: "12345678"
-    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-
+    url: jdbc:h2:mem:timeright
+    driverClassName: org.h2.Driver
+    username: sa
+    password: 
+  
   jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     show-sql: true
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.SQLServerDialect
-        format_sql: true
-
-  web:
-    cors:
-      allowed-origin-patterns: "*"
-      allowed-methods: GET,POST,PUT,DELETE,OPTIONS
-      allowed-headers: "*"
-      allow-credentials: false
-
+  
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
   mail:
     host: smtp.office365.com
     port: 587
-    username: rm94720@estudante.fieb.edu.br
-    password: ${MAIL_PASSWORD:}
+    username: ${MAIL_USERNAME:rm94877@estudante.fieb.edu.br}
+    password: ${MAIL_PASSWORD:your_password_here}
     properties:
       mail:
         smtp:
@@ -40,13 +34,8 @@ spring:
             trust: smtp.office365.com
 
 jwt:
-  secret: labellevie_super_secret_jwt_key_2024
+  secret: timeright_super_secret_jwt_key_2024
   expiration: 86400000
 
-admin:
-  email: rm94720@estudante.fieb.edu.br
-
-logging:
-  level:
-    com.labellevie: DEBUG
-    org.springframework.security: DEBUG
+cors:
+  allowed-origins: http://localhost:5173

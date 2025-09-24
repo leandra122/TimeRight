@@ -37,7 +37,7 @@ const ClientRegister = () => {
         setLoading(true);
         
         try {
-            await axios.post(`${import.meta.env.VITE_API_BASE_URL}/client/register`, {
+            await axios.post('http://localhost:8080/api/client/register', {
                 name: formData.name,
                 email: formData.email,
                 password: formData.password,
@@ -51,7 +51,7 @@ const ClientRegister = () => {
             });
             
             setTimeout(() => {
-                navigate('/client-login');
+                navigate('/cliente/login');
             }, 2000);
             
         } catch (error) {
@@ -151,7 +151,7 @@ const ClientRegister = () => {
                             
                             <div className="text-center">
                                 <span>Já tem conta? </span>
-                                <Link to="/client-login" className="text-decoration-none">
+                                <Link to="/cliente/login" className="text-decoration-none">
                                     Faça login
                                 </Link>
                             </div>

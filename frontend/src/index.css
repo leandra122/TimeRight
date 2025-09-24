@@ -26,6 +26,7 @@ body {
   color: var(--text-dark);
   line-height: 1.6;
   font-weight: 400;
+  padding-top: 90px;
 }
 
 .btn {
@@ -186,9 +187,7 @@ body {
   box-shadow: 0 8px 25px rgba(255, 255, 255, 0.2);
 }
 
-body {
-  padding-top: 80px;
-}
+
 
 @media (max-width: 991px) {
   .navbar-collapse {
@@ -255,6 +254,25 @@ h3 {
   letter-spacing: -0.01em;
 }
 
+.login-choice-card {
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.login-choice-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--primary-color);
+  box-shadow: 0 15px 35px rgba(139, 92, 246, 0.2) !important;
+}
+
+.login-choice-card .fas {
+  transition: all 0.3s ease;
+}
+
+.login-choice-card:hover .fas {
+  transform: scale(1.1);
+}
+
 @media (max-width: 768px) {
   h1 {
     font-size: 2.5rem;
@@ -270,6 +288,10 @@ h3 {
   
   .animated-subtitle {
     font-size: 1.2rem;
+  }
+  
+  .login-choice-card {
+    margin-bottom: 20px;
   }
 }
 

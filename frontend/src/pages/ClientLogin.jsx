@@ -24,7 +24,7 @@ const ClientLogin = () => {
         setLoading(true);
         
         try {
-            const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/client/login`, formData);
+            const response = await axios.post('http://localhost:8080/api/client/login', formData);
             
             // Salvar dados do cliente no localStorage
             localStorage.setItem('clientToken', response.data.token);
@@ -37,7 +37,7 @@ const ClientLogin = () => {
             });
             
             setTimeout(() => {
-                navigate('/client-dashboard');
+                navigate('/cliente/dashboard');
             }, 1500);
             
         } catch (error) {
@@ -104,7 +104,7 @@ const ClientLogin = () => {
                                     Esqueceu sua senha?
                                 </Link>
                                 <span>Não tem conta? </span>
-                                <Link to="/client-register" className="text-decoration-none">
+                                <Link to="/cliente/cadastro" className="text-decoration-none">
                                     Cadastre-se
                                 </Link>
                             </div>

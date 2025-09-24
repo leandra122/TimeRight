@@ -28,7 +28,7 @@ public class PasswordResetToken {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-        expiresAt = LocalDateTime.now().plusMinutes(15);
+        expiresAt = LocalDateTime.now().plusMinutes(10);
     }
     
     // Getters and Setters

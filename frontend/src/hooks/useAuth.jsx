@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { authAPI } from '../services/api'
+import axios from 'axios'
 
 const AuthContext = createContext()
 
@@ -17,45 +17,30 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const token = localStorage.getItem('token')
-    if (token) {
-      authAPI.me()
-        .then(response => {
-          setAdmin(response.data.admin)
-        })
-        .catch(() => {
-          localStorage.removeItem('token')
-        })
-        .finally(() => {
-          setLoading(false)
-        })
-    } else {
-      setLoading(false)
+    const adminData = localStorage.getItem('adminData')
+    if (token && adminData) {
+      setAdmin(JSON.parse(adminData))
     }
+    setLoading(false)
   }, [])
 
   const login = async (credentials) => {
-    try {
-      const response = await authAPI.login(credentials)
-      const { token, admin } = response.data
-      
-      localStorage.setItem('token', token)
-      setAdmin(admin)
-      
-      return { success: true }
-    } catch (error) {
-      return { 
-        success: false, 
-        error: error.response?.data?.error || 'Erro no login' 
-      }
-    }
+    const response = await axios.post('http://localhost:8080/api/auth/login', credentials)
+    const { token, admin } = response.data
+    
+    localStorage.setItem('token', token)
+    localStorage.setItem('adminData', JSON.stringify(admin))
+    setAdmin(admin)
   }
 
   const logout = () => {
     localStorage.removeItem('token')
+    localStorage.removeItem('adminData')
     setAdmin(null)
   }
 
   const value = {
+    user: admin,
     admin,
     loading,
     login,

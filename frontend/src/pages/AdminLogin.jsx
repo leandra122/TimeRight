@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 
 const AdminLogin = () => {
@@ -24,7 +24,7 @@ const AdminLogin = () => {
 
     try {
       await login(formData)
-      navigate('/admin')
+      navigate('/admin/dashboard')
     } catch (error) {
       setError(error.message || 'Erro no login')
     }
@@ -76,9 +76,9 @@ const AdminLogin = () => {
               </Form>
               
               <div className="text-center mt-3">
-                <a href="/forgot-password" className="text-decoration-none">
-                  Esqueceu sua senha?
-                </a>
+                <Link to="/forgot-password" className="text-decoration-none">
+                  🔐 Esqueceu sua senha?
+                </Link>
               </div>
               
               <div className="text-center mt-2">

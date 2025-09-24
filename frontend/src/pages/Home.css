@@ -1,15 +1,17 @@
 .hero-carousel-section {
-  height: 100vh;
+  height: calc(100vh - 90px);
   overflow: hidden;
   position: relative;
+  margin-top: -90px;
+  padding-top: 90px;
 }
 
 .hero-carousel {
-  height: 100vh;
+  height: calc(100vh - 90px);
 }
 
 .carousel-image {
-  height: 100vh;
+  height: calc(100vh - 90px);
   width: 100%;
   background-size: cover;
   background-position: center;

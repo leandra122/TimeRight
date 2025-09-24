@@ -10,7 +10,7 @@ public class EmailService {
     
     private final JavaMailSender mailSender;
     
-    @Value("${admin.email:rm94720@estudante.fieb.edu.br}")
+    @Value("${admin.email:rm94877@estudante.fieb.edu.br}")
     private String adminEmail;
     
     public EmailService(JavaMailSender mailSender) {
@@ -18,35 +18,68 @@ public class EmailService {
     }
     
     public void sendSupportRequest(String name, String email, String subject, String message) {
-        SimpleMailMessage mailMessage = new SimpleMailMessage();
-        mailMessage.setTo(adminEmail);
-        mailMessage.setSubject("Nova Solicitação de Suporte: " + subject);
-        mailMessage.setText(
-            "Nova solicitação de suporte recebida:\n\n" +
-            "Nome: " + name + "\n" +
-            "E-mail: " + email + "\n" +
-            "Assunto: " + subject + "\n" +
-            "Mensagem: " + message + "\n\n" +
-            "Data: " + java.time.LocalDateTime.now()
+        // E-mail para admin
+        SimpleMailMessage adminMessage = new SimpleMailMessage();
+        adminMessage.setTo(adminEmail);
+        adminMessage.setSubject("🎯 TimeRight - Nova Solicitação: " + subject);
+        adminMessage.setText(
+            "═══════════════════════════════════════\n" +
+            "         NOVA SOLICITAÇÃO DE SUPORTE\n" +
+            "═══════════════════════════════════════\n\n" +
+            "👤 Nome: " + name + "\n" +
+            "📧 E-mail: " + email + "\n" +
+            "📋 Assunto: " + subject + "\n\n" +
+            "💬 Mensagem:\n" +
+            "───────────────────────────────────────\n" +
+            message + "\n" +
+            "───────────────────────────────────────\n\n" +
+            "🕐 Recebido em: " + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) + "\n\n" +
+            "TimeRight - Sistema de Agendamento"
         );
-        mailMessage.setFrom("noreply@timeright.com");
+        adminMessage.setReplyTo(email);
         
-        mailSender.send(mailMessage);
+        // E-mail de confirmação para usuário
+        SimpleMailMessage userMessage = new SimpleMailMessage();
+        userMessage.setTo(email);
+        userMessage.setSubject("✅ TimeRight - Solicitação Recebida");
+        userMessage.setText(
+            "Olá " + name + ",\n\n" +
+            "Recebemos sua solicitação de suporte com sucesso!\n\n" +
+            "📋 Assunto: " + subject + "\n" +
+            "🕐 Recebido em: " + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) + "\n\n" +
+            "Nossa equipe analisará sua mensagem e retornará em breve.\n\n" +
+            "Obrigado por escolher o TimeRight!\n\n" +
+            "═══════════════════════════════════════\n" +
+            "TimeRight - Seu tempo, nossa prioridade\n" +
+            "═══════════════════════════════════════"
+        );
+        
+        mailSender.send(adminMessage);
+        mailSender.send(userMessage);
     }
     
     public void sendPasswordResetToken(String email, String token) {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setTo(email);
-        mailMessage.setSubject("Código de Redefinição de Senha - Time Right");
+        mailMessage.setSubject("🔐 TimeRight - Código de Recuperação");
         mailMessage.setText(
+            "═══════════════════════════════════════\n" +
+            "         RECUPERAÇÃO DE SENHA\n" +
+            "═══════════════════════════════════════\n\n" +
             "Olá,\n\n" +
-            "Você solicitou a redefinição de sua senha.\n\n" +
-            "Seu código de redefinição é: " + token + "\n\n" +
-            "Este código expira em 15 minutos.\n\n" +
-            "Se você não solicitou esta redefinição, ignore este e-mail.\n\n" +
-            "Equipe Time Right"
+            "Você solicitou a recuperação de sua senha no TimeRight.\n\n" +
+            "🔑 SEU CÓDIGO DE VERIFICAÇÃO:\n\n" +
+            "        " + token + "\n\n" +
+            "⏰ IMPORTANTE:\n" +
+            "• Este código expira em 10 minutos\n" +
+            "• Use apenas uma vez\n" +
+            "• Não compartilhe com ninguém\n\n" +
+            "Se você não solicitou esta recuperação, ignore este e-mail.\n" +
+            "Sua conta permanecerá segura.\n\n" +
+            "═══════════════════════════════════════\n" +
+            "TimeRight - Seu tempo, nossa prioridade\n" +
+            "═══════════════════════════════════════"
         );
-        mailMessage.setFrom("noreply@timeright.com");
         
         mailSender.send(mailMessage);
     }
