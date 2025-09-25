@@ -32,7 +32,7 @@ const Home = () => {
         <Carousel 
           activeIndex={index} 
           onSelect={handleSelect} 
-          controls={true} 
+          controls={false} 
           indicators={true}
           interval={5000}
           className="hero-carousel"

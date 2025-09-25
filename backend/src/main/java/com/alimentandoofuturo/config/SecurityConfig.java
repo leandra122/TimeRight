@@ -39,6 +39,8 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/api/auth/login").permitAll()
                 .requestMatchers("/health").permitAll()
+                .requestMatchers("/actuator/**").permitAll()
+                .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/").permitAll()
                 .requestMatchers("/api/categories/**").permitAll()
                 .requestMatchers("/api/professionals/**").permitAll()
