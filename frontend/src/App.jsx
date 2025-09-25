@@ -22,6 +22,7 @@ import AdminCategories from './pages/AdminCategories'
 import AdminProfessionals from './pages/AdminProfessionals'
 import AdminPromotions from './pages/AdminPromotions'
 import AdminSchedules from './pages/AdminSchedules'
+import AdminReports from './pages/AdminReports'
 import LoginChoice from './pages/LoginChoice'
 import ProtectedRoute from './components/ProtectedRoute'
 import ClientProtectedRoute from './components/ClientProtectedRoute'
@@ -102,6 +103,11 @@ function AppContent() {
             <Route path="/admin/agendas" element={
               <ProtectedRoute>
                 <AdminSchedules />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/relatorios" element={
+              <ProtectedRoute>
+                <AdminReports />
               </ProtectedRoute>
             } />
             

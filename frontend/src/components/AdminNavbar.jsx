@@ -42,6 +42,10 @@ const AdminNavbar = () => {
               <i className="fas fa-calendar nav-icon"></i>
               Agendas
             </Nav.Link>
+            <Nav.Link as={Link} to="/admin/relatorios">
+              <i className="fas fa-chart-bar nav-icon"></i>
+              Relatórios
+            </Nav.Link>
           </Nav>
           
           <Nav className="align-items-center">

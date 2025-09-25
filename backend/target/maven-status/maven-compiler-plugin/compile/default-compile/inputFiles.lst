@@ -2,10 +2,13 @@
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/entity/Support.java
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/service/ClientService.java
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/repository/SupportRepository.java
+/workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/controller/ReportsController.java
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/security/JwtUtil.java
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/entity/PasswordResetToken.java
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/config/SecurityConfig.java
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/entity/Admin.java
+/workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/controller/ForgotPasswordController.java
+/workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/entity/PasswordReset.java
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/dto/SupportRequest.java
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/dto/AppointmentRequest.java
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/repository/CategoryRepository.java
@@ -29,6 +32,7 @@
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/controller/AppointmentController.java
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/repository/AdminRepository.java
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/entity/Client.java
+/workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/repository/PasswordResetRepository.java
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/repository/ClientRepository.java
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/controller/SupportController.java
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/controller/ClientAuthController.java

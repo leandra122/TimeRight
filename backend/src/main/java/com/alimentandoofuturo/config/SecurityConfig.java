@@ -37,20 +37,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/api/auth/login").permitAll()
-                .requestMatchers("/health").permitAll()
-                .requestMatchers("/actuator/**").permitAll()
-                .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/").permitAll()
-                .requestMatchers("/api/categories/**").permitAll()
-                .requestMatchers("/api/professionals/**").permitAll()
-                .requestMatchers("/api/dashboard/**").permitAll()
-                .requestMatchers("/api/support/**").permitAll()
-                .requestMatchers("/api/password/**").permitAll()
-                .requestMatchers("/api/client/register").permitAll()
-                .requestMatchers("/api/client/login").permitAll()
-                .requestMatchers("/api/appointments/**").permitAll()
-                .anyRequest().authenticated()
+                .anyRequest().permitAll()
             );
         
         return http.build();

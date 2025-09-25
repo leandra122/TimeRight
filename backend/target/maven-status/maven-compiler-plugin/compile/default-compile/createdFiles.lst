@@ -16,6 +16,7 @@ com/alimentandoofuturo/controller/ProfessionalController.class
 com/alimentandoofuturo/controller/AuthController.class
 com/alimentandoofuturo/config/CorsConfig.class
 com/alimentandoofuturo/dto/LoginResponse$AdminDto.class
+com/alimentandoofuturo/controller/ReportsController.class
 com/alimentandoofuturo/dto/ClientLoginRequest.class
 com/alimentandoofuturo/service/AppointmentService.class
 com/alimentandoofuturo/dto/LoginResponse.class
@@ -30,14 +31,17 @@ com/alimentandoofuturo/controller/CategoryController.class
 com/alimentandoofuturo/controller/AuthController$ErrorResponse.class
 com/alimentandoofuturo/entity/Support.class
 com/alimentandoofuturo/entity/Client.class
+com/alimentandoofuturo/entity/PasswordReset.class
 com/alimentandoofuturo/dto/SupportRequest.class
 com/alimentandoofuturo/entity/Category.class
 com/alimentandoofuturo/controller/HomeController.class
 com/alimentandoofuturo/repository/PasswordResetTokenRepository.class
 com/alimentandoofuturo/AlimentandoOFuturoApplication.class
 com/alimentandoofuturo/entity/Appointment.class
+com/alimentandoofuturo/controller/ForgotPasswordController.class
 com/alimentandoofuturo/controller/PasswordResetController.class
 com/alimentandoofuturo/service/ClientService.class
+com/alimentandoofuturo/repository/PasswordResetRepository.class
 com/alimentandoofuturo/repository/SupportRepository.class
 com/alimentandoofuturo/service/PasswordResetService.class
 com/alimentandoofuturo/dto/ClientRegisterRequest.class

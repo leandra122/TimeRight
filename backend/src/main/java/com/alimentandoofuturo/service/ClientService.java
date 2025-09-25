@@ -33,11 +33,11 @@ public class ClientService {
     }
     
     public Optional<Client> authenticateClient(String email, String password) {
-        Optional<Client> clientOpt = clientRepository.findByEmailAndActiveTrue(email);
+        Optional<Client> clientOpt = clientRepository.findByEmail(email);
         
         if (clientOpt.isPresent()) {
             Client client = clientOpt.get();
-            if (passwordEncoder.matches(password, client.getPassword())) {
+            if (client.getActive() && passwordEncoder.matches(password, client.getPassword())) {
                 return Optional.of(client);
             }
         }
