@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Container, Row, Col, Card, Spinner } from 'react-bootstrap'
 import { useAuth } from '../hooks/useAuth'
-import { dashboardAPI } from '../api/client'
+import api from '../services/api'
 
 const AdminDashboard = () => {
   const { user } = useAuth()
@@ -19,10 +19,19 @@ const AdminDashboard = () => {
 
   const loadStats = async () => {
     try {
-      const response = await dashboardAPI.getStats()
-      setStats(response.data)
+      const response = await api.get('/dashboard/stats')
+      setStats(response.data || {
+        totalCategories: 0,
+        totalProfessionals: 0,
+        activeCategories: 0,
+        activeProfessionals: 0
+      })
     } catch (error) {
       console.error('Erro ao carregar estatísticas:', error)
+      // Se erro de autenticação, manter valores padrão
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        console.log('Erro de autenticação, usando valores padrão')
+      }
     } finally {
       setLoading(false)
     }

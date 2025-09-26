@@ -77,6 +77,11 @@ function AppContent() {
                 <ClientDashboard />
               </ClientProtectedRoute>
             } />
+            <Route path="/cliente/perfil" element={
+              <ClientProtectedRoute>
+                <ClientDashboard />
+              </ClientProtectedRoute>
+            } />
             
             {/* Área Administrativa */}
             <Route path="/admin/login" element={<AdminLogin />} />

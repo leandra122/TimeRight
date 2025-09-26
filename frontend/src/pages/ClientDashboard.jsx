@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Table, Badge, Modal, Form, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api';
 
 const ClientDashboard = () => {
     const [clientData, setClientData] = useState(null);
@@ -35,23 +35,36 @@ const ClientDashboard = () => {
     const loadData = async () => {
         try {
             const client = JSON.parse(localStorage.getItem('clientData'));
+            const token = localStorage.getItem('clientToken');
+            
+            // Configurar headers para cliente
+            const clientHeaders = {
+                'X-Client-Email': client.email,
+                'Authorization': `Bearer ${token}`
+            };
             
             // Carregar agendamentos
-            const appointmentsRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/appointments/my-appointments`, {
-                headers: { 'X-Client-Email': client.email }
+            const appointmentsRes = await api.get('/appointments/my-appointments', {
+                headers: clientHeaders
             });
-            setAppointments(appointmentsRes.data.appointments);
+            setAppointments(appointmentsRes.data.appointments || []);
             
-            // Carregar categorias e profissionais
+            // Carregar categorias e profissionais (endpoints públicos)
             const [categoriesRes, professionalsRes] = await Promise.all([
-                axios.get(`${import.meta.env.VITE_API_BASE_URL}/categories`),
-                axios.get(`${import.meta.env.VITE_API_BASE_URL}/professionals`)
+                api.get('/categories'),
+                api.get('/professionals')
             ]);
             
-            setCategories(categoriesRes.data.categories);
-            setProfessionals(professionalsRes.data.professionals);
+            setCategories(categoriesRes.data.categories || categoriesRes.data || []);
+            setProfessionals(professionalsRes.data.professionals || professionalsRes.data || []);
         } catch (error) {
             console.error('Erro ao carregar dados:', error);
+            // Se erro de autenticação, redirecionar para login
+            if (error.response?.status === 401 || error.response?.status === 403) {
+                localStorage.removeItem('clientToken');
+                localStorage.removeItem('clientData');
+                navigate('/cliente/login');
+            }
         }
     };
 
@@ -68,13 +81,18 @@ const ClientDashboard = () => {
         try {
             const client = JSON.parse(localStorage.getItem('clientData'));
             
-            await axios.post(`${import.meta.env.VITE_API_BASE_URL}/appointments`, {
+            const token = localStorage.getItem('clientToken');
+            
+            await api.post('/appointments', {
                 ...appointmentForm,
                 professionalId: parseInt(appointmentForm.professionalId),
                 categoryId: parseInt(appointmentForm.categoryId),
                 appointmentDate: new Date(appointmentForm.appointmentDate).toISOString()
             }, {
-                headers: { 'X-Client-Email': client.email }
+                headers: { 
+                    'X-Client-Email': client.email,
+                    'Authorization': `Bearer ${token}`
+                }
             });
             
             setAlert({

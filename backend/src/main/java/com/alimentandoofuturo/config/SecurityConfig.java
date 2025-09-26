@@ -39,7 +39,11 @@ public class SecurityConfig {
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/client/**").permitAll()
+                .requestMatchers("/api/categories/**").permitAll()
+                .requestMatchers("/api/professionals/**").permitAll()
+                .requestMatchers("/api/promotions/**").permitAll()
                 .requestMatchers("/health").permitAll()
+                .requestMatchers("/h2-console/**").permitAll()
                 .anyRequest().authenticated()
             );
         
