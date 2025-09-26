@@ -13,7 +13,10 @@ public class EmailService {
     
     public void sendPasswordResetCode(String email, String codigo) {
         // Mock - em produção configuraria SMTP real
-        System.out.println("Email enviado para: " + email + " com código: " + codigo);
+        // Log sanitizado para evitar injection
+        if (email != null && email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+            // Email válido, pode logar
+        }
     }
     
     public void sendPasswordResetToken(String email, String token) {

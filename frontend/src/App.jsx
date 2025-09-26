@@ -114,8 +114,11 @@ function AppContent() {
             {/* Redirecionamentos para compatibilidade */}
             <Route path="/client-register" element={<ClientRegister />} />
             <Route path="/client-login" element={<ClientLogin />} />
-            <Route path="/client-dashboard" element={<ClientDashboard />} />
-            <Route path="/login" element={<AdminLogin />} />
+            <Route path="/client-dashboard" element={
+              <ClientProtectedRoute>
+                <ClientDashboard />
+              </ClientProtectedRoute>
+            } />
             <Route path="/admin" element={
               <ProtectedRoute>
                 <AdminDashboard />

@@ -17,6 +17,7 @@ public class Client {
     private String email;
     
     @Column(nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private String password;
     
     @Column(nullable = false)

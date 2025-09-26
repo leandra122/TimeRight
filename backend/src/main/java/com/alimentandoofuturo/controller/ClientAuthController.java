@@ -26,9 +26,10 @@ public class ClientAuthController {
     
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
+        String token = java.util.UUID.randomUUID().toString();
         return ResponseEntity.ok(Map.of(
             "message", "Login realizado com sucesso",
-            "token", "mock-token-123",
+            "token", token,
             "client", Map.of(
                 "id", 1,
                 "name", "Cliente Teste",
