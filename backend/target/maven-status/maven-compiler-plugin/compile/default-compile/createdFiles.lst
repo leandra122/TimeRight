@@ -39,7 +39,6 @@ com/alimentandoofuturo/repository/PasswordResetTokenRepository.class
 com/alimentandoofuturo/AlimentandoOFuturoApplication.class
 com/alimentandoofuturo/entity/Appointment.class
 com/alimentandoofuturo/controller/ForgotPasswordController.class
-com/alimentandoofuturo/controller/PasswordResetController.class
 com/alimentandoofuturo/service/ClientService.class
 com/alimentandoofuturo/repository/PasswordResetRepository.class
 com/alimentandoofuturo/repository/SupportRepository.class

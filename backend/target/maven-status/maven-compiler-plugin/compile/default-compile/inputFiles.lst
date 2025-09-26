@@ -39,7 +39,6 @@
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/controller/ProfessionalController.java
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/dto/ClientRegisterRequest.java
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/controller/HomeController.java
-/workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/controller/PasswordResetController.java
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/dto/LoginResponse.java
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/controller/DashboardController.java
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/entity/Appointment.java
