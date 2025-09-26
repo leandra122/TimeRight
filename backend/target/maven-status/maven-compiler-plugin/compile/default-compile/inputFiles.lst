@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/controller/AuthController.java
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/entity/Support.java
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/service/ClientService.java
@@ -42,3 +43,50 @@
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/dto/LoginResponse.java
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/controller/DashboardController.java
 /workspaces/La-Belle-Vie/backend/src/main/java/com/alimentandoofuturo/entity/Appointment.java
+=======
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\controller\AuthController.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\controller\HomeController.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\repository\SupportRepository.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\dto\LoginRequest.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\AlimentandoOFuturoApplication.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\entity\Category.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\entity\Client.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\entity\PasswordResetToken.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\controller\PasswordResetController.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\service\EmailService.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\entity\Support.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\repository\AppointmentRepository.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\config\CorsConfig.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\entity\Appointment.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\service\ClientService.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\repository\ClientRepository.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\repository\ProfessionalRepository.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\dto\ForgotPasswordRequest.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\repository\AdminRepository.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\controller\ReportsController.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\repository\CategoryRepository.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\service\AppointmentService.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\service\PasswordResetService.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\controller\AppointmentController.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\controller\ClientAuthController.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\dto\ClientRegisterRequest.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\config\SecurityConfig.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\dto\LoginResponse.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\dto\ClientLoginRequest.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\entity\Admin.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\service\AdminService.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\controller\CategoryController.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\repository\PasswordResetRepository.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\dto\ResetPasswordRequest.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\entity\Professional.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\controller\ForgotPasswordController.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\controller\SupportController.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\dto\SupportRequest.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\dto\AppointmentRequest.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\security\JwtUtil.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\repository\PasswordResetTokenRepository.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\controller\ProfessionalController.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\entity\PasswordReset.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\config\DataInitializer.java
+Z:\Nova pasta\TimeRight\backend\src\main\java\com\alimentandoofuturo\controller\DashboardController.java
+>>>>>>> 3e6657ac6a0a43b35ac885a1ea2f94781e1b79d2

@@ -4,7 +4,11 @@ Para adicionar as imagens do carrossel, faça o download das páginas 01, 02 e 0
 
 - `1.png` - Página 01 do TimeRight
 - `2.png` - Página 02 do TimeRight  
+<<<<<<< HEAD
 - `3.png` - Página 03 do TimeRight
+=======
+- `3.png` - Página 06 do TimeRight
+>>>>>>> 3e6657ac6a0a43b35ac885a1ea2f94781e1b79d2
 
 As imagens devem ter resolução mínima de 1920x1080 para melhor qualidade em telas grandes.
 
