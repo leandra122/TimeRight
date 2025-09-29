@@ -67,7 +67,7 @@ public class Admin implements UserDetails {
     
     @Override
     public boolean isEnabled() {
-        return active;
+        return active != null && active;
     }
     
     public Long getId() { return id; }

@@ -24,7 +24,7 @@ spring:
     host: smtp.office365.com
     port: 587
     username: ${MAIL_USERNAME:rm94877@estudante.fieb.edu.br}
-    password: ${MAIL_PASSWORD:your_password_here}
+    password: ${MAIL_PASSWORD:}
     properties:
       mail:
         smtp:
@@ -35,7 +35,7 @@ spring:
             trust: smtp.office365.com
 
 jwt:
-  secret: timeright_super_secret_jwt_key_2024
+  secret: ${JWT_SECRET:timeright_super_secret_jwt_key_2024}
   expiration: 86400000
 
 cors:

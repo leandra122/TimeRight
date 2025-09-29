@@ -1,5 +1,12 @@
 // API de autenticação - funções para login, cadastro e logout
-import apiClient from './client';
+import axios from 'axios';
+
+const apiClient = axios.create({
+  baseURL: 'https://cuddly-doodle-x5v5x45w6xpgcvxvj-8080.app.github.dev',
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
 
 export const authAPI = {
   // Realiza login do usuário

@@ -46,10 +46,10 @@ function AppContent() {
   const location = useLocation()
   
   const getNavbar = () => {
-    if (location.pathname.startsWith('/admin')) {
+    if (location.pathname.startsWith('/admin') && location.pathname !== '/admin/login') {
       return <AdminNavbar />
     }
-    if (location.pathname.startsWith('/cliente')) {
+    if (location.pathname.startsWith('/cliente') && location.pathname !== '/cliente/login' && location.pathname !== '/cliente/cadastro') {
       return <ClientNavbar />
     }
     return <Navbar />

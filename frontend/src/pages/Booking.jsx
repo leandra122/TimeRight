@@ -21,6 +21,9 @@ const Booking = () => {
 
   useEffect(() => {
     fetchServices();
+  }, []);
+  
+  useEffect(() => {
     // Verifica se há serviço pré-selecionado via URL
     const urlParams = new URLSearchParams(window.location.search);
     const serviceId = urlParams.get('service');
