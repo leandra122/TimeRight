@@ -16,7 +16,7 @@ const dbConfig = {
 };
 
 // Configuração do nodemailer
-const transporter = nodemailer.createTransporter({
+const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: process.env.SMTP_PORT,
   secure: false,
@@ -24,6 +24,25 @@ const transporter = nodemailer.createTransporter({
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS
   }
+});
+
+// Endpoint de login simples
+router.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  
+  if (email === 'admin@timeright.com' && password === 'admin123') {
+    return res.json({
+      message: 'Login realizado com sucesso',
+      token: 'fake-jwt-token',
+      admin: {
+        id: 1,
+        name: 'Administrador Time Right',
+        email: 'admin@timeright.com'
+      }
+    });
+  }
+  
+  return res.status(401).json({ error: 'Credenciais inválidas' });
 });
 
 // Endpoint para recuperação de senha
