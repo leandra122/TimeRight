@@ -16,11 +16,11 @@ const Home = () => {
       alt: 'Página 01 do TimeRight - Apresentação do sistema'
     },
     {
-      src: '/images/2.png',
+      src: '/images/2-1.png',
       alt: 'Página 02 do TimeRight - Funcionalidades principais'
     },
     {
-      src: '/images/3.png',
+      src: '/images/3-1.png',
       alt: 'Página 06 do TimeRight - Interface do usuário'
     }
   ]

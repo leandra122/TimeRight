@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: 'https://cuddly-doodle-x5v5x45w6xpgcvxvj-8080.app.github.dev',
+  baseURL: 'http://localhost:8080',
   headers: {
     'Content-Type': 'application/json'
   }
