@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_BASE_URL = 'https://cuddly-doodle-x5v5x45w6xpgcvxvj-8080.app.github.dev'
+const API_BASE_URL = 'http://localhost:8080/api/v1/usuario'
 
 const api = axios.create({
   baseURL: API_BASE_URL,
