@@ -54,7 +54,7 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <Button as={Link} to="/login" variant="outline-light" size="sm" className="me-2">
+                <Button as={Link} to="/admin-login" variant="outline-light" size="sm" className="me-2">
                   <i className="fas fa-sign-in-alt me-1"></i>
                   Entrar
                 </Button>

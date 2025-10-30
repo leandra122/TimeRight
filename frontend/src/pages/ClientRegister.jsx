@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 
 const ClientRegister = () => {
     const [formData, setFormData] = useState({
-        name: '',
+        nome: '',
         email: '',
-        password: '',
-        confirmPassword: '',
-        phone: ''
+        senha: '',
+        confirmPassword: ''
     });
     const [loading, setLoading] = useState(false);
     const [alert, setAlert] = useState({ show: false, type: '', message: '' });
@@ -25,7 +23,7 @@ const ClientRegister = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        if (formData.password !== formData.confirmPassword) {
+        if (formData.senha !== formData.confirmPassword) {
             setAlert({
                 show: true,
                 type: 'danger',
@@ -34,15 +32,37 @@ const ClientRegister = () => {
             return;
         }
         
+        if (formData.senha.length < 6) {
+            setAlert({
+                show: true,
+                type: 'danger',
+                message: 'Senha deve ter pelo menos 6 caracteres'
+            });
+            return;
+        }
+        
         setLoading(true);
         
         try {
-            await axios.post('/api/client/register', {
-                name: formData.name,
+            const userData = {
+                nome: formData.nome,
                 email: formData.email,
-                password: formData.password,
-                phone: formData.phone
+                senha: formData.senha,
+                dataCadastro: new Date().toISOString().split('T')[0],
+                codStatus: true
+            };
+
+            const response = await fetch('http://localhost:8080/api/usuario', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userData)
             });
+
+            if (!response.ok) {
+                throw new Error('Erro no cadastro');
+            }
             
             setAlert({
                 show: true,
@@ -55,18 +75,10 @@ const ClientRegister = () => {
             }, 2000);
             
         } catch (error) {
-            let errorMessage = 'Erro ao realizar cadastro';
-            
-            if (error.code === 'ERR_NETWORK' || error.message.includes('ERR_CONNECTION_REFUSED')) {
-                errorMessage = 'Servidor indisponível. Tente novamente em alguns instantes.';
-            } else if (error.response?.data?.error) {
-                errorMessage = error.response.data.error;
-            }
-            
             setAlert({
                 show: true,
                 type: 'danger',
-                message: errorMessage
+                message: error.message || 'Erro no cadastro'
             });
         } finally {
             setLoading(false);
@@ -93,8 +105,8 @@ const ClientRegister = () => {
                                     <Form.Label>Nome Completo</Form.Label>
                                     <Form.Control
                                         type="text"
-                                        name="name"
-                                        value={formData.name}
+                                        name="nome"
+                                        value={formData.nome}
                                         onChange={handleChange}
                                         required
                                     />
@@ -112,23 +124,11 @@ const ClientRegister = () => {
                                 </Form.Group>
                                 
                                 <Form.Group className="mb-3">
-                                    <Form.Label>Telefone</Form.Label>
-                                    <Form.Control
-                                        type="tel"
-                                        name="phone"
-                                        value={formData.phone}
-                                        onChange={handleChange}
-                                        placeholder="(11) 99999-9999"
-                                        required
-                                    />
-                                </Form.Group>
-                                
-                                <Form.Group className="mb-3">
                                     <Form.Label>Senha</Form.Label>
                                     <Form.Control
                                         type="password"
-                                        name="password"
-                                        value={formData.password}
+                                        name="senha"
+                                        value={formData.senha}
                                         onChange={handleChange}
                                         minLength="6"
                                         required

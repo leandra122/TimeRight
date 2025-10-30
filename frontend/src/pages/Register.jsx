@@ -1,27 +1,48 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext.jsx';
 
 const Register = () => {
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [formData, setFormData] = useState({ nome: '', email: '', senha: '' });
   const [error, setError] = useState('');
-  const { register, loading } = useAuth();
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    if (formData.password.length < 6) {
+    if (formData.senha.length < 6) {
       setError('Senha deve ter pelo menos 6 caracteres');
       return;
     }
 
+    setLoading(true);
     try {
-      await register(formData);
-      navigate('/dashboard');
+      const userData = {
+        nome: formData.nome,
+        email: formData.email,
+        senha: formData.senha,
+        dataCadastro: new Date().toISOString().split('T')[0],
+        codStatus: true
+      };
+
+      const response = await fetch('http://localhost:8080/api/usuario', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(userData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro no cadastro');
+      }
+
+      navigate('/login');
     } catch (err) {
       setError(err.message || 'Erro no cadastro');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -42,12 +63,12 @@ const Register = () => {
 
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label htmlFor="name">Nome:</label>
+              <label htmlFor="nome">Nome:</label>
               <input
                 type="text"
-                id="name"
-                name="name"
-                value={formData.name}
+                id="nome"
+                name="nome"
+                value={formData.nome}
                 onChange={handleChange}
                 required
               />
@@ -66,12 +87,12 @@ const Register = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="password">Senha:</label>
+              <label htmlFor="senha">Senha:</label>
               <input
                 type="password"
-                id="password"
-                name="password"
-                value={formData.password}
+                id="senha"
+                name="senha"
+                value={formData.senha}
                 onChange={handleChange}
                 required
                 minLength="6"

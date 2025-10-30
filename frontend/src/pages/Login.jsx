@@ -1,23 +1,55 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext.jsx';
 
 const Login = () => {
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [formData, setFormData] = useState({ email: '', senha: '' });
   const [error, setError] = useState('');
-  const { login, loading } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
     try {
-      await login(formData);
-      navigate('/dashboard');
+      const response = await fetch('http://localhost:8080/api/usuario/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          senha: formData.senha
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Email ou senha inválidos');
+      }
+
+      const userData = await response.json();
+      localStorage.setItem('user', JSON.stringify(userData));
+      setUser(userData);
+      navigate('/admin-dashboard');
     } catch (err) {
       setError(err.message || 'Erro no login');
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    setUser(null);
   };
 
   const handleChange = (e) => {
@@ -49,29 +81,44 @@ const Login = () => {
             </div>
 
             <div className="form-group">
-              <label htmlFor="password">Senha:</label>
+              <label htmlFor="senha">Senha:</label>
               <input
                 type="password"
-                id="password"
-                name="password"
-                value={formData.password}
+                id="senha"
+                name="senha"
+                value={formData.senha}
                 onChange={handleChange}
                 required
               />
             </div>
 
-            <button 
-              type="submit" 
-              className="btn btn-primary"
-              disabled={loading}
-            >
-              {loading ? 'Entrando...' : 'Entrar'}
-            </button>
+            {user ? (
+              <div className="user-info">
+                <span>Bem-vindo, {user.nome}!</span>
+                <button 
+                  type="button" 
+                  className="btn btn-secondary"
+                  onClick={handleLogout}
+                >
+                  Sair
+                </button>
+              </div>
+            ) : (
+              <button 
+                type="submit" 
+                className="btn btn-primary"
+                disabled={loading}
+              >
+                {loading ? 'Entrando...' : 'Entrar'}
+              </button>
+            )}
           </form>
 
-          <p className="auth-link">
-            Não tem conta? <Link to="/register">Cadastre-se</Link>
-          </p>
+          {!user && (
+            <p className="auth-link">
+              Não tem conta? <Link to="/register">Cadastre-se</Link>
+            </p>
+          )}
         </div>
       </div>
     </div>

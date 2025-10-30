@@ -1,14 +1,20 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Container, Row, Col, Card, Form, Button, Alert } from 'react-bootstrap'
 import { useNavigate, Link } from 'react-router-dom'
-import { useAuth } from '../hooks/useAuth'
 
 const AdminLogin = () => {
-  const [formData, setFormData] = useState({ email: '', password: '' })
+  const [formData, setFormData] = useState({ email: '', senha: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const { login } = useAuth()
+  const [user, setUser] = useState(null)
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const userData = localStorage.getItem('user')
+    if (userData) {
+      setUser(JSON.parse(userData))
+    }
+  }, [])
 
   const handleChange = (e) => {
     setFormData({
@@ -23,13 +29,35 @@ const AdminLogin = () => {
     setError('')
 
     try {
-      await login(formData)
-      navigate('/admin/dashboard')
+      const response = await fetch('http://localhost:8080/api/usuario/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          senha: formData.senha
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Email ou senha inválidos')
+      }
+
+      const userData = await response.json()
+      localStorage.setItem('user', JSON.stringify(userData))
+      setUser(userData)
+      navigate('/admin-dashboard')
     } catch (error) {
       setError(error.message || 'Erro no login')
     }
     
     setLoading(false)
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('user')
+    setUser(null)
   }
 
   return (
@@ -58,34 +86,51 @@ const AdminLogin = () => {
                   <Form.Label>Senha</Form.Label>
                   <Form.Control
                     type="password"
-                    name="password"
-                    value={formData.password}
+                    name="senha"
+                    value={formData.senha}
                     onChange={handleChange}
                     required
                   />
                 </Form.Group>
                 
-                <Button 
-                  type="submit" 
-                  variant="primary" 
-                  className="w-100"
-                  disabled={loading}
-                >
-                  {loading ? 'Entrando...' : 'Entrar'}
-                </Button>
+                {user ? (
+                  <div className="text-center">
+                    <p className="mb-3">Bem-vindo, {user.nome}!</p>
+                    <Button 
+                      variant="secondary" 
+                      className="w-100"
+                      onClick={handleLogout}
+                    >
+                      Sair
+                    </Button>
+                  </div>
+                ) : (
+                  <Button 
+                    type="submit" 
+                    variant="primary" 
+                    className="w-100"
+                    disabled={loading}
+                  >
+                    {loading ? 'Entrando...' : 'Entrar'}
+                  </Button>
+                )}
               </Form>
               
-              <div className="text-center mt-3">
-                <Link to="/forgot-password" className="text-decoration-none">
-                  🔐 Esqueceu sua senha?
-                </Link>
-              </div>
-              
-              <div className="text-center mt-2">
-                <small className="text-muted">
-                  Credenciais: admin@timeright.com / admin123
-                </small>
-              </div>
+              {!user && (
+                <>
+                  <div className="text-center mt-3">
+                    <Link to="/forgot-password" className="text-decoration-none">
+                      🔐 Esqueceu sua senha?
+                    </Link>
+                  </div>
+                  
+                  <div className="text-center mt-2">
+                    <small className="text-muted">
+                      Credenciais: admin@timeright.com / admin123
+                    </small>
+                  </div>
+                </>
+              )}
             </Card.Body>
           </Card>
         </Col>
