@@ -1,0 +1,23 @@
+Primeiramente eu vou te explicar cada usuário como vai funcionar, se você tiver dúvidas pode perguntar sobre, pode dar sugestões sobre o que melhorar, enfim, quero ajuda.
+
+Usuário Comum (quem vai baixar o aplicativo mobile para usar os agendamentos): parte mobile, o usuário faz cadastro de nível acesso user(cliente/usuário).
+
+Nesse nível de acesso deve ser possível: login, realizar agendamentos, pesquisar salões, escolher por qual funcionário quer ser atendido e o serviço, favoritar salão, favoritar 
+
+funcionário, consultar lista de favoritados, por foto de perfil, alterar senha, alterar nome de usuário.
+ 
+Gerente do Salão (quem vai cadastrar o salão): parte web, o gerente faz cadastro como usuário de nível acesso manager(gerente), após essa ação, ele realiza o cadastro do salão(nome do salão, CNPJ, cep, foto de perfil, fotos do lugar, cadastro de serviços com duração e preço, numero de telefone, cadastro dos funcionários). 
+
+Nesse nível de acesso deve ser possível: login, consultar agendamentos, realizar o cadastro dos funcionários, cadastro dos serviços disponíveis, bloqueio de dias ou horários da agenda, excluir o próprio salao ou inativar, inativar ou excluir funcionários, inativar ou excluir serviços.
+ 
+Funcionário do Salão (quem trabalha no salão):  parte web, não faz o próprio cadastro, apenas realiza login.
+
+Nesse nível de acesso deve ser possível: login, consultar apenas a própria agenda, bloquear datas na propria agenda (mas antes deve passar por autorização do gerente).
+ 
+Administrador Geral do Sistema: parte web, realiza apenas login no nível de acesso admin(administrador) (os perfis já estarão cadastrados no banco).
+
+dashboard geral do sistema com todos os salões cadastrados, gerentes, funcionários e usuários comuns, inativar ou excluir salões, inativar ou excluir perfis de gerente.
+ 
+ 
+Partes automáticas do sistema: usuário e funcionario- notificação de lembrete de agendamento(para cliente e funcionário), regras de negocio como: não deve ser possível marcar um agendamento em um dia e horário já ocupado por outro cliente, marcar um agendamento com 60 dias ou mais de antecedência, marcar um agendamento em dias que já passaram, marcar um agendamento com menos de 2 horas de antecedência
+ 

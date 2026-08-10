@@ -1,2 +1,0 @@
-# TimeRight
-Projeto completo
