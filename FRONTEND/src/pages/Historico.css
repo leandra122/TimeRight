@@ -1,0 +1,97 @@
+.historico-page {
+  min-height: 100vh;
+  background: var(--off-white);
+}
+
+.historico-container {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 40px 24px 60px;
+}
+
+.historico-header {
+  margin-bottom: 32px;
+  animation: fadeInUp 0.35s ease;
+}
+.historico-header h1 { font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.historico-header p { font-size: 14px; color: var(--text-soft); }
+
+.historico-lista { display: flex; flex-direction: column; gap: 14px; }
+
+.historico-card {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  padding: 22px 24px;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: var(--transition);
+  flex-wrap: wrap;
+}
+.historico-card:hover { box-shadow: var(--shadow-sm); border-color: var(--brand-light); }
+
+.historico-card-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  min-width: 180px;
+}
+.historico-avatar {
+  width: 44px;
+  height: 44px;
+  background: var(--brand-pale);
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brand-dark);
+  flex-shrink: 0;
+}
+.historico-info h3 { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.historico-local {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-soft);
+}
+
+.historico-detalhes {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: var(--text-soft);
+}
+.historico-detalhes span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.historico-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.btn-cancelar { padding: 7px 14px; font-size: 12px; }
+
+.historico-vazio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 60px 0;
+  color: var(--text-soft);
+  text-align: center;
+}
+.historico-vazio p { font-size: 16px; font-weight: 600; color: var(--text); margin: 0; }
+.historico-vazio span { font-size: 13px; }
+
+@media (max-width: 600px) {
+  .historico-card { flex-direction: column; align-items: flex-start; }
+  .historico-actions { width: 100%; justify-content: space-between; }
+}

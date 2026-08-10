@@ -1,0 +1,27 @@
+USE bd_timeright;
+GO
+
+IF NOT EXISTS (
+    SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_NAME = 'Salao' AND COLUMN_NAME = 'razao_social'
+)
+    ALTER TABLE Salao ADD razao_social VARCHAR(150) NULL;
+
+IF NOT EXISTS (
+    SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_NAME = 'Salao' AND COLUMN_NAME = 'nome_fantasia'
+)
+    ALTER TABLE Salao ADD nome_fantasia VARCHAR(150) NULL;
+
+IF NOT EXISTS (
+    SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_NAME = 'Salao' AND COLUMN_NAME = 'situacao_cadastral'
+)
+    ALTER TABLE Salao ADD situacao_cadastral VARCHAR(50) NULL;
+
+IF NOT EXISTS (
+    SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_NAME = 'Salao' AND COLUMN_NAME = 'estabelecimento_verificado'
+)
+    ALTER TABLE Salao ADD estabelecimento_verificado BIT NOT NULL DEFAULT 0;
+GO

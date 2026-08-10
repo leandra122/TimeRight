@@ -1,0 +1,305 @@
+.admin-page {
+  min-height: 100vh;
+  background: var(--off-white);
+}
+
+.admin-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 24px 60px;
+}
+
+/* Welcome */
+.admin-welcome {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 36px;
+  animation: fadeInUp 0.35s ease;
+}
+.admin-welcome-avatar {
+  width: 56px;
+  height: 56px;
+  background: var(--brand);
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+  box-shadow: 0 6px 20px rgba(255, 161, 186, 0.35);
+}
+.admin-welcome h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.admin-welcome p { font-size: 14px; color: var(--text-soft); }
+
+/* Stats */
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 40px;
+}
+.stat-card {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: var(--transition);
+}
+.stat-card:hover { box-shadow: var(--shadow-sm); }
+.stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.stat-icon--blue { background: #eff6ff; color: #2563eb; }
+.stat-icon--green { background: #f0fdf4; color: #16a34a; }
+.stat-icon--pink { background: var(--brand-pale); color: var(--brand-dark); }
+.stat-icon--orange { background: #fff7ed; color: #ea580c; }
+.stat-icon--purple { background: #f5f3ff; color: #7c3aed; }
+.stat-label { font-size: 12px; color: var(--text-soft); margin-bottom: 3px; }
+.stat-value { font-size: 20px; font-weight: 700; color: var(--text); }
+
+/* Section title */
+.admin-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 16px;
+}
+
+/* Atalhos */
+.admin-atalhos {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.atalho-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 22px 24px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: var(--text);
+  transition: var(--transition);
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  text-align: left;
+}
+.atalho-card:hover {
+  border-color: var(--brand-light);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+.atalho-card strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+.atalho-card span {
+  font-size: 12px;
+  color: var(--text-soft);
+}
+.atalho-icon {
+  width: 48px;
+  height: 48px;
+  background: var(--brand-pale);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brand-dark);
+  flex-shrink: 0;
+}
+.atalho-card--danger { border-color: #ffc9c9; }
+.atalho-card--danger:hover { border-color: #f87171; box-shadow: 0 4px 16px rgba(239,68,68,0.12); }
+.atalho-card--danger:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.atalho-icon--danger { background: #fff0f0; color: #d93025; }
+
+/* ── Admin header (Painel, Funcionários, etc.) ── */
+.admin-header { margin-bottom: 28px; }
+.admin-header h1 { font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.admin-header p { font-size: 14px; color: var(--text-soft); }
+
+.admin-boas-vindas { margin-bottom: 28px; }
+.admin-boas-vindas h1 { font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.admin-boas-vindas p { font-size: 14px; color: var(--text-soft); }
+
+/* ── Card ── */
+.admin-card { width: 100%; }
+.admin-card h2 { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.admin-subtitulo { font-size: 13px; color: var(--text-soft); margin-bottom: 22px; line-height: 1.5; }
+
+/* ── Tabela ── */
+.agenda-tabela {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.tabela-header,
+.tabela-linha {
+  display: grid;
+  grid-template-columns: 2fr 2fr 1.2fr 1fr 1.2fr;
+  padding: 13px 20px;
+  align-items: center;
+}
+.tabela-header-acoes,
+.tabela-linha-acoes {
+  grid-template-columns: 2fr 2fr 1.5fr 1.5fr 1fr 1.5fr;
+}
+
+.tabela-header {
+  background: var(--off-white);
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--text-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  border-bottom: 1px solid var(--border);
+}
+
+.tabela-linha {
+  font-size: 13.5px;
+  color: var(--text);
+  border-top: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.tabela-linha:hover { background: var(--brand-pale); }
+
+/* ── Ações ── */
+.acoes-btns { display: flex; gap: 6px; align-items: center; }
+
+.btn-acao {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: var(--transition);
+  color: var(--text-soft);
+}
+.btn-acao:hover { border-color: var(--brand-light); background: var(--brand-pale); }
+.btn-acao.salvar { border-color: #bbf7d0; background: #f0fdf4; color: #166534; }
+.btn-acao.salvar:hover { background: #dcfce7; }
+.btn-acao.cancelar-acao { border-color: #ffc9c9; background: #fff0f0; color: #d93025; }
+.btn-acao.cancelar-acao:hover { background: #ffe0e0; }
+
+/* ── Inputs inline ── */
+.input-hora, .select-status {
+  padding: 7px 10px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: 'Poppins', sans-serif;
+  color: var(--text);
+  background: var(--white);
+  outline: none;
+  width: 100%;
+  transition: var(--transition);
+}
+.input-hora:focus, .select-status:focus {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(255, 161, 186, 0.15);
+}
+
+/* ── Form salão ── */
+.salao-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* ── Abas ── */
+.admin-abas { display: flex; gap: 8px; margin-bottom: 24px; }
+.aba-btn {
+  padding: 10px 22px;
+  border: 1.5px solid var(--border);
+  border-radius: 50px;
+  background: var(--white);
+  color: var(--text-soft);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: 'Poppins', sans-serif;
+}
+.aba-btn.ativa {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(255, 161, 186, 0.35);
+}
+
+/* ── Aviso ── */
+.aviso-unico-cadastro {
+  background: #fff8e1;
+  color: #e65100;
+  border: 1px solid #ffe082;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .admin-stats { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .admin-stats { grid-template-columns: 1fr 1fr; }
+  .admin-atalhos { grid-template-columns: 1fr; }
+  .salao-form .form-row { grid-template-columns: 1fr; }
+  .tabela-header, .tabela-linha { grid-template-columns: 1fr 1fr; font-size: 12px; }
+  .tabela-header-acoes, .tabela-linha-acoes { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── Serviços (CadastroSalao) ── */
+.servicos-section-admin { margin-top: 28px; }
+.servicos-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.servicos-header h4 { font-size: 15px; font-weight: 600; color: var(--text); }
+.servicos-lista { display: flex; flex-direction: column; gap: 8px; }
+.servico-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--off-white);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.servico-item strong { display: block; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.servico-item span { font-size: 12px; color: var(--text-soft); }
