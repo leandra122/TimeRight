@@ -1,9 +1,8 @@
 USE bd_timeright;
 GO
 
--- =========================
--- DROP SEGURO
--- =========================
+
+-- DROP 
 DROP TABLE IF EXISTS Agendamento;
 DROP TABLE IF EXISTS Funcionario;
 DROP TABLE IF EXISTS Servico;
@@ -12,9 +11,7 @@ DROP TABLE IF EXISTS NivelAcesso;
 DROP TABLE IF EXISTS Salao;
 GO
 
--- =========================
 -- NÍVEL DE ACESSO
--- =========================
 CREATE TABLE NivelAcesso (
     id INT IDENTITY(1,1) PRIMARY KEY,
     nome VARCHAR(50) NOT NULL,
@@ -28,9 +25,8 @@ VALUES
 ('user', 'ATIVO');
 GO
 
--- =========================
+
 -- USUÁRIO
--- =========================
 CREATE TABLE Usuario (
     id INT IDENTITY(1,1) PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
@@ -52,9 +48,7 @@ CREATE TABLE Usuario (
 );
 GO
 
--- =========================
 -- SALÃO
--- =========================
 CREATE TABLE Salao (
     id INT IDENTITY(1,1) PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
@@ -66,9 +60,7 @@ CREATE TABLE Salao (
 );
 GO
 
--- =========================
 -- SERVIÇO
--- =========================
 CREATE TABLE Servico (
     id INT IDENTITY(1,1) PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
@@ -85,9 +77,7 @@ CREATE TABLE Servico (
 );
 GO
 
--- =========================
 -- FUNCIONÁRIO
--- =========================
 CREATE TABLE Funcionario (
     id INT IDENTITY(1,1) PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
@@ -105,9 +95,7 @@ CREATE TABLE Funcionario (
 );
 GO
 
--- =========================
 -- AGENDAMENTO
--- =========================
 CREATE TABLE Agendamento (
     id INT IDENTITY(1,1) PRIMARY KEY,
 
@@ -134,9 +122,7 @@ CREATE TABLE Agendamento (
 );
 GO
 
--- =========================
 -- TABELA AVALIACAO
--- =========================
 CREATE TABLE Avaliacao (
     id              INT IDENTITY(1,1) PRIMARY KEY,
     usuario_id      INT NOT NULL,
@@ -157,10 +143,8 @@ CREATE TABLE Avaliacao (
 );
 GO
 
--- =========================
 -- TRIGGER (regra de negócio)
 -- SOMENTE USER PODE AGENDAR
--- =========================
 CREATE TRIGGER trg_agendamento_user
 ON Agendamento
 INSTEAD OF INSERT
@@ -200,9 +184,7 @@ BEGIN
 END;
 GO
 
--- =========================
--- CONSULTAS
--- =========================
+
 SELECT * FROM NivelAcesso;
 SELECT * FROM Usuario;
 SELECT * FROM Salao;
