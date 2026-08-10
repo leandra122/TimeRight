@@ -1,0 +1,19 @@
+# Logs
+*.log
+
+# Variáveis de ambiente
+.env
+.env.*
+
+# Configurações locais com senhas
+application-local.properties
+application-local.yml
+
+# Arquivos gerados
+node_modules/
+target/
+dist/
+
+# Editores
+.vscode/
+.idea/
