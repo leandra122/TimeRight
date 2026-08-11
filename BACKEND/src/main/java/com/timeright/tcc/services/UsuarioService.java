@@ -59,15 +59,8 @@ public class UsuarioService {
             throw new RuntimeException("Email já cadastrado");
         }
 
-        // 🔴 CORREÇÃO PRINCIPAL: nunca confiar no objeto vindo do frontend
-        if (usuario.getNivelAcesso() == null || usuario.getNivelAcesso().getId() == null) {
-            throw new RuntimeException("Nível de acesso é obrigatório.");
-        }
-
-        Long nivelId = usuario.getNivelAcesso().getId();
-
-        NivelAcesso nivel = nivelAcessoRepository.findById(nivelId)
-                .orElseThrow(() -> new RuntimeException("Nível de acesso não encontrado."));
+        NivelAcesso nivel = nivelAcessoRepository.findByNomeIgnoreCase("manager")
+                .orElseThrow(() -> new RuntimeException("Nível de acesso manager não encontrado."));
 
         Usuario novo = new Usuario();
         novo.setNome(usuario.getNome());
@@ -142,7 +135,6 @@ public class UsuarioService {
 
         usuarioRepository.save(usuario);
 
-        System.out.println("[MOCK] Token de recuperação: " + token);
     }
 
     @Transactional

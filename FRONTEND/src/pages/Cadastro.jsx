@@ -10,8 +10,7 @@ const Cadastro = () => {
   const [form, setForm] = useState({
     nome: '',
     email: '',
-    senha: '',
-    tipo: 'manager'
+    senha: ''
   });
 
   const [erro, setErro] = useState('');
@@ -25,42 +24,18 @@ const Cadastro = () => {
     });
   };
 
-  const handleTipo = (tipo) => {
-    setForm({
-      ...form,
-      tipo
-    });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     setErro('');
     setLoading(true);
 
-    // IDs corretos do banco
-    // 1 = adm
-    // 2 = manager
-    // 3 = user
-
-    const nivelAcessoId =
-      form.tipo === 'admin'
-        ? 1
-        : form.tipo === 'manager'
-        ? 2
-        : 3;
-
     const payload = {
       nome: form.nome,
       username: form.email,
-      password: form.senha,
-      statusUsuario: "ATIVO",
-      nivelAcesso: {
-        id: nivelAcessoId
-      }
+      password: form.senha
     };
 
-    console.log("Enviando:", payload);
 
     try {
       const response = await fetch("http://localhost:8080/usuarios", {
@@ -73,7 +48,6 @@ const Cadastro = () => {
 
       const data = await response.json();
 
-      console.log("Resposta:", data);
 
       if (!response.ok) {
         throw new Error(
@@ -83,24 +57,14 @@ const Cadastro = () => {
         );
       }
 
-      if (form.tipo === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/manager");
-      }
+      navigate("/login");
 
     } catch (err) {
-      console.error(err);
       setErro(err.message);
     } finally {
       setLoading(false);
     }
   };
-
-  const tipos = [
-    { key: "manager", label: "Gerente" },
-    { key: "admin", label: "Administrador" }
-  ];
 
   return (
     <div className="auth-page">
@@ -114,21 +78,8 @@ const Cadastro = () => {
               <Scissors size={24} />
             </div>
 
-            <h2>Criar sua conta</h2>
+            <h2>Criar conta de gerente</h2>
             <p>Preencha os dados abaixo para começar</p>
-          </div>
-
-          <div className="tipo-selector">
-            {tipos.map((t) => (
-              <button
-                key={t.key}
-                type="button"
-                className={`tipo-btn ${form.tipo === t.key ? "ativo" : ""}`}
-                onClick={() => handleTipo(t.key)}
-              >
-                {t.label}
-              </button>
-            ))}
           </div>
 
           <form onSubmit={handleSubmit}>
@@ -210,15 +161,7 @@ const Cadastro = () => {
               type="submit"
               disabled={loading}
             >
-              {loading
-                ? "Criando conta..."
-                : `Criar conta como ${
-                    form.tipo === "admin"
-                      ? "Administrador"
-                      : form.tipo === "manager"
-                      ? "Gerente"
-                      : "Cliente"
-                  }`}
+              {loading ? "Criando conta..." : "Criar conta como Gerente"}
             </button>
 
           </form>

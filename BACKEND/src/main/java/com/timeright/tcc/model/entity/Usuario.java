@@ -2,6 +2,8 @@ package com.timeright.tcc.model.entity;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -27,6 +29,7 @@ public class Usuario {
     private String username;
 
     @Column(name = "password")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Column(name = "data_cadastro")
@@ -43,9 +46,11 @@ public class Usuario {
     private String statusUsuario;
 
     @Column(name = "reset_token")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String resetToken;
 
     @Column(name = "reset_token_expiracao")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private LocalDateTime resetTokenExpiracao;
 
 
