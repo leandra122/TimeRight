@@ -27,7 +27,7 @@ const Login = () => {
       });
       if (!response.ok) {
         const erroResponse = await response.json();
-        throw new Error(erroResponse.message || 'Erro ao fazer login');
+        throw new Error(erroResponse.error || erroResponse.message || 'Erro ao fazer login');
       }
       const usuario = await response.json();
       const nivelId = usuario.nivelAcesso?.id;

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,10 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class UsuarioService {
+
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(
+            "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}$",
+            Pattern.CASE_INSENSITIVE);
 
     private final UsuarioRepository usuarioRepository;
     private final NivelAcessoRepository nivelAcessoRepository;
@@ -55,7 +60,11 @@ public class UsuarioService {
     @Transactional
     public Usuario salvar(Usuario usuario) {
 
-        if (usuarioRepository.findByUsername(usuario.getUsername()).isPresent()) {
+        validarCadastro(usuario);
+
+        String username = usuario.getUsername().trim().toLowerCase();
+
+        if (usuarioRepository.findByUsername(username).isPresent()) {
             throw new RuntimeException("Email já cadastrado");
         }
 
@@ -63,14 +72,30 @@ public class UsuarioService {
                 .orElseThrow(() -> new RuntimeException("Nível de acesso manager não encontrado."));
 
         Usuario novo = new Usuario();
-        novo.setNome(usuario.getNome());
-        novo.setUsername(usuario.getUsername());
+        novo.setNome(usuario.getNome().trim());
+        novo.setUsername(username);
         novo.setPassword(passwordEncoder.encode(usuario.getPassword()));
         novo.setNivelAcesso(nivel);
         novo.setStatusUsuario("ATIVO");
         novo.setDataCadastro(LocalDateTime.now());
 
         return usuarioRepository.save(novo);
+    }
+
+    private void validarCadastro(Usuario usuario) {
+        if (usuario == null) {
+            throw new RuntimeException("Dados do cadastro são obrigatórios");
+        }
+        if (usuario.getNome() == null || usuario.getNome().isBlank()) {
+            throw new RuntimeException("Nome é obrigatório");
+        }
+        if (usuario.getUsername() == null
+                || !EMAIL_PATTERN.matcher(usuario.getUsername().trim()).matches()) {
+            throw new RuntimeException("E-mail inválido");
+        }
+        if (usuario.getPassword() == null || usuario.getPassword().length() < 6) {
+            throw new RuntimeException("A senha deve ter no mínimo 6 caracteres");
+        }
     }
 
     // =========================

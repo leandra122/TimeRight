@@ -5,9 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.util.Optional;
 
@@ -72,6 +74,40 @@ class UsuarioServiceTest {
                 () -> assertEquals("senha-codificada", usuarioSalvo.getPassword()),
                 () -> assertEquals("ATIVO", usuarioSalvo.getStatusUsuario()),
                 () -> assertNotNull(usuarioSalvo.getDataCadastro()));
+    }
+
+    @Test
+    void salvarNormalizaNomeEEmail() {
+        NivelAcesso manager = novoNivel(2L, "manager");
+        Usuario usuario = new Usuario();
+        usuario.setNome("  Gerente Teste  ");
+        usuario.setUsername("  GERENTE@TESTE.COM  ");
+        usuario.setPassword("123456");
+
+        when(usuarioRepository.findByUsername("gerente@teste.com")).thenReturn(Optional.empty());
+        when(nivelAcessoRepository.findByNomeIgnoreCase("manager")).thenReturn(Optional.of(manager));
+        when(passwordEncoder.encode("123456")).thenReturn("senha-codificada");
+        when(usuarioRepository.save(any(Usuario.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Usuario resultado = usuarioService.salvar(usuario);
+
+        assertAll(
+                () -> assertEquals("Gerente Teste", resultado.getNome()),
+                () -> assertEquals("gerente@teste.com", resultado.getUsername()));
+    }
+
+    @Test
+    void salvarRejeitaSenhaCurtaAntesDeConsultarRepositorio() {
+        Usuario usuario = new Usuario();
+        usuario.setNome("Gerente Teste");
+        usuario.setUsername("gerente@teste.com");
+        usuario.setPassword("12345");
+
+        RuntimeException erro = assertThrows(RuntimeException.class,
+                () -> usuarioService.salvar(usuario));
+
+        assertEquals("A senha deve ter no mínimo 6 caracteres", erro.getMessage());
+        verifyNoInteractions(usuarioRepository, nivelAcessoRepository, passwordEncoder);
     }
 
     private NivelAcesso novoNivel(Long id, String nome) {
