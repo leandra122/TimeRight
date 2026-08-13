@@ -14,6 +14,15 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
 
     @Query("""
         SELECT a FROM Agendamento a
+        WHERE a.funcionario.id = :funcionarioId
+          AND a.funcionario.salao.id = a.servico.salao.id
+        ORDER BY a.dataHora ASC, a.id ASC
+        """)
+    List<Agendamento> buscarAgendaEmployeeComVinculosConsistentes(
+            @Param("funcionarioId") Long funcionarioId);
+
+    @Query("""
+        SELECT a FROM Agendamento a
         WHERE a.funcionario.salao.gerente.id = :gerenteId
           AND a.funcionario.salao.id = a.servico.salao.id
         """)

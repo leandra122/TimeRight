@@ -14,13 +14,20 @@ const AtualizarSalao = lazy(() => import('./pages/AtualizarSalao'));
 const GerenciarUsuarios = lazy(() => import('./pages/GerenciarUsuarios'));
 const GerenciarFuncionarios = lazy(() => import('./pages/GerenciarFuncionarios'));
 const CadastroSalaoGerente = lazy(() => import('./pages/CadastroSalaoGerente'));
+const AgendaFuncionario = lazy(() => import('./pages/AgendaFuncionario'));
+
+const destinoPorTipo = {
+  admin: '/admin',
+  manager: '/manager',
+  employee: '/employee/agenda',
+};
 
 const RotaProtegida = ({ children, tipo }) => {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
   // USER não acessa o sistema WEB
   if (user.tipo === 'cliente') return <Navigate to="/login" replace />;
-  if (tipo && user.tipo !== tipo) return <Navigate to="/admin" replace />;
+  if (tipo && user.tipo !== tipo) return <Navigate to={destinoPorTipo[user.tipo] || '/login'} replace />;
   return children;
 };
 
@@ -44,6 +51,8 @@ function App() {
             <Route path="/manager/cadastro-salao" element={<RotaProtegida tipo="manager"><CadastroSalaoGerente /></RotaProtegida>} />
             <Route path="/manager/painel" element={<RotaProtegida tipo="manager"><Painel /></RotaProtegida>} />
             <Route path="/manager/funcionarios" element={<RotaProtegida tipo="manager"><GerenciarFuncionarios /></RotaProtegida>} />
+
+            <Route path="/employee/agenda" element={<RotaProtegida tipo="employee"><AgendaFuncionario /></RotaProtegida>} />
 
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

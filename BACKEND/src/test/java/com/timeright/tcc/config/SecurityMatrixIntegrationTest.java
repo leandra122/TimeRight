@@ -102,6 +102,12 @@ class SecurityMatrixIntegrationTest {
         mockMvc.perform(get("/agendamentos/usuario/1")
                         .header("Authorization", bearer(token("USER"))))
                 .andExpect(status().isForbidden());
+        mockMvc.perform(get("/funcionarios/me/agendamentos")
+                        .header("Authorization", bearer(token("ADMIN"))))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(get("/funcionarios/me/agendamentos")
+                        .header("Authorization", bearer(token("MANAGER"))))
+                .andExpect(status().isForbidden());
     }
 
     @Test

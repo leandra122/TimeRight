@@ -40,7 +40,8 @@ const Login = () => {
         tipo,
       };
       login(usuario, data.token);
-      navigate(tipo === 'admin' ? '/admin' : tipo === 'manager' ? '/manager' : '/');
+      const destinos = { admin: '/admin', manager: '/manager', employee: '/employee/agenda' };
+      navigate(destinos[tipo]);
     } catch (err) {
       setErro(err.response?.data?.error || err.message || 'E-mail ou senha inválidos');
     } finally {

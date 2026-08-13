@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.timeright.tcc.model.entity.Funcionario;
+import com.timeright.tcc.dto.EmployeeAgendamentoDTO;
+import com.timeright.tcc.services.EmployeeAgendaService;
 import com.timeright.tcc.services.FuncionarioService;
 
 @RestController
@@ -22,9 +24,17 @@ import com.timeright.tcc.services.FuncionarioService;
 public class FuncionarioController {
 
     private final FuncionarioService funcionarioService;
+    private final EmployeeAgendaService employeeAgendaService;
 
-    public FuncionarioController(FuncionarioService funcionarioService) {
+    public FuncionarioController(FuncionarioService funcionarioService,
+                                 EmployeeAgendaService employeeAgendaService) {
         this.funcionarioService = funcionarioService;
+        this.employeeAgendaService = employeeAgendaService;
+    }
+
+    @GetMapping("/me/agendamentos")
+    public ResponseEntity<List<EmployeeAgendamentoDTO>> listarMinhaAgenda() {
+        return ResponseEntity.ok(employeeAgendaService.listarAgendaPropria());
     }
 
     // LISTAR

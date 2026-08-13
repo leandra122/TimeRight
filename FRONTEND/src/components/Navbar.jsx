@@ -55,6 +55,9 @@ const Navbar = () => {
                   <Link to="/manager/funcionarios" className="nav-link"><Users size={14} />Equipe</Link>
                 </>
               )}
+              {user.tipo === 'employee' && (
+                <Link to="/employee/agenda" className="nav-link"><Calendar size={14} />Agenda</Link>
+              )}
               <div className="nav-user">
                 <div className="nav-avatar">{user.nome?.charAt(0).toUpperCase()}</div>
                 <span className="nav-name">{user.nome?.split(' ')[0]}</span>
@@ -101,6 +104,9 @@ const Navbar = () => {
                   <Link to="/manager/painel" className="mobile-link" onClick={() => setMenuOpen(false)}>Painel</Link>
                   <Link to="/manager/funcionarios" className="mobile-link" onClick={() => setMenuOpen(false)}>Equipe</Link>
                 </>
+              )}
+              {user.tipo === 'employee' && (
+                <Link to="/employee/agenda" className="mobile-link" onClick={() => setMenuOpen(false)}>Agenda</Link>
               )}
               <button onClick={handleLogout} className="btn-secondary" style={{ width: '100%' }}>
                 <LogOut size={15} /> Sair

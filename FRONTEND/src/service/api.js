@@ -60,6 +60,7 @@ export const cadastrarFuncionario = (salaoId, dados) => api.post(`/funcionarios/
 export const atualizarFuncionario = (id, dados) => api.put(`/funcionarios/${id}`, dados);
 export const atualizarStatusFuncionario = (id, status) => api.patch(`/funcionarios/${id}/status`, { status });
 export const excluirFuncionario = (id) => api.delete(`/funcionarios/${id}`);
+export const listarMinhaAgendaFuncionario = () => api.get('/funcionarios/me/agendamentos');
 
 // AGENDAMENTO
 export const listarAgendamentosGlobais = () => api.get('/agendamentos');
