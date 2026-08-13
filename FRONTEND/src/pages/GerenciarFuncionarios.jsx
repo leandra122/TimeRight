@@ -1,15 +1,19 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from '../components/Navbar';
+import { useAuth } from '../context/AuthContext';
 import { Plus, Pencil, Trash2, Check, X, ToggleLeft, ToggleRight } from 'lucide-react';
 import {
-  listarFuncionarios, cadastrarFuncionario, atualizarFuncionario,
-  atualizarStatusFuncionario, excluirFuncionario, listarSaloes,
+  listarFuncionariosGlobais, listarMeusFuncionarios, cadastrarFuncionario,
+  atualizarFuncionario, atualizarStatusFuncionario, excluirFuncionario,
+  listarMeusSaloes,
 } from '../service/api';
 import './DashboardAdmin.css';
 
 const formVazio = { nome: '', email: '', senha: '', funcao: '', observacoes: '', salaoId: '' };
 
 const GerenciarFuncionarios = () => {
+  const { user } = useAuth();
+  const podeGerenciar = user?.tipo === 'manager';
   const [funcionarios, setFuncionarios] = useState([]);
   const [saloes, setSaloes] = useState([]);
   const [editando, setEditando] = useState(null);
@@ -29,11 +33,20 @@ const GerenciarFuncionarios = () => {
 
   const carregar = useCallback(async () => {
     try {
-      const [{ data: funcs }, { data: sal }] = await Promise.all([listarFuncionarios(), listarSaloes()]);
-      setFuncionarios(funcs); setSaloes(sal);
+      if (podeGerenciar) {
+        const [{ data: funcs }, { data: sal }] = await Promise.all([
+          listarMeusFuncionarios(), listarMeusSaloes(),
+        ]);
+        setFuncionarios(funcs);
+        setSaloes(sal);
+      } else {
+        const { data } = await listarFuncionariosGlobais();
+        setFuncionarios(data);
+        setSaloes([]);
+      }
     } catch { exibirMensagem('Erro ao carregar dados.', 'erro'); }
     finally { setCarregando(false); }
-  }, []);
+  }, [podeGerenciar]);
 
   useEffect(() => { carregar(); }, [carregar]);
 
@@ -73,17 +86,27 @@ const GerenciarFuncionarios = () => {
       <div className="admin-container">
         <div className="admin-boas-vindas">
           <h1>Gerenciar Equipe</h1>
-          <p>Cadastre, edite, inative ou exclua funcionários do salão.</p>
+          <p>{podeGerenciar
+            ? 'Cadastre, edite, inative ou exclua funcionários dos seus salões.'
+            : 'Consulte os funcionários cadastrados na plataforma.'}</p>
         </div>
 
         {mensagem && <div className="msg-sucesso">{mensagem}</div>}
         {erro && <div className="msg-erro">{erro}</div>}
 
-        <div style={{ marginBottom: 20 }}>
-          <button className="btn-primary" onClick={() => setCadastrando(true)}>
-            <Plus size={16} />Novo Funcionário
-          </button>
-        </div>
+        {podeGerenciar && saloes.length > 0 && (
+          <div style={{ marginBottom: 20 }}>
+            <button className="btn-primary" onClick={() => setCadastrando(true)}>
+              <Plus size={16} />Novo Funcionário
+            </button>
+          </div>
+        )}
+
+        {podeGerenciar && !carregando && saloes.length === 0 && (
+          <div className="aviso-unico-cadastro">
+            Cadastre um salão antes de adicionar funcionários.
+          </div>
+        )}
 
         {carregando ? (
           <p style={{ color: 'var(--text-soft)', fontSize: 14 }}>Carregando...</p>
@@ -100,7 +123,7 @@ const GerenciarFuncionarios = () => {
 
               {funcionarios.map(f => (
                 <div key={f.id} className="tabela-linha" style={{ gridTemplateColumns: '2fr 2fr 1.5fr 1fr 1.2fr' }}>
-                  {editando === f.id ? (
+                  {podeGerenciar && editando === f.id ? (
                     <>
                       <input className="input-hora" value={editForm.nome} onChange={e => setEditForm(ef => ({ ...ef, nome: e.target.value }))} />
                       <input className="input-hora" value={editForm.email} onChange={e => setEditForm(ef => ({ ...ef, email: e.target.value }))} />
@@ -117,14 +140,18 @@ const GerenciarFuncionarios = () => {
                       <span style={{ fontSize: 12, color: 'var(--text-soft)' }}>{f.email}</span>
                       <span style={{ fontSize: 13 }}>{f.funcao}</span>
                       <span>
-                        <button className="btn-acao" onClick={() => alternarStatus(f)} title={f.status === 'ATIVO' ? 'Inativar' : 'Ativar'} style={{ width: 'auto', padding: '4px 10px', gap: 5, fontSize: 12, fontWeight: 600, color: f.status === 'ATIVO' ? '#16a34a' : '#d93025', borderColor: f.status === 'ATIVO' ? '#bbf7d0' : '#ffc9c9', background: f.status === 'ATIVO' ? '#f0fdf4' : '#fff0f0' }}>
+                        <button className="btn-acao" onClick={() => podeGerenciar && alternarStatus(f)} disabled={!podeGerenciar} title={podeGerenciar ? (f.status === 'ATIVO' ? 'Inativar' : 'Ativar') : 'Somente consulta'} style={{ width: 'auto', padding: '4px 10px', gap: 5, fontSize: 12, fontWeight: 600, color: f.status === 'ATIVO' ? '#16a34a' : '#d93025', borderColor: f.status === 'ATIVO' ? '#bbf7d0' : '#ffc9c9', background: f.status === 'ATIVO' ? '#f0fdf4' : '#fff0f0' }}>
                           {f.status === 'ATIVO' ? <ToggleRight size={14} /> : <ToggleLeft size={14} />}
                           {f.status}
                         </button>
                       </span>
                       <div className="acoes-btns">
-                        <button className="btn-acao" onClick={() => iniciarEdicao(f)} title="Editar"><Pencil size={13} /></button>
-                        <button className="btn-acao cancelar-acao" onClick={() => setConfirmarExcluir(f)} title="Excluir"><Trash2 size={13} /></button>
+                        {podeGerenciar && (
+                          <>
+                            <button className="btn-acao" onClick={() => iniciarEdicao(f)} title="Editar"><Pencil size={13} /></button>
+                            <button className="btn-acao cancelar-acao" onClick={() => setConfirmarExcluir(f)} title="Excluir"><Trash2 size={13} /></button>
+                          </>
+                        )}
                       </div>
                     </>
                   )}
@@ -135,7 +162,7 @@ const GerenciarFuncionarios = () => {
         )}
       </div>
 
-      {cadastrando && (
+      {podeGerenciar && cadastrando && (
         <div className="modal-overlay" onClick={() => setCadastrando(false)}>
           <div className="modal-card card" onClick={e => e.stopPropagation()}>
             <h3>Novo Funcionário</h3>
@@ -177,7 +204,7 @@ const GerenciarFuncionarios = () => {
         </div>
       )}
 
-      {confirmarExcluir && (
+      {podeGerenciar && confirmarExcluir && (
         <div className="modal-overlay" onClick={() => setConfirmarExcluir(null)}>
           <div className="modal-card card" onClick={e => e.stopPropagation()}>
             <h3>Excluir Funcionário</h3>

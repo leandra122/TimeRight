@@ -82,11 +82,11 @@ class SecurityMatrixIntegrationTest {
     }
 
     @Test
-    void managerAcessaClientesFuncionariosEAgendamentos() throws Exception {
+    void managerAcessaClientesSeusFuncionariosEAgendamentos() throws Exception {
         String authorization = bearer(token("MANAGER"));
         mockMvc.perform(get("/usuarios/clientes").header("Authorization", authorization))
                 .andExpect(status().isOk());
-        mockMvc.perform(get("/funcionarios").header("Authorization", authorization))
+        mockMvc.perform(get("/funcionarios/me").header("Authorization", authorization))
                 .andExpect(status().isOk());
         mockMvc.perform(get("/agendamentos").header("Authorization", authorization))
                 .andExpect(status().isOk());

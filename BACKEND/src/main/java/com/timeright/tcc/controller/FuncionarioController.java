@@ -30,39 +30,32 @@ public class FuncionarioController {
     // LISTAR
     @GetMapping
     public ResponseEntity<List<Funcionario>> listar() {
-        return ResponseEntity.ok(funcionarioService.listar());
+        return ResponseEntity.ok(funcionarioService.listarGlobal());
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<List<Funcionario>> listarMeus() {
+        return ResponseEntity.ok(funcionarioService.listarMeus());
     }
 
     // BUSCAR POR ID
     @GetMapping("/{id}")
     public ResponseEntity<Object> findById(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(funcionarioService.findById(id));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        return ResponseEntity.ok(funcionarioService.buscarAutorizado(id));
     }
 
     // CADASTRAR (DONO DO SALÃO)
     @PostMapping("/{salaoId}")
     public ResponseEntity<Object> salvar(@PathVariable Long salaoId,
                                          @RequestBody Funcionario funcionario) {
-        try {
-            return ResponseEntity.ok(funcionarioService.salvar(funcionario, salaoId));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        return ResponseEntity.ok(funcionarioService.salvar(funcionario, salaoId));
     }
 
     // ATUALIZAR
     @PutMapping("/{id}")
     public ResponseEntity<Object> atualizar(@PathVariable Long id,
                                            @RequestBody Funcionario funcionario) {
-        try {
-            return ResponseEntity.ok(funcionarioService.atualizar(id, funcionario));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
-        }
+        return ResponseEntity.ok(funcionarioService.atualizar(id, funcionario));
     }
 
     // STATUS

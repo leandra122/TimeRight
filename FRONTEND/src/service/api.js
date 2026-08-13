@@ -47,11 +47,14 @@ export const cadastrarSalaoComServicos = (dados) => api.post('/saloes/com-servic
 
 // SERVIÇO
 export const listarServicos = () => api.get('/servicos');
+export const listarMeusServicos = () => api.get('/servicos/me');
 export const buscarServico = (id) => api.get(`/servicos/${id}`);
 export const listarServicosPorSalao = (salaoId) => api.get(`/servicos/salao/${salaoId}`);
 
 // FUNCIONÁRIO
-export const listarFuncionarios = () => api.get('/funcionarios');
+export const listarFuncionariosGlobais = () => api.get('/funcionarios');
+export const listarMeusFuncionarios = () => api.get('/funcionarios/me');
+export const listarFuncionarios = listarFuncionariosGlobais;
 export const buscarFuncionario = (id) => api.get(`/funcionarios/${id}`);
 export const cadastrarFuncionario = (salaoId, dados) => api.post(`/funcionarios/${salaoId}`, dados);
 export const atualizarFuncionario = (id, dados) => api.put(`/funcionarios/${id}`, dados);

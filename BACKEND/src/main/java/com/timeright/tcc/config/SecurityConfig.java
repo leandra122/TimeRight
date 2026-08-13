@@ -48,9 +48,14 @@ public class SecurityConfig {
                         "/usuarios/redefinir-senha").permitAll()
                 .requestMatchers(HttpMethod.GET,
                         "/saloes",
-                        "/servicos/**",
                         "/avaliacoes/salao/**",
                         "/actuator/health").permitAll()
+                .requestMatchers(HttpMethod.GET, "/servicos/me")
+                    .hasRole("MANAGER")
+                .requestMatchers(HttpMethod.GET,
+                        "/servicos",
+                        "/servicos/{id}",
+                        "/servicos/salao/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/saloes/me")
                     .hasRole("MANAGER")
                 .requestMatchers(HttpMethod.GET, "/saloes/{id}").permitAll()
@@ -62,7 +67,21 @@ public class SecurityConfig {
                     .hasAnyRole("ADMIN", "MANAGER")
                 .requestMatchers("/dashboard/stats", "/dashboard/stats/plataforma")
                     .hasRole("ADMIN")
-                .requestMatchers("/funcionarios/**", "/agendamentos/**")
+                .requestMatchers(HttpMethod.GET, "/funcionarios")
+                    .hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/funcionarios/me")
+                    .hasRole("MANAGER")
+                .requestMatchers(HttpMethod.GET, "/funcionarios/{id}")
+                    .hasAnyRole("ADMIN", "MANAGER")
+                .requestMatchers(HttpMethod.POST, "/funcionarios/**")
+                    .hasRole("MANAGER")
+                .requestMatchers(HttpMethod.PUT, "/funcionarios/**")
+                    .hasRole("MANAGER")
+                .requestMatchers(HttpMethod.PATCH, "/funcionarios/**")
+                    .hasRole("MANAGER")
+                .requestMatchers(HttpMethod.DELETE, "/funcionarios/**")
+                    .hasRole("MANAGER")
+                .requestMatchers("/agendamentos/**")
                     .hasAnyRole("ADMIN", "MANAGER")
                 .requestMatchers(HttpMethod.GET, "/saloes/cnpj/**")
                     .hasAnyRole("ADMIN", "MANAGER")
@@ -73,13 +92,13 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/saloes/**")
                     .hasAnyRole("ADMIN", "MANAGER")
                 .requestMatchers(HttpMethod.POST, "/servicos/**")
-                    .hasAnyRole("ADMIN", "MANAGER")
+                    .hasRole("MANAGER")
                 .requestMatchers(HttpMethod.PUT, "/servicos/**")
-                    .hasAnyRole("ADMIN", "MANAGER")
+                    .hasRole("MANAGER")
                 .requestMatchers(HttpMethod.PATCH, "/servicos/**")
-                    .hasAnyRole("ADMIN", "MANAGER")
+                    .hasRole("MANAGER")
                 .requestMatchers(HttpMethod.DELETE, "/servicos/**")
-                    .hasAnyRole("ADMIN", "MANAGER")
+                    .hasRole("MANAGER")
                 .anyRequest().denyAll())
             .exceptionHandling(exceptions -> exceptions
                 .authenticationEntryPoint((request, response, exception) -> {

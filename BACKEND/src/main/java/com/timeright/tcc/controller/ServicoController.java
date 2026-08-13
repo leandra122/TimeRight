@@ -28,82 +28,45 @@ public class ServicoController {
         this.servicoService = servicoService;
     }
 
-    // 🔹 LISTAR TODOS
     @GetMapping
     public ResponseEntity<List<Servico>> findAll() {
         return ResponseEntity.ok(servicoService.listarTodos());
     }
 
-    // 🔹 LISTAR POR SALÃO
+    @GetMapping("/me")
+    public ResponseEntity<List<Servico>> findMine() {
+        return ResponseEntity.ok(servicoService.listarMeus());
+    }
+
     @GetMapping("/salao/{salaoId}")
     public ResponseEntity<List<Servico>> findBySalao(@PathVariable Long salaoId) {
         return ResponseEntity.ok(servicoService.listarPorSalao(salaoId));
     }
 
-    // 🔹 BUSCAR POR ID
     @GetMapping("/{id}")
-    public ResponseEntity<Object> findById(@PathVariable String id) {
-        try {
-            Long idLong = Long.parseLong(id);
-            return ResponseEntity.ok(servicoService.findById(idLong));
-        } catch (NumberFormatException e) {
-            return ResponseEntity.badRequest().body(Map.of("status", 400, "error", "Bad Request", "message", "O id informado não é válido: " + id));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body(Map.of("status", 404, "error", "Not Found", "message", "Serviço não encontrado com o id: " + id));
-        }
+    public ResponseEntity<Servico> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(servicoService.findById(id));
     }
 
-    // 🔹 SALVAR
     @PostMapping
-    public ResponseEntity<Object> save(@RequestBody Servico servico) {
-        try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(servicoService.salvar(servico));
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("status", 500, "error", "Internal Server Error", "message", "Erro ao salvar serviço: " + e.getMessage()));
-        }
+    public ResponseEntity<Servico> save(@RequestBody Servico servico) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(servicoService.salvar(servico));
     }
 
-    // 🔹 ATUALIZAR
     @PutMapping("/{id}")
-    public ResponseEntity<Object> atualizar(@PathVariable String id, @RequestBody Servico servico) {
-        try {
-            Long idLong = Long.parseLong(id);
-            return ResponseEntity.ok(servicoService.atualizar(idLong, servico));
-        } catch (NumberFormatException e) {
-            return ResponseEntity.badRequest().body(Map.of("status", 400, "error", "Bad Request", "message", "O id informado não é válido: " + id));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body(Map.of("status", 404, "error", "Not Found", "message", "Serviço não encontrado com o id: " + id));
-        }
+    public ResponseEntity<Servico> atualizar(@PathVariable Long id, @RequestBody Servico servico) {
+        return ResponseEntity.ok(servicoService.atualizar(id, servico));
     }
 
-    // 🔹 ATUALIZAR STATUS
     @PatchMapping("/{id}/status")
-    public ResponseEntity<Object> atualizarStatus(@PathVariable String id, @RequestBody Map<String, String> body) {
-        try {
-            Long idLong = Long.parseLong(id);
-            String novoStatus = body.get("status");
-            if (novoStatus == null || (!novoStatus.equals("ATIVO") && !novoStatus.equals("INATIVO"))) {
-                return ResponseEntity.badRequest().body(Map.of("message", "Status inválido. Use ATIVO ou INATIVO."));
-            }
-            return ResponseEntity.ok(servicoService.atualizarStatus(idLong, novoStatus));
-        } catch (NumberFormatException e) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Id inválido: " + id));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body(Map.of("message", "Serviço não encontrado com id: " + id));
-        }
+    public ResponseEntity<Servico> atualizarStatus(@PathVariable Long id,
+                                                    @RequestBody Map<String, String> body) {
+        return ResponseEntity.ok(servicoService.atualizarStatus(id, body.get("status")));
     }
 
-    // 🔹 DELETAR
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deletar(@PathVariable String id) {
-        try {
-            Long idLong = Long.parseLong(id);
-            servicoService.deletar(idLong);
-            return ResponseEntity.ok(Map.of("status", 200, "message", "Serviço deletado com sucesso!"));
-        } catch (NumberFormatException e) {
-            return ResponseEntity.badRequest().body(Map.of("status", 400, "error", "Bad Request", "message", "O id informado não é válido: " + id));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body(Map.of("status", 404, "error", "Not Found", "message", "Serviço não encontrado com o id " + id));
-        }
+    public ResponseEntity<Map<String, String>> deletar(@PathVariable Long id) {
+        servicoService.deletar(id);
+        return ResponseEntity.ok(Map.of("message", "Serviço deletado com sucesso"));
     }
 }
