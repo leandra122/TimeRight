@@ -6,11 +6,10 @@ import {
   Store, Calendar, PenLine, Users, UserCog, PowerOff,
   TrendingUp, Clock, CheckCircle, Star, Scissors
 } from 'lucide-react';
-import { getDashboardStats, atualizarSalao } from '../service/api';
+import { getDashboardStats, getSalaoStats, listarMeusSaloes } from '../service/api';
 import './DashboardAdmin.css';
 
 const atalhosAdmin = [
-  { to: '/admin/cadastro-salao', icon: <Store size={24} />, titulo: 'Cadastrar Salão', desc: 'Adicione as informações do seu salão' },
   { to: '/admin/painel', icon: <Calendar size={24} />, titulo: 'Painel', desc: 'Veja e edite os agendamentos' },
   { to: '/admin/atualizar-salao', icon: <PenLine size={24} />, titulo: 'Atualizar Salão', desc: 'Edite os dados do seu salão' },
   { to: '/admin/usuario', icon: <Users size={24} />, titulo: 'Gerenciar Usuários', desc: 'Inclua, edite ou exclua perfis' },
@@ -18,6 +17,7 @@ const atalhosAdmin = [
 ];
 
 const atalhosManager = [
+  { to: '/manager/cadastro-salao', icon: <Store size={24} />, titulo: 'Cadastrar Salão', desc: 'Adicione um novo estabelecimento' },
   { to: '/manager/painel', icon: <Calendar size={24} />, titulo: 'Painel', desc: 'Veja e edite os agendamentos' },
   { to: '/manager/funcionarios', icon: <UserCog size={24} />, titulo: 'Gerenciar Equipe', desc: 'Cadastre e gerencie funcionários' },
 ];
@@ -29,13 +29,48 @@ const DashboardAdmin = () => {
   const [desativado, setDesativado] = useState(false);
   const [stats, setStats] = useState(null);
   const [loadingStats, setLoadingStats] = useState(true);
+  const [saloes, setSaloes] = useState([]);
+  const [salaoSelecionadoId, setSalaoSelecionadoId] = useState('');
 
   useEffect(() => {
-    getDashboardStats()
-      .then(({ data }) => setStats(data))
-      .catch(() => setStats(null))
-      .finally(() => setLoadingStats(false));
-  }, []);
+    if (user?.tipo !== 'manager') {
+      getDashboardStats()
+        .then(({ data }) => setStats(data))
+        .catch(() => setStats(null))
+        .finally(() => setLoadingStats(false));
+      return;
+    }
+
+    listarMeusSaloes()
+      .then(({ data }) => {
+        setSaloes(data);
+        setSalaoSelecionadoId(data[0]?.id?.toString() || '');
+        if (!data.length) setLoadingStats(false);
+      })
+      .catch(() => {
+        setSaloes([]);
+        setStats(null);
+        setLoadingStats(false);
+      });
+  }, [user?.tipo]);
+
+  useEffect(() => {
+    if (user?.tipo !== 'manager' || !salaoSelecionadoId) return;
+
+    const carregarStatsSalao = async () => {
+      setLoadingStats(true);
+      try {
+        const { data } = await getSalaoStats(salaoSelecionadoId);
+        setStats(data);
+      } catch {
+        setStats(null);
+      } finally {
+        setLoadingStats(false);
+      }
+    };
+
+    carregarStatsSalao();
+  }, [salaoSelecionadoId, user?.tipo]);
 
   const handleDesativar = () => {
     desativarSalao();
@@ -60,6 +95,27 @@ const DashboardAdmin = () => {
         </div>
 
         {desativado && <div className="msg-sucesso">Salão desativado com sucesso.</div>}
+
+        {user?.tipo === 'manager' && saloes.length > 0 && (
+          <div className="form-group">
+            <label htmlFor="salao-dashboard">Salão exibido no painel</label>
+            <select
+              id="salao-dashboard"
+              value={salaoSelecionadoId}
+              onChange={(event) => setSalaoSelecionadoId(event.target.value)}
+            >
+              {saloes.map((item) => (
+                <option key={item.id} value={item.id}>{item.nome}</option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {user?.tipo === 'manager' && !loadingStats && saloes.length === 0 && (
+          <div className="aviso-unico-cadastro">
+            Nenhum salão cadastrado. Use o atalho abaixo para criar seu primeiro estabelecimento.
+          </div>
+        )}
 
         <div className="admin-stats">
           <div className="stat-card">

@@ -2,16 +2,22 @@ package com.timeright.tcc.services;
 
 import java.util.List;
 
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.timeright.tcc.dto.SalaoServicosDTO;
 import com.timeright.tcc.dto.ServicoDTO;
+import com.timeright.tcc.exception.ResourceNotFoundException;
 import com.timeright.tcc.integration.CnpjConsultaGateway;
 import com.timeright.tcc.integration.CnpjConsultaResultado;
 import com.timeright.tcc.model.entity.Salao;
 import com.timeright.tcc.model.entity.Servico;
 import com.timeright.tcc.model.repository.SalaoRepository;
 import com.timeright.tcc.model.repository.ServicoRepository;
+import com.timeright.tcc.model.repository.UsuarioRepository;
+import com.timeright.tcc.security.AuthenticatedUser;
+import com.timeright.tcc.security.AuthenticatedUserService;
 import com.timeright.tcc.util.CnpjValidator;
 
 @Service
@@ -20,22 +26,44 @@ public class SalaoService {
     private final SalaoRepository salaoRepository;
     private final ServicoRepository servicoRepository;
     private final CnpjConsultaGateway cnpjGateway;
+    private final UsuarioRepository usuarioRepository;
+    private final AuthenticatedUserService authenticatedUserService;
 
     public SalaoService(SalaoRepository salaoRepository,
                         ServicoRepository servicoRepository,
-                        CnpjConsultaGateway cnpjGateway) {
+                        CnpjConsultaGateway cnpjGateway,
+                        UsuarioRepository usuarioRepository,
+                        AuthenticatedUserService authenticatedUserService) {
         this.salaoRepository = salaoRepository;
         this.servicoRepository = servicoRepository;
         this.cnpjGateway = cnpjGateway;
+        this.usuarioRepository = usuarioRepository;
+        this.authenticatedUserService = authenticatedUserService;
     }
 
     // =========================
     // CREATE COM SERVIÇOS
     // =========================
+    @Transactional
     public Salao salvarComServicos(SalaoServicosDTO dto) {
 
+        AuthenticatedUser authenticated = authenticatedUserService.getCurrentUser();
+        if (!"MANAGER".equals(authenticated.role())) {
+            throw new AccessDeniedException("Acesso negado");
+        }
+
+        var gerente = usuarioRepository.findById(authenticated.userId())
+                .orElseThrow(() -> new AccessDeniedException("Acesso negado"));
+        String managerRole = gerente.getNivelAcesso() == null
+                ? "" : gerente.getNivelAcesso().getNome().trim().toUpperCase();
+        if ("ADM".equals(managerRole)) managerRole = "ADMIN";
+        if (!"ATIVO".equalsIgnoreCase(gerente.getStatusUsuario())
+                || !"MANAGER".equals(managerRole)) {
+            throw new AccessDeniedException("Acesso negado");
+        }
+
         if (!CnpjValidator.isValid(dto.cnpj))
-            throw new RuntimeException("CNPJ inválido.");
+            throw new IllegalArgumentException("CNPJ inválido.");
 
         CnpjConsultaResultado consulta = cnpjGateway.consultar(dto.cnpj);
 
@@ -46,6 +74,7 @@ public class SalaoService {
         salao.setTelefone(dto.telefone);
         salao.setEndereco(dto.endereco);
         salao.setStatus(dto.status != null ? dto.status : "ATIVO");
+        salao.setGerente(gerente);
 
         Salao salaoSalvo = salaoRepository.save(salao);
 
@@ -74,31 +103,50 @@ public class SalaoService {
         return salaoRepository.findAll();
     }
 
+    public List<Salao> listarMeusSaloes() {
+        AuthenticatedUser authenticated = authenticatedUserService.getCurrentUser();
+        if (!"MANAGER".equals(authenticated.role())) {
+            throw new AccessDeniedException("Acesso negado");
+        }
+        return salaoRepository.findByGerenteId(authenticated.userId());
+    }
+
     // =========================
     // BUSCAR POR ID
     // =========================
     public Salao buscarPorId(Long id) {
         return salaoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Salão não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Salão não encontrado"));
     }
 
     // =========================
     // DELETAR
     // =========================
     public void deletar(Long id) {
-        if (!salaoRepository.existsById(id)) {
-            throw new RuntimeException("Salão não encontrado");
-        }
+        buscarAutorizado(id);
         salaoRepository.deleteById(id);
     }
 
     public Salao atualizar(Long id, Salao dados) {
-        Salao existente = buscarPorId(id);
+        Salao existente = buscarAutorizado(id);
         if (dados.getNome() != null) existente.setNome(dados.getNome());
         if (dados.getTelefone() != null) existente.setTelefone(dados.getTelefone());
         if (dados.getEmail() != null) existente.setEmail(dados.getEmail());
         if (dados.getEndereco() != null) existente.setEndereco(dados.getEndereco());
         if (dados.getStatus() != null) existente.setStatus(dados.getStatus());
         return salaoRepository.save(existente);
+    }
+
+    public Salao buscarAutorizado(Long id) {
+        Salao salao = buscarPorId(id);
+        AuthenticatedUser authenticated = authenticatedUserService.getCurrentUser();
+        if ("ADMIN".equals(authenticated.role())) {
+            return salao;
+        }
+        if (!"MANAGER".equals(authenticated.role())
+                || !salaoRepository.existsByIdAndGerenteId(id, authenticated.userId())) {
+            throw new AccessDeniedException("Acesso negado");
+        }
+        return salao;
     }
 }

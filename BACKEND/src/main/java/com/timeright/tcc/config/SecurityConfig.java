@@ -48,10 +48,12 @@ public class SecurityConfig {
                         "/usuarios/redefinir-senha").permitAll()
                 .requestMatchers(HttpMethod.GET,
                         "/saloes",
-                        "/saloes/{id}",
                         "/servicos/**",
                         "/avaliacoes/salao/**",
                         "/actuator/health").permitAll()
+                .requestMatchers(HttpMethod.GET, "/saloes/me")
+                    .hasRole("MANAGER")
+                .requestMatchers(HttpMethod.GET, "/saloes/{id}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/usuarios/clientes")
                     .hasAnyRole("ADMIN", "MANAGER")
                 .requestMatchers("/niveis-acesso/**", "/usuarios/**")
@@ -64,8 +66,8 @@ public class SecurityConfig {
                     .hasAnyRole("ADMIN", "MANAGER")
                 .requestMatchers(HttpMethod.GET, "/saloes/cnpj/**")
                     .hasAnyRole("ADMIN", "MANAGER")
-                .requestMatchers(HttpMethod.POST, "/saloes/**")
-                    .hasAnyRole("ADMIN", "MANAGER")
+                .requestMatchers(HttpMethod.POST, "/saloes/com-servicos")
+                    .hasRole("MANAGER")
                 .requestMatchers(HttpMethod.PUT, "/saloes/**")
                     .hasAnyRole("ADMIN", "MANAGER")
                 .requestMatchers(HttpMethod.DELETE, "/saloes/**")

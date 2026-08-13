@@ -51,24 +51,13 @@ public class SalaoController {
     // =========================
     @PostMapping("/com-servicos")
     public ResponseEntity<Object> salvarComServicos(@RequestBody SalaoServicosDTO dto) {
-        try {
-            Salao salao = salaoService.salvarComServicos(dto);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(
+        Salao salao = salaoService.salvarComServicos(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(
                 Map.of(
                     "message", "Salão criado com sucesso",
                     "data", salao
                 )
             );
-
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", e.getMessage()));
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Erro interno no servidor"));
-        }
     }
 
     // =========================
@@ -77,6 +66,11 @@ public class SalaoController {
     @GetMapping
     public ResponseEntity<List<Salao>> listarTodos() {
         return ResponseEntity.ok(salaoService.listarTodos());
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<List<Salao>> listarMeusSaloes() {
+        return ResponseEntity.ok(salaoService.listarMeusSaloes());
     }
 
     // =========================
@@ -97,12 +91,7 @@ public class SalaoController {
     // =========================
     @PutMapping("/{id}")
     public ResponseEntity<Object> atualizar(@PathVariable Long id, @RequestBody Salao salao) {
-        try {
-            return ResponseEntity.ok(salaoService.atualizar(id, salao));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", e.getMessage()));
-        }
+        return ResponseEntity.ok(salaoService.atualizar(id, salao));
     }
 
     // =========================
@@ -110,13 +99,7 @@ public class SalaoController {
     // =========================
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deletar(@PathVariable Long id) {
-        try {
-            salaoService.deletar(id);
-            return ResponseEntity.ok(Map.of("message", "Salão deletado com sucesso"));
-
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", e.getMessage()));
-        }
+        salaoService.deletar(id);
+        return ResponseEntity.ok(Map.of("message", "Salão deletado com sucesso"));
     }
 }

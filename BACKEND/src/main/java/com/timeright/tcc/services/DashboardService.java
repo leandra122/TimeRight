@@ -27,19 +27,22 @@ public class DashboardService {
     private final ServicoRepository servicoRepository;
     private final AvaliacaoRepository avaliacaoRepository;
     private final SalaoRepository salaoRepository;
+    private final SalaoService salaoService;
 
     public DashboardService(AgendamentoRepository agendamentoRepository,
                              UsuarioRepository usuarioRepository,
                              FuncionarioRepository funcionarioRepository,
                              ServicoRepository servicoRepository,
                              AvaliacaoRepository avaliacaoRepository,
-                             SalaoRepository salaoRepository) {
+                             SalaoRepository salaoRepository,
+                             SalaoService salaoService) {
         this.agendamentoRepository = agendamentoRepository;
         this.usuarioRepository = usuarioRepository;
         this.funcionarioRepository = funcionarioRepository;
         this.servicoRepository = servicoRepository;
         this.avaliacaoRepository = avaliacaoRepository;
         this.salaoRepository = salaoRepository;
+        this.salaoService = salaoService;
     }
 
     public DashboardStatsDTO getStats() {
@@ -85,8 +88,7 @@ public class DashboardService {
     }
 
     public SalaoStatsDTO getStatsSalao(Long salaoId) {
-        Salao salao = salaoRepository.findById(salaoId)
-                .orElseThrow(() -> new RuntimeException("Salão não encontrado."));
+        Salao salao = salaoService.buscarAutorizado(salaoId);
 
         Double media = avaliacaoRepository.mediaNotasBySalaoId(salaoId);
         long totalAvaliacoes = avaliacaoRepository.totalAvaliacoesBySalaoId(salaoId);

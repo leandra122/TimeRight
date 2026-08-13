@@ -8,4 +8,6 @@ import com.timeright.tcc.model.entity.Salao;
 
 public interface SalaoRepository extends JpaRepository<Salao, Long> {
     List<Salao> findByGerenteId(Long gerenteId);
+
+    boolean existsByIdAndGerenteId(Long salaoId, Long gerenteId);
 }

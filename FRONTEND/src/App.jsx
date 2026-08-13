@@ -6,7 +6,6 @@ const Home = lazy(() => import('./pages/Home'));
 const Login = lazy(() => import('./pages/Login'));
 const Cadastro = lazy(() => import('./pages/Cadastro'));
 const DashboardAdmin = lazy(() => import('./pages/DashboardAdmin'));
-const CadastroSalao = lazy(() => import('./pages/CadastroSalao'));
 const Painel = lazy(() => import('./pages/Painel'));
 const DashboardCliente = lazy(() => import('./pages/DashboardCliente'));
 const Perfil = lazy(() => import('./pages/Perfil'));
@@ -36,7 +35,6 @@ function App() {
             <Route path="/cadastro" element={<Cadastro />} />
 
             <Route path="/admin" element={<RotaProtegida tipo="admin"><DashboardAdmin /></RotaProtegida>} />
-            <Route path="/admin/cadastro-salao" element={<RotaProtegida tipo="admin"><CadastroSalao /></RotaProtegida>} />
             <Route path="/admin/painel" element={<RotaProtegida tipo="admin"><Painel /></RotaProtegida>} />
             <Route path="/admin/atualizar-salao" element={<RotaProtegida tipo="admin"><AtualizarSalao /></RotaProtegida>} />
             <Route path="/admin/usuario" element={<RotaProtegida tipo="admin"><GerenciarUsuarios /></RotaProtegida>} />

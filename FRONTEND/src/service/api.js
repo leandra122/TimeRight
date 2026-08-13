@@ -39,6 +39,7 @@ export const atualizarStatusUsuario = (id, status) => api.patch(`/usuarios/${id}
 
 // SALÃO
 export const listarSaloes = () => api.get('/saloes');
+export const listarMeusSaloes = () => api.get('/saloes/me');
 export const buscarSalao = (id) => api.get(`/saloes/${id}`);
 export const atualizarSalao = (id, dados) => api.put(`/saloes/${id}`, dados);
 export const consultarCnpj = (cnpj) => api.get(`/saloes/cnpj/${cnpj}`);

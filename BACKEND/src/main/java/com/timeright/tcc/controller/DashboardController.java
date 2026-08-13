@@ -35,10 +35,6 @@ public class DashboardController {
 
     @GetMapping("/stats/salao/{salaoId}")
     public ResponseEntity<Object> statsSalao(@PathVariable Long salaoId) {
-        try {
-            return ResponseEntity.ok(service.getStatsSalao(salaoId));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        return ResponseEntity.ok(service.getStatsSalao(salaoId));
     }
 }
