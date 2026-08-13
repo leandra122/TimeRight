@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Navbar from '../components/Navbar';
 import { Store, Plus, Trash2, CheckCircle, XCircle, Loader } from 'lucide-react';
-import { consultarCnpj } from '../service/api';
+import { cadastrarSalaoComServicos, consultarCnpj } from '../service/api';
 import './DashboardAdmin.css';
 
 const CNPJ_VAZIO = {
@@ -124,10 +124,7 @@ const CadastroSalaoGerente = () => {
     }
 
     try {
-      const res = await fetch('http://localhost:8080/saloes/com-servicos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      await cadastrarSalaoComServicos({
           nome:              salao.nome,
           cnpj:              apenasDigitos(salao.cnpj),
           razaoSocial:       salao.razaoSocial,
@@ -141,18 +138,14 @@ const CadastroSalaoGerente = () => {
             nome: s.nome, descricao: s.descricao,
             preco: Number(s.preco) || 0, duracao: Number(s.duracao) || 0,
           })),
-        }),
       });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Erro ao cadastrar salão.');
 
       setSalaoSalvo(true);
       setSalao(CNPJ_VAZIO);
       setCnpjStatus('idle');
       setTimeout(() => setSalaoSalvo(false), 4000);
     } catch (err) {
-      setErroSalvar(err.message);
+      setErroSalvar(err.response?.data?.error || err.message);
     }
   };
 

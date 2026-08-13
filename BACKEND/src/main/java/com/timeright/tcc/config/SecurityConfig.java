@@ -9,6 +9,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -37,15 +38,66 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .formLogin(form -> form.disable())
             .httpBasic(basic -> basic.disable())
-            // As rotas permanecem públicas durante o estágio de transição para JWT.
             .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll())
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers("/error").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                .requestMatchers(HttpMethod.POST,
+                        "/usuarios",
+                        "/usuarios/esqueci-senha",
+                        "/usuarios/redefinir-senha").permitAll()
+                .requestMatchers(HttpMethod.GET,
+                        "/saloes",
+                        "/saloes/{id}",
+                        "/servicos/**",
+                        "/avaliacoes/salao/**",
+                        "/actuator/health").permitAll()
+                .requestMatchers(HttpMethod.GET, "/usuarios/clientes")
+                    .hasAnyRole("ADMIN", "MANAGER")
+                .requestMatchers("/niveis-acesso/**", "/usuarios/**")
+                    .hasRole("ADMIN")
+                .requestMatchers("/dashboard/stats/salao/**")
+                    .hasAnyRole("ADMIN", "MANAGER")
+                .requestMatchers("/dashboard/stats", "/dashboard/stats/plataforma")
+                    .hasRole("ADMIN")
+                .requestMatchers("/funcionarios/**", "/agendamentos/**")
+                    .hasAnyRole("ADMIN", "MANAGER")
+                .requestMatchers(HttpMethod.GET, "/saloes/cnpj/**")
+                    .hasAnyRole("ADMIN", "MANAGER")
+                .requestMatchers(HttpMethod.POST, "/saloes/**")
+                    .hasAnyRole("ADMIN", "MANAGER")
+                .requestMatchers(HttpMethod.PUT, "/saloes/**")
+                    .hasAnyRole("ADMIN", "MANAGER")
+                .requestMatchers(HttpMethod.DELETE, "/saloes/**")
+                    .hasAnyRole("ADMIN", "MANAGER")
+                .requestMatchers(HttpMethod.POST, "/servicos/**")
+                    .hasAnyRole("ADMIN", "MANAGER")
+                .requestMatchers(HttpMethod.PUT, "/servicos/**")
+                    .hasAnyRole("ADMIN", "MANAGER")
+                .requestMatchers(HttpMethod.PATCH, "/servicos/**")
+                    .hasAnyRole("ADMIN", "MANAGER")
+                .requestMatchers(HttpMethod.DELETE, "/servicos/**")
+                    .hasAnyRole("ADMIN", "MANAGER")
+                .anyRequest().denyAll())
+            .exceptionHandling(exceptions -> exceptions
+                .authenticationEntryPoint((request, response, exception) -> {
+                    response.setStatus(401);
+                    response.setContentType("application/json");
+                    response.getWriter().write(
+                            "{\"error\":\"Autenticação necessária ou token inválido\"}");
+                })
+                .accessDeniedHandler((request, response, exception) -> {
+                    response.setStatus(403);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"error\":\"Acesso negado\"}");
+                }))
             .oauth2ResourceServer(oauth2 -> oauth2
                 .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
                 .authenticationEntryPoint((request, response, exception) -> {
                     response.setStatus(401);
                     response.setContentType("application/json");
-                    response.getWriter().write("{\"error\":\"Token ausente ou inválido\"}");
+                    response.getWriter().write(
+                            "{\"error\":\"Autenticação necessária ou token inválido\"}");
                 }));
 
         return http.build();

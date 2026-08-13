@@ -12,6 +12,19 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const isLogin = error.config?.url?.includes('/api/auth/login');
+    if (error.response?.status === 401 && !isLogin) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('usuario');
+      window.dispatchEvent(new Event('timeright:session-expired'));
+    }
+    return Promise.reject(error);
+  },
+);
+
 // AUTENTICAÇÃO
 export const login = (dados) => api.post('/api/auth/login', dados);
 
@@ -29,6 +42,7 @@ export const listarSaloes = () => api.get('/saloes');
 export const buscarSalao = (id) => api.get(`/saloes/${id}`);
 export const atualizarSalao = (id, dados) => api.put(`/saloes/${id}`, dados);
 export const consultarCnpj = (cnpj) => api.get(`/saloes/cnpj/${cnpj}`);
+export const cadastrarSalaoComServicos = (dados) => api.post('/saloes/com-servicos', dados);
 
 // SERVIÇO
 export const listarServicos = () => api.get('/servicos');

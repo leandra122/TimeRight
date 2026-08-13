@@ -50,6 +50,18 @@ export const AuthProvider = ({ children }) => {
     }
   }, [user, token]);
 
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      dispatch({ type: 'LOGOUT' });
+      if (window.location.pathname !== '/login') {
+        window.location.assign('/login');
+      }
+    };
+
+    window.addEventListener('timeright:session-expired', handleSessionExpired);
+    return () => window.removeEventListener('timeright:session-expired', handleSessionExpired);
+  }, []);
+
   const setUser = (usuario, authToken = token) => dispatch({
     type: 'SET_USER',
     payload: { user: usuario, token: authToken },
