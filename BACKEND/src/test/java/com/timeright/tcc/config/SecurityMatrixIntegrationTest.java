@@ -82,13 +82,15 @@ class SecurityMatrixIntegrationTest {
     }
 
     @Test
-    void managerAcessaClientesSeusFuncionariosEAgendamentos() throws Exception {
+    void managerNaoAcessaClientesNemAgendaGlobaisMasAcessaRecursosProprios() throws Exception {
         String authorization = bearer(token("MANAGER"));
         mockMvc.perform(get("/usuarios/clientes").header("Authorization", authorization))
-                .andExpect(status().isOk());
+                .andExpect(status().isForbidden());
         mockMvc.perform(get("/funcionarios/me").header("Authorization", authorization))
                 .andExpect(status().isOk());
         mockMvc.perform(get("/agendamentos").header("Authorization", authorization))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(get("/agendamentos/me").header("Authorization", authorization))
                 .andExpect(status().isOk());
     }
 

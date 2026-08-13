@@ -27,12 +27,12 @@ public class Agendamento {
 
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)
-    @JsonIgnoreProperties({"password", "nivelAcesso", "dataCadastro", "dataAtualizacao", "statusUsuario"})
+    @JsonIgnoreProperties({"username", "password", "nivelAcesso", "dataCadastro", "dataAtualizacao", "statusUsuario", "resetToken", "resetTokenExpiracao"})
     private Usuario usuario;
 
     @ManyToOne
     @JoinColumn(name = "funcionario_id", nullable = false)
-    @JsonIgnoreProperties({"senha", "observacoes"})
+    @JsonIgnoreProperties({"email", "senha", "observacoes", "usuario"})
     private Funcionario funcionario;
 
     @ManyToOne

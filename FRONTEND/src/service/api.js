@@ -62,7 +62,8 @@ export const atualizarStatusFuncionario = (id, status) => api.patch(`/funcionari
 export const excluirFuncionario = (id) => api.delete(`/funcionarios/${id}`);
 
 // AGENDAMENTO
-export const listarAgendamentos = () => api.get('/agendamentos');
+export const listarAgendamentosGlobais = () => api.get('/agendamentos');
+export const listarMeusAgendamentos = () => api.get('/agendamentos/me');
 export const listarAgendamentosPorUsuario = (usuarioId) => api.get(`/agendamentos/usuario/${usuarioId}`);
 export const buscarAgendamento = (id) => api.get(`/agendamentos/${id}`);
 export const cadastrarAgendamento = (dados) => api.post('/agendamentos', dados);

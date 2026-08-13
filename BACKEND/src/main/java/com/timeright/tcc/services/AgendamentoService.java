@@ -5,6 +5,9 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.access.AccessDeniedException;
+
+import com.timeright.tcc.exception.ResourceNotFoundException;
 
 import com.timeright.tcc.model.entity.Agendamento;
 import com.timeright.tcc.model.entity.Funcionario;
@@ -14,6 +17,8 @@ import com.timeright.tcc.model.repository.AgendamentoRepository;
 import com.timeright.tcc.model.repository.FuncionarioRepository;
 import com.timeright.tcc.model.repository.ServicoRepository;
 import com.timeright.tcc.model.repository.UsuarioRepository;
+import com.timeright.tcc.security.AuthenticatedUser;
+import com.timeright.tcc.security.AuthenticatedUserService;
 
 @Service
 public class AgendamentoService {
@@ -22,32 +27,64 @@ public class AgendamentoService {
     private final UsuarioRepository usuarioRepository;
     private final FuncionarioRepository funcionarioRepository;
     private final ServicoRepository servicoRepository;
+    private final AuthenticatedUserService authenticatedUserService;
 
     public AgendamentoService(
             AgendamentoRepository agendamentoRepository,
             UsuarioRepository usuarioRepository,
             FuncionarioRepository funcionarioRepository,
-            ServicoRepository servicoRepository) {
+            ServicoRepository servicoRepository,
+            AuthenticatedUserService authenticatedUserService) {
 
         this.agendamentoRepository = agendamentoRepository;
         this.usuarioRepository = usuarioRepository;
         this.funcionarioRepository = funcionarioRepository;
         this.servicoRepository = servicoRepository;
+        this.authenticatedUserService = authenticatedUserService;
     }
 
-    public List<Agendamento> listarTodos() {
+    public List<Agendamento> listarGlobal() {
+        exigirPapel("ADMIN");
         return agendamentoRepository.findAll();
     }
 
+    public List<Agendamento> listarMeus() {
+        AuthenticatedUser user = exigirPapel("MANAGER");
+        return agendamentoRepository.buscarPorGerenteComVinculosConsistentes(user.userId());
+    }
+
     public List<Agendamento> listarPorUsuario(Long usuarioId) {
+        exigirPapel("ADMIN");
         return agendamentoRepository.findByUsuarioId(usuarioId);
     }
 
-    public Agendamento findById(Long id) {
-        return agendamentoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Agendamento não encontrado"));
+    public Agendamento buscarAutorizado(Long id) {
+        AuthenticatedUser user = authenticatedUserService.getCurrentUser();
+        if ("ADMIN".equals(user.role())) {
+            return buscarExistente(id);
+        }
+        if (!"MANAGER".equals(user.role())) {
+            throw new AccessDeniedException("Acesso negado");
+        }
+        if (!agendamentoRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Agendamento não encontrado");
+        }
+        return agendamentoRepository.buscarPorIdEGerenteComVinculosConsistentes(id, user.userId())
+                .orElseThrow(() -> new AccessDeniedException("Acesso negado"));
     }
 
+    private Agendamento buscarExistente(Long id) {
+        return agendamentoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Agendamento não encontrado"));
+    }
+
+    private AuthenticatedUser exigirPapel(String papel) {
+        AuthenticatedUser user = authenticatedUserService.getCurrentUser();
+        if (!papel.equals(user.role())) {
+            throw new AccessDeniedException("Acesso negado");
+        }
+        return user;
+    }
     @Transactional
     public Agendamento salvar(Agendamento agendamento) {
 
@@ -108,7 +145,7 @@ public class AgendamentoService {
     @Transactional
     public Agendamento atualizar(Long id, Agendamento agendamento) {
 
-        Agendamento existente = findById(id);
+        Agendamento existente = buscarExistente(id);
 
         if (agendamento.getDataHora() != null) {
 
@@ -160,7 +197,7 @@ public class AgendamentoService {
 
     @Transactional
     public Agendamento cancelar(Long id) {
-        Agendamento a = findById(id);
+        Agendamento a = buscarExistente(id);
 
         // Cancelamento somente com no mínimo 12 horas de antecedência
         if (a.getDataHora().isBefore(LocalDateTime.now().plusHours(12))) {
@@ -174,13 +211,13 @@ public class AgendamentoService {
 
     @Transactional
     public Agendamento atualizarStatus(Long id, String status) {
-        Agendamento a = findById(id);
+        Agendamento a = buscarExistente(id);
         a.setStatus(status);
         return agendamentoRepository.save(a);
     }
 
     @Transactional
     public void deletar(Long id) {
-        agendamentoRepository.delete(findById(id));
+        agendamentoRepository.delete(buscarExistente(id));
     }
 }

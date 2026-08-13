@@ -2,6 +2,7 @@ package com.timeright.tcc.model.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -10,6 +11,22 @@ import org.springframework.data.repository.query.Param;
 import com.timeright.tcc.model.entity.Agendamento;
 
 public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> {
+
+    @Query("""
+        SELECT a FROM Agendamento a
+        WHERE a.funcionario.salao.gerente.id = :gerenteId
+          AND a.funcionario.salao.id = a.servico.salao.id
+        """)
+    List<Agendamento> buscarPorGerenteComVinculosConsistentes(@Param("gerenteId") Long gerenteId);
+
+    @Query("""
+        SELECT a FROM Agendamento a
+        WHERE a.id = :id
+          AND a.funcionario.salao.gerente.id = :gerenteId
+          AND a.funcionario.salao.id = a.servico.salao.id
+        """)
+    Optional<Agendamento> buscarPorIdEGerenteComVinculosConsistentes(
+            @Param("id") Long id, @Param("gerenteId") Long gerenteId);
 
     List<Agendamento> findByUsuarioId(Long usuarioId);
 

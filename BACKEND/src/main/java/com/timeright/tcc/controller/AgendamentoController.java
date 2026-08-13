@@ -30,22 +30,21 @@ public class AgendamentoController {
 
     @GetMapping
     public ResponseEntity<List<Agendamento>> findAll() {
-        return ResponseEntity.ok(service.listarTodos());
+        return ResponseEntity.ok(service.listarGlobal());
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<List<Agendamento>> findMine() {
+        return ResponseEntity.ok(service.listarMeus());
+    }
     @GetMapping("/usuario/{usuarioId}")
     public ResponseEntity<List<Agendamento>> findByUsuario(@PathVariable Long usuarioId) {
         return ResponseEntity.ok(service.listarPorUsuario(usuarioId));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> findById(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(service.findById(id));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(404)
-                    .body(Map.of("message", e.getMessage()));
-        }
+    public ResponseEntity<Agendamento> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(service.buscarAutorizado(id));
     }
 
     @PostMapping
