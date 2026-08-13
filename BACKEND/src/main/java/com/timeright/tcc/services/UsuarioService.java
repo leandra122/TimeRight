@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
+import java.util.Locale;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -191,7 +192,8 @@ public class UsuarioService {
             return null;
         }
 
-        Optional<Usuario> usuarioOpt = usuarioRepository.findByUsername(username.trim());
+        String usernameNormalizado = username.trim().toLowerCase(Locale.ROOT);
+        Optional<Usuario> usuarioOpt = usuarioRepository.findByUsername(usernameNormalizado);
 
         if (usuarioOpt.isPresent()) {
 

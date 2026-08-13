@@ -5,22 +5,23 @@ const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
 
 // --- Reducer ---
+const tokenSalvo = localStorage.getItem('token');
+const usuarioSalvo = localStorage.getItem('usuario');
+
 const initialState = {
-  user: (() => {
-    const salvo = localStorage.getItem('usuario');
-    return salvo ? JSON.parse(salvo) : null;
-  })(),
+  user: tokenSalvo && usuarioSalvo ? JSON.parse(usuarioSalvo) : null,
+  token: tokenSalvo,
   salao: null,
 };
 
 function authReducer(state, action) {
   switch (action.type) {
     case 'SET_USER':
-      return { ...state, user: action.payload };
+      return { ...state, user: action.payload.user, token: action.payload.token };
     case 'ATUALIZAR_PERFIL':
       return { ...state, user: { ...state.user, ...action.payload } };
     case 'LOGOUT':
-      return { ...state, user: null };
+      return { ...state, user: null, token: null };
     case 'SALVAR_SALAO':
       return { ...state, salao: { ...action.payload, ativo: true } };
     case 'ATUALIZAR_SALAO':
@@ -34,7 +35,7 @@ function authReducer(state, action) {
 
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
-  const { user, salao } = state;
+  const { user, token, salao } = state;
 
   useEffect(() => {
     if (user) {
@@ -42,10 +43,21 @@ export const AuthProvider = ({ children }) => {
     } else {
       localStorage.removeItem('usuario');
     }
-  }, [user]);
+    if (token) {
+      localStorage.setItem('token', token);
+    } else {
+      localStorage.removeItem('token');
+    }
+  }, [user, token]);
 
-  const setUser = (usuario) => dispatch({ type: 'SET_USER', payload: usuario });
-  const login = (usuario) => dispatch({ type: 'SET_USER', payload: usuario });
+  const setUser = (usuario, authToken = token) => dispatch({
+    type: 'SET_USER',
+    payload: { user: usuario, token: authToken },
+  });
+  const login = (usuario, authToken) => dispatch({
+    type: 'SET_USER',
+    payload: { user: usuario, token: authToken },
+  });
   const logout = () => dispatch({ type: 'LOGOUT' });
   const atualizarPerfil = (dados) => dispatch({ type: 'ATUALIZAR_PERFIL', payload: dados });
   const salvarSalao = (dados) => dispatch({ type: 'SALVAR_SALAO', payload: dados });
@@ -56,6 +68,7 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         user,
+        token,
         setUser,
         login,
         logout,

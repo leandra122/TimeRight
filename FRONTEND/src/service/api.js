@@ -1,73 +1,63 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:8080';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
-export const api = axios.create({ baseURL: `${BASE_URL}/usuarios` });
+export const api = axios.create({ baseURL: BASE_URL });
 
-// ========================
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// AUTENTICAÇÃO
+export const login = (dados) => api.post('/api/auth/login', dados);
+
 // USUÁRIO
-// ========================
-export const listarUsuario = () => api.get('');
-export const listarUsuarios = () => api.get('');
-export const listarClientes = () => api.get('/clientes');
-export const buscarUsuario = (id) => api.get(`/${id}`);
-export const atualizarUsuario = (id, dados) => api.put(`/${id}`, dados);
-export const excluirUsuario = (id) => api.delete(`/${id}`);
-export const atualizarStatusUsuario = (id, status) => api.patch(`/${id}/status`, { status });
-export const login = (dados) => api.post('/login', dados);
+export const listarUsuario = () => api.get('/usuarios');
+export const listarUsuarios = () => api.get('/usuarios');
+export const listarClientes = () => api.get('/usuarios/clientes');
+export const buscarUsuario = (id) => api.get(`/usuarios/${id}`);
+export const atualizarUsuario = (id, dados) => api.put(`/usuarios/${id}`, dados);
+export const excluirUsuario = (id) => api.delete(`/usuarios/${id}`);
+export const atualizarStatusUsuario = (id, status) => api.patch(`/usuarios/${id}/status`, { status });
 
-// ========================
 // SALÃO
-// ========================
-const salaoApi = axios.create({ baseURL: `${BASE_URL}/saloes` });
-export const listarSaloes = () => salaoApi.get('');
-export const buscarSalao = (id) => salaoApi.get(`/${id}`);
-export const atualizarSalao = (id, dados) => salaoApi.put(`/${id}`, dados);
-export const consultarCnpj = (cnpj) => salaoApi.get(`/cnpj/${cnpj}`);
+export const listarSaloes = () => api.get('/saloes');
+export const buscarSalao = (id) => api.get(`/saloes/${id}`);
+export const atualizarSalao = (id, dados) => api.put(`/saloes/${id}`, dados);
+export const consultarCnpj = (cnpj) => api.get(`/saloes/cnpj/${cnpj}`);
 
-// ========================
 // SERVIÇO
-// ========================
-const servicoApi = axios.create({ baseURL: `${BASE_URL}/servicos` });
-export const listarServicos = () => servicoApi.get('');
-export const buscarServico = (id) => servicoApi.get(`/${id}`);
-export const listarServicosPorSalao = (salaoId) => servicoApi.get(`/salao/${salaoId}`);
+export const listarServicos = () => api.get('/servicos');
+export const buscarServico = (id) => api.get(`/servicos/${id}`);
+export const listarServicosPorSalao = (salaoId) => api.get(`/servicos/salao/${salaoId}`);
 
-// ========================
 // FUNCIONÁRIO
-// ========================
-const funcionarioApi = axios.create({ baseURL: `${BASE_URL}/funcionarios` });
-export const listarFuncionarios = () => funcionarioApi.get('');
-export const buscarFuncionario = (id) => funcionarioApi.get(`/${id}`);
-export const cadastrarFuncionario = (salaoId, dados) => funcionarioApi.post(`/${salaoId}`, dados);
-export const atualizarFuncionario = (id, dados) => funcionarioApi.put(`/${id}`, dados);
-export const atualizarStatusFuncionario = (id, status) => funcionarioApi.patch(`/${id}/status`, { status });
-export const excluirFuncionario = (id) => funcionarioApi.delete(`/${id}`);
+export const listarFuncionarios = () => api.get('/funcionarios');
+export const buscarFuncionario = (id) => api.get(`/funcionarios/${id}`);
+export const cadastrarFuncionario = (salaoId, dados) => api.post(`/funcionarios/${salaoId}`, dados);
+export const atualizarFuncionario = (id, dados) => api.put(`/funcionarios/${id}`, dados);
+export const atualizarStatusFuncionario = (id, status) => api.patch(`/funcionarios/${id}/status`, { status });
+export const excluirFuncionario = (id) => api.delete(`/funcionarios/${id}`);
 
-// ========================
 // AGENDAMENTO
-// ========================
-const agendamentoApi = axios.create({ baseURL: `${BASE_URL}/agendamentos` });
-export const listarAgendamentos = () => agendamentoApi.get('');
-export const listarAgendamentosPorUsuario = (usuarioId) => agendamentoApi.get(`/usuario/${usuarioId}`);
-export const buscarAgendamento = (id) => agendamentoApi.get(`/${id}`);
-export const cadastrarAgendamento = (dados) => agendamentoApi.post('', dados);
-export const atualizarAgendamento = (id, dados) => agendamentoApi.put(`/${id}`, dados);
-export const cancelarAgendamento = (id) => agendamentoApi.patch(`/${id}/cancelar`);
-export const excluirAgendamento = (id) => agendamentoApi.delete(`/${id}`);
+export const listarAgendamentos = () => api.get('/agendamentos');
+export const listarAgendamentosPorUsuario = (usuarioId) => api.get(`/agendamentos/usuario/${usuarioId}`);
+export const buscarAgendamento = (id) => api.get(`/agendamentos/${id}`);
+export const cadastrarAgendamento = (dados) => api.post('/agendamentos', dados);
+export const atualizarAgendamento = (id, dados) => api.put(`/agendamentos/${id}`, dados);
+export const cancelarAgendamento = (id) => api.patch(`/agendamentos/${id}/cancelar`);
+export const excluirAgendamento = (id) => api.delete(`/agendamentos/${id}`);
 
-// ========================
 // AVALIAÇÕES
-// ========================
-const avaliacaoApi = axios.create({ baseURL: `${BASE_URL}/avaliacoes` });
-export const listarAvaliacoesPorSalao = (salaoId) => avaliacaoApi.get(`/salao/${salaoId}`);
-export const listarAvaliacoesPorUsuario = (usuarioId) => avaliacaoApi.get(`/usuario/${usuarioId}`);
-export const criarAvaliacao = (dados) => avaliacaoApi.post('', dados);
+export const listarAvaliacoesPorSalao = (salaoId) => api.get(`/avaliacoes/salao/${salaoId}`);
+export const listarAvaliacoesPorUsuario = (usuarioId) => api.get(`/avaliacoes/usuario/${usuarioId}`);
+export const criarAvaliacao = (dados) => api.post('/avaliacoes', dados);
 
-// ========================
 // DASHBOARD
-// ========================
-const dashboardApi = axios.create({ baseURL: `${BASE_URL}/dashboard` });
-export const getDashboardStats = () => dashboardApi.get('/stats');
-export const getPlataformaStats = () => dashboardApi.get('/stats/plataforma');
-export const getSalaoStats = (salaoId) => dashboardApi.get(`/stats/salao/${salaoId}`);
+export const getDashboardStats = () => api.get('/dashboard/stats');
+export const getPlataformaStats = () => api.get('/dashboard/stats/plataforma');
+export const getSalaoStats = (salaoId) => api.get(`/dashboard/stats/salao/${salaoId}`);

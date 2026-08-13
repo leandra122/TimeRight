@@ -3,11 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Scissors, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../context/AuthContext';
+import { login as autenticar } from '../service/api';
 import './Auth.css';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { setUser } = useAuth();
+  const { login } = useAuth();
   const [form, setForm] = useState({ username: '', senha: '' });
   const [erro, setErro] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,31 +21,28 @@ const Login = () => {
     setErro('');
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:8080/usuarios/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
-      if (!response.ok) {
-        const erroResponse = await response.json();
-        throw new Error(erroResponse.error || erroResponse.message || 'Erro ao fazer login');
-      }
-      const usuario = await response.json();
-      const nivelId = usuario.nivelAcesso?.id;
-      const nomeNivel = usuario.nivelAcesso?.nomeNivelAcesso?.toLowerCase();
+      const { data } = await autenticar(form);
+      const role = data.role?.toUpperCase();
 
-      // USER (nivel 3) não acessa o sistema WEB
-      if (nivelId === 3 || nomeNivel === 'user') {
+      if (role === 'USER') {
         throw new Error('Acesso não permitido. Utilize o aplicativo mobile.');
       }
 
-      const tipo = (nivelId === 1 || nomeNivel === 'adm' || nomeNivel === 'admin') ? 'admin' : 'manager';
-      const usuarioComTipo = { ...usuario, tipo };
-      setUser(usuarioComTipo);
-      localStorage.setItem('usuario', JSON.stringify(usuarioComTipo));
-      navigate(tipo === 'admin' ? '/admin' : '/manager');
+      const tipos = { ADM: 'admin', ADMIN: 'admin', MANAGER: 'manager', EMPLOYEE: 'employee' };
+      const tipo = tipos[role];
+      if (!tipo) throw new Error('Perfil de acesso não reconhecido.');
+
+      const usuario = {
+        id: data.userId,
+        nome: data.nome,
+        username: data.username,
+        role,
+        tipo,
+      };
+      login(usuario, data.token);
+      navigate(tipo === 'admin' ? '/admin' : tipo === 'manager' ? '/manager' : '/');
     } catch (err) {
-      setErro(err.message || 'E-mail ou senha inválidos');
+      setErro(err.response?.data?.error || err.message || 'E-mail ou senha inválidos');
     } finally {
       setLoading(false);
     }

@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.timeright.tcc.dto.LoginRequest;
 import com.timeright.tcc.model.entity.Usuario;
 import com.timeright.tcc.services.UsuarioService;
 
@@ -176,25 +175,4 @@ public class UsuarioController {
         }
     }
 
-    // =========================
-    // LOGIN
-    // =========================
-    @PostMapping("/login")
-    public ResponseEntity<Object> login(@RequestBody LoginRequest loginRequest) {
-
-        Usuario usuario = usuarioService.validarLogin(
-                loginRequest.getUsername(),
-                loginRequest.getSenha()
-        );
-
-        if (usuario != null) {
-            return ResponseEntity.ok(usuario);
-        }
-
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                Map.of(
-                        "error", "Username ou senha inválidos"
-                )
-        );
-    }
 }
