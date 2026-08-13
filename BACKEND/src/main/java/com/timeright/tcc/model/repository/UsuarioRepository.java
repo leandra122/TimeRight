@@ -12,6 +12,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     Optional<Usuario> findByUsername(String username);
 
+    boolean existsByUsername(String username);
+
     Optional<Usuario> findByResetToken(String resetToken);
 
     @Query("SELECT u FROM Usuario u WHERE u.nivelAcesso.id <> 3")

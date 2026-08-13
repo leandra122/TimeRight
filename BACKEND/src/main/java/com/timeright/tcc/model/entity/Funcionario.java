@@ -10,6 +10,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
@@ -46,6 +47,7 @@ public class Funcionario {
 
     @OneToOne
     @JoinColumn(name = "usuario_id", unique = true)
+    @JsonIgnore
     private Usuario usuario;
 
     public Long getId() { return id; }

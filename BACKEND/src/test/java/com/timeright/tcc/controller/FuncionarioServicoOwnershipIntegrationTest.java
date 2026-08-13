@@ -59,6 +59,7 @@ class FuncionarioServicoOwnershipIntegrationTest {
 
     @BeforeEach
     void setup() {
+        nivelAcessoRepository.save(nivel("EMPLOYEE"));
         manager = usuario("MANAGER", "manager-ownership@teste.com");
         outroManager = usuario("MANAGER", "outro-ownership@teste.com");
         admin = usuario("ADM", "admin-ownership@teste.com");
@@ -66,6 +67,13 @@ class FuncionarioServicoOwnershipIntegrationTest {
         salaoDois = salao("Salão Dois", "40688134000161", manager);
         salaoAlheio = salao("Salão Alheio", "11222333000181", outroManager);
         salaoLegado = salao("Salão Legado", "19131243000197", null);
+    }
+
+    private NivelAcesso nivel(String role) {
+        NivelAcesso nivel = new NivelAcesso();
+        nivel.setNome(role);
+        nivel.setStatusNivelAcesso("ATIVO");
+        return nivel;
     }
 
     @Test
@@ -92,7 +100,8 @@ class FuncionarioServicoOwnershipIntegrationTest {
 
         Funcionario criado = funcionarioRepository.findByEmail("novo-funcionario@teste.com").orElseThrow();
         assertEquals(salaoUm.getId(), criado.getSalao().getId());
-        org.junit.jupiter.api.Assertions.assertNull(criado.getUsuario());
+        org.junit.jupiter.api.Assertions.assertNotNull(criado.getUsuario());
+        assertEquals("EMPLOYEE", criado.getUsuario().getNivelAcesso().getNome());
 
         mockMvc.perform(post("/funcionarios/{id}", salaoAlheio.getId())
                         .header("Authorization", bearer(manager))
@@ -282,10 +291,8 @@ class FuncionarioServicoOwnershipIntegrationTest {
     }
 
     private Usuario usuario(String role, String email) {
-        NivelAcesso nivel = new NivelAcesso();
-        nivel.setNome(role);
-        nivel.setStatusNivelAcesso("ATIVO");
-        nivel = nivelAcessoRepository.save(nivel);
+        NivelAcesso nivel = nivelAcessoRepository.findByNomeIgnoreCase(role)
+                .orElseGet(() -> nivelAcessoRepository.save(nivel(role)));
         Usuario usuario = new Usuario();
         usuario.setNome(email);
         usuario.setUsername(email);

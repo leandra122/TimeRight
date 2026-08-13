@@ -71,6 +71,6 @@ public class FuncionarioController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Object> deletar(@PathVariable Long id) {
         funcionarioService.deletar(id);
-        return ResponseEntity.ok(Map.of("message", "Funcionário removido"));
+        return ResponseEntity.ok(Map.of("message", "Funcionário inativado; histórico preservado"));
     }
 }

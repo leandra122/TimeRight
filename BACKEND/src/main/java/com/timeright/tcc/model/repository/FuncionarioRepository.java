@@ -10,6 +10,10 @@ import com.timeright.tcc.model.entity.Funcionario;
 public interface FuncionarioRepository extends JpaRepository<Funcionario, Long> {
     Optional<Funcionario> findByEmail(String email);
 
+    boolean existsByEmail(String email);
+
+    boolean existsByEmailAndIdNot(String email, Long id);
+
     Optional<Funcionario> findByUsuarioId(Long usuarioId);
 
     List<Funcionario> findBySalaoGerenteId(Long gerenteId);
