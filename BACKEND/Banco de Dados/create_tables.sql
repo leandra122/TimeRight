@@ -4,12 +4,13 @@ GO
 -- =========================
 -- DROP SEGURO
 -- =========================
+DROP TABLE IF EXISTS Avaliacao;
 DROP TABLE IF EXISTS Agendamento;
 DROP TABLE IF EXISTS Funcionario;
 DROP TABLE IF EXISTS Servico;
+DROP TABLE IF EXISTS Salao;
 DROP TABLE IF EXISTS Usuario;
 DROP TABLE IF EXISTS NivelAcesso;
-DROP TABLE IF EXISTS Salao;
 GO
 
 -- =========================
@@ -25,7 +26,8 @@ INSERT INTO NivelAcesso (nome, status)
 VALUES
 ('adm', 'ATIVO'),
 ('manager', 'ATIVO'),
-('user', 'ATIVO');
+('user', 'ATIVO'),
+('employee', 'ATIVO');
 GO
 
 -- =========================
@@ -62,8 +64,14 @@ CREATE TABLE Salao (
     email VARCHAR(100) NOT NULL,
     endereco VARCHAR(200) NOT NULL,
     telefone VARCHAR(20) NOT NULL,
-    status VARCHAR(20) NOT NULL
+    status VARCHAR(20) NOT NULL,
+    gerente_id INT NULL,
+
+    CONSTRAINT FK_Salao_Gerente
+        FOREIGN KEY (gerente_id)
+        REFERENCES Usuario(id)
 );
+CREATE INDEX IX_Salao_GerenteId ON Salao(gerente_id);
 GO
 
 -- =========================
@@ -97,12 +105,20 @@ CREATE TABLE Funcionario (
     funcao VARCHAR(100) NOT NULL,
     status VARCHAR(20) NOT NULL,
     salao_id INT NOT NULL,
+    usuario_id INT NULL,
 
     CONSTRAINT FK_Funcionario_Salao
         FOREIGN KEY (salao_id)
         REFERENCES Salao(id)
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+
+    CONSTRAINT FK_Funcionario_Usuario
+        FOREIGN KEY (usuario_id)
+        REFERENCES Usuario(id)
 );
+CREATE UNIQUE INDEX UX_Funcionario_UsuarioId
+    ON Funcionario(usuario_id)
+    WHERE usuario_id IS NOT NULL;
 GO
 
 -- =========================
@@ -209,4 +225,5 @@ SELECT * FROM Salao;
 SELECT * FROM Servico;
 SELECT * FROM Funcionario;
 SELECT * FROM Agendamento;
+SELECT * FROM Avaliacao;
 GO

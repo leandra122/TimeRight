@@ -9,6 +9,8 @@ import com.timeright.tcc.model.entity.Funcionario;
 public interface FuncionarioRepository extends JpaRepository<Funcionario, Long> {
     Optional<Funcionario> findByEmail(String email);
 
+    Optional<Funcionario> findByUsuarioId(Long usuarioId);
+
     long countBySalaoIdAndStatus(Long salaoId, String status);
 
     long countByStatus(String status);

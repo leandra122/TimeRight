@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -33,6 +35,10 @@ public class Salao {
     @Column(nullable = false, length = 20)
     private String status;
 
+    @ManyToOne
+    @JoinColumn(name = "gerente_id")
+    private Usuario gerente;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -53,4 +59,7 @@ public class Salao {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public Usuario getGerente() { return gerente; }
+    public void setGerente(Usuario gerente) { this.gerente = gerente; }
 }

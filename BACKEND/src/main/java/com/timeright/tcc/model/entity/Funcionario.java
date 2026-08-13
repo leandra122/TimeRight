@@ -7,8 +7,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "Funcionario")
@@ -25,6 +27,7 @@ public class Funcionario {
     private String email;
 
     @Column(nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String senha;
 
     @Column
@@ -40,6 +43,10 @@ public class Funcionario {
     @JoinColumn(name = "salao_id", nullable = false)
     @JsonIgnoreProperties({"cnpj", "telefone", "email", "endereco", "status"})
     private Salao salao;
+
+    @OneToOne
+    @JoinColumn(name = "usuario_id", unique = true)
+    private Usuario usuario;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -64,4 +71,7 @@ public class Funcionario {
 
     public Salao getSalao() { return salao; }
     public void setSalao(Salao salao) { this.salao = salao; }
+
+    public Usuario getUsuario() { return usuario; }
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
 }
