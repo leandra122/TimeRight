@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.timeright.tcc.dto.SalaoServicosDTO;
+import com.timeright.tcc.dto.ConfiguracaoAgendamentoSalaoRequest;
+import com.timeright.tcc.dto.ConfiguracaoAgendamentoSalaoResponse;
 import com.timeright.tcc.integration.CnpjConsultaException;
 import com.timeright.tcc.integration.CnpjConsultaGateway;
 import com.timeright.tcc.model.entity.Salao;
@@ -101,5 +103,19 @@ public class SalaoController {
     public ResponseEntity<Object> deletar(@PathVariable Long id) {
         salaoService.deletar(id);
         return ResponseEntity.ok(Map.of("message", "Salão deletado com sucesso"));
+    }
+
+    @GetMapping("/{id}/configuracao-agendamento")
+    public ResponseEntity<ConfiguracaoAgendamentoSalaoResponse> buscarConfiguracaoAgendamento(
+            @PathVariable Long id) {
+        return ResponseEntity.ok(salaoService.buscarConfiguracaoAgendamento(id));
+    }
+
+    @PutMapping("/{id}/configuracao-agendamento")
+    public ResponseEntity<ConfiguracaoAgendamentoSalaoResponse> atualizarConfiguracaoAgendamento(
+            @PathVariable Long id,
+            @RequestBody ConfiguracaoAgendamentoSalaoRequest configuracao) {
+        return ResponseEntity.ok(
+                salaoService.atualizarConfiguracaoAgendamento(id, configuracao));
     }
 }

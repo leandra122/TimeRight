@@ -37,6 +37,12 @@ public class Salao {
     @Column(nullable = false, length = 20)
     private String status;
 
+    @Column(name = "antecedencia_minima_minutos", nullable = false)
+    private Integer antecedenciaMinimaMinutos = 120;
+
+    @Column(name = "limite_agendamento_dias", nullable = false)
+    private Integer limiteAgendamentoDias = 60;
+
     @ManyToOne
     @JoinColumn(name = "gerente_id")
     @JsonIgnore
@@ -62,6 +68,16 @@ public class Salao {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public Integer getAntecedenciaMinimaMinutos() { return antecedenciaMinimaMinutos; }
+    public void setAntecedenciaMinimaMinutos(Integer antecedenciaMinimaMinutos) {
+        this.antecedenciaMinimaMinutos = antecedenciaMinimaMinutos;
+    }
+
+    public Integer getLimiteAgendamentoDias() { return limiteAgendamentoDias; }
+    public void setLimiteAgendamentoDias(Integer limiteAgendamentoDias) {
+        this.limiteAgendamentoDias = limiteAgendamentoDias;
+    }
 
     public Usuario getGerente() { return gerente; }
     public void setGerente(Usuario gerente) { this.gerente = gerente; }

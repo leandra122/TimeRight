@@ -66,10 +66,18 @@ CREATE TABLE Salao (
     telefone VARCHAR(20) NOT NULL,
     status VARCHAR(20) NOT NULL,
     gerente_id INT NULL,
+    antecedencia_minima_minutos INT NOT NULL
+        CONSTRAINT DF_Salao_AntecedenciaMinimaMinutos DEFAULT (120),
+    limite_agendamento_dias INT NOT NULL
+        CONSTRAINT DF_Salao_LimiteAgendamentoDias DEFAULT (60),
 
     CONSTRAINT FK_Salao_Gerente
         FOREIGN KEY (gerente_id)
-        REFERENCES Usuario(id)
+        REFERENCES Usuario(id),
+    CONSTRAINT CK_Salao_AntecedenciaMinimaMinutos
+        CHECK (antecedencia_minima_minutos BETWEEN 0 AND 10080),
+    CONSTRAINT CK_Salao_LimiteAgendamentoDias
+        CHECK (limite_agendamento_dias BETWEEN 1 AND 365)
 );
 CREATE INDEX IX_Salao_GerenteId ON Salao(gerente_id);
 GO

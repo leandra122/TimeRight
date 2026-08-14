@@ -8,6 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.timeright.tcc.dto.SalaoServicosDTO;
 import com.timeright.tcc.dto.ServicoDTO;
+import com.timeright.tcc.dto.ConfiguracaoAgendamentoSalaoRequest;
+import com.timeright.tcc.dto.ConfiguracaoAgendamentoSalaoResponse;
 import com.timeright.tcc.exception.ResourceNotFoundException;
 import com.timeright.tcc.integration.CnpjConsultaGateway;
 import com.timeright.tcc.integration.CnpjConsultaResultado;
@@ -22,6 +24,10 @@ import com.timeright.tcc.util.CnpjValidator;
 
 @Service
 public class SalaoService {
+
+    private static final int ANTECEDENCIA_PADRAO_MINUTOS = 120;
+    private static final int LIMITE_PADRAO_DIAS = 60;
+    private static final String FUSO_HORARIO_MVP = "America/Sao_Paulo";
 
     private final SalaoRepository salaoRepository;
     private final ServicoRepository servicoRepository;
@@ -148,5 +154,44 @@ public class SalaoService {
             throw new AccessDeniedException("Acesso negado");
         }
         return salao;
+    }
+
+    @Transactional(readOnly = true)
+    public ConfiguracaoAgendamentoSalaoResponse buscarConfiguracaoAgendamento(Long id) {
+        return respostaConfiguracao(buscarAutorizado(id));
+    }
+
+    @Transactional
+    public ConfiguracaoAgendamentoSalaoResponse atualizarConfiguracaoAgendamento(
+            Long id, ConfiguracaoAgendamentoSalaoRequest dados) {
+        Salao salao = buscarAutorizado(id);
+        validarConfiguracao(dados);
+        salao.setAntecedenciaMinimaMinutos(dados.antecedenciaMinimaMinutos());
+        salao.setLimiteAgendamentoDias(dados.limiteAgendamentoDias());
+        return respostaConfiguracao(salaoRepository.save(salao));
+    }
+
+    private ConfiguracaoAgendamentoSalaoResponse respostaConfiguracao(Salao salao) {
+        Integer antecedencia = salao.getAntecedenciaMinimaMinutos() == null
+                ? ANTECEDENCIA_PADRAO_MINUTOS : salao.getAntecedenciaMinimaMinutos();
+        Integer limite = salao.getLimiteAgendamentoDias() == null
+                ? LIMITE_PADRAO_DIAS : salao.getLimiteAgendamentoDias();
+        return new ConfiguracaoAgendamentoSalaoResponse(
+                salao.getId(), antecedencia, limite, FUSO_HORARIO_MVP);
+    }
+
+    private void validarConfiguracao(ConfiguracaoAgendamentoSalaoRequest dados) {
+        if (dados == null || dados.antecedenciaMinimaMinutos() == null
+                || dados.antecedenciaMinimaMinutos() < 0
+                || dados.antecedenciaMinimaMinutos() > 10080) {
+            throw new IllegalArgumentException(
+                    "Antecedência mínima deve estar entre 0 e 10080 minutos");
+        }
+        if (dados.limiteAgendamentoDias() == null
+                || dados.limiteAgendamentoDias() < 1
+                || dados.limiteAgendamentoDias() > 365) {
+            throw new IllegalArgumentException(
+                    "Limite de agendamento deve estar entre 1 e 365 dias");
+        }
     }
 }
