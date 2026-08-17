@@ -111,6 +111,17 @@ class SecurityMatrixIntegrationTest {
     }
 
     @Test
+    void somenteUserAcessaRotasDeAgendamentoDoCliente() throws Exception {
+        mockMvc.perform(get("/api/client/agendamentos"))
+                .andExpect(status().isUnauthorized());
+        for (String role : new String[] {"ADMIN", "MANAGER", "EMPLOYEE"}) {
+            mockMvc.perform(get("/api/client/agendamentos")
+                            .header("Authorization", bearer(token(role))))
+                    .andExpect(status().isForbidden());
+        }
+    }
+
+    @Test
     void cadastroClienteECatalogoDeFuncionariosSaoPublicos() throws Exception {
         mockMvc.perform(post("/api/auth/register/client")
                         .contentType(MediaType.APPLICATION_JSON)

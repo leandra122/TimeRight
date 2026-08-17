@@ -1,0 +1,18 @@
+package com.timeright.tcc.config;
+
+import java.time.Clock;
+import java.time.ZoneId;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class TimeConfig {
+
+    public static final ZoneId MVP_ZONE = ZoneId.of("America/Sao_Paulo");
+
+    @Bean
+    Clock applicationClock() {
+        return Clock.system(MVP_ZONE);
+    }
+}

@@ -37,6 +37,29 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     Optional<Agendamento> buscarPorIdEGerenteComVinculosConsistentes(
             @Param("id") Long id, @Param("gerenteId") Long gerenteId);
 
+    @Query("""
+        SELECT a FROM Agendamento a
+        WHERE a.usuario.id = :usuarioId
+          AND a.funcionario.salao.id = a.servico.salao.id
+        ORDER BY a.dataHora DESC, a.id DESC
+        """)
+    List<Agendamento> buscarClienteComVinculosConsistentes(@Param("usuarioId") Long usuarioId);
+
+    @Query(value = """
+        SELECT COUNT(*)
+        FROM Agendamento a
+        WHERE a.funcionario_id = :funcionarioId
+          AND a.status <> 'CANCELADO'
+          AND a.data_hora < :fim
+          AND DATEADD(MINUTE,
+                CASE WHEN a.duracao IS NULL OR a.duracao <= 0 THEN 1440 ELSE a.duracao END,
+                a.data_hora) > :inicio
+        """, nativeQuery = true)
+    long contarConflitosCliente(
+            @Param("funcionarioId") Long funcionarioId,
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fim") LocalDateTime fim);
+
     List<Agendamento> findByUsuarioId(Long usuarioId);
 
     List<Agendamento> findByFuncionarioId(Long funcionarioId);
