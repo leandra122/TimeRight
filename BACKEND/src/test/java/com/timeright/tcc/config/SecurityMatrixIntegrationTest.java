@@ -111,6 +111,16 @@ class SecurityMatrixIntegrationTest {
     }
 
     @Test
+    void cadastroClienteECatalogoDeFuncionariosSaoPublicos() throws Exception {
+        mockMvc.perform(post("/api/auth/register/client")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(get("/catalogo/saloes/999999/funcionarios"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void endpointNaoClassificadoENegado() throws Exception {
         mockMvc.perform(get("/endpoint-nao-classificado")
                         .header("Authorization", bearer(token("ADMIN"))))

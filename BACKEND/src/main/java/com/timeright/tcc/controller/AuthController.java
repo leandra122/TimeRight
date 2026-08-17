@@ -9,11 +9,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.timeright.tcc.dto.ClienteCadastroRequest;
+import com.timeright.tcc.dto.ClienteCadastroResponse;
 import com.timeright.tcc.dto.LoginRequest;
 import com.timeright.tcc.dto.LoginResponse;
 import com.timeright.tcc.model.entity.Usuario;
 import com.timeright.tcc.services.JwtService;
 import com.timeright.tcc.services.UsuarioService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -25,6 +29,13 @@ public class AuthController {
     public AuthController(UsuarioService usuarioService, JwtService jwtService) {
         this.usuarioService = usuarioService;
         this.jwtService = jwtService;
+    }
+
+    @PostMapping("/register/client")
+    public ResponseEntity<ClienteCadastroResponse> cadastrarCliente(
+            @Valid @RequestBody ClienteCadastroRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(usuarioService.cadastrarCliente(request));
     }
 
     @PostMapping("/login")

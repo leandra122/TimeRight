@@ -27,6 +27,7 @@ api.interceptors.response.use(
 
 // AUTENTICAÇÃO
 export const login = (dados) => api.post('/api/auth/login', dados);
+export const cadastrarGerente = (dados) => api.post('/usuarios', dados);
 
 // USUÁRIO
 export const listarUsuario = () => api.get('/usuarios');

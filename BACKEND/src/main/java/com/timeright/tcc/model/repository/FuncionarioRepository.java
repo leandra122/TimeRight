@@ -18,6 +18,9 @@ public interface FuncionarioRepository extends JpaRepository<Funcionario, Long> 
 
     List<Funcionario> findBySalaoGerenteId(Long gerenteId);
 
+    List<Funcionario> findBySalaoIdAndStatusIgnoreCaseOrderByNomeAscIdAsc(
+            Long salaoId, String status);
+
     Optional<Funcionario> findByIdAndSalaoGerenteId(Long id, Long gerenteId);
 
     boolean existsByIdAndSalaoGerenteId(Long id, Long gerenteId);

@@ -10,6 +10,9 @@ import java.util.Locale;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.timeright.tcc.dto.ClienteCadastroRequest;
+import com.timeright.tcc.dto.ClienteCadastroResponse;
+import com.timeright.tcc.exception.ConflictException;
 import com.timeright.tcc.model.entity.NivelAcesso;
 import com.timeright.tcc.model.entity.Usuario;
 import com.timeright.tcc.model.repository.NivelAcessoRepository;
@@ -81,6 +84,37 @@ public class UsuarioService {
         novo.setDataCadastro(LocalDateTime.now());
 
         return usuarioRepository.save(novo);
+    }
+
+    @Transactional
+    public ClienteCadastroResponse cadastrarCliente(ClienteCadastroRequest request) {
+        String nome = request.nome().trim();
+        String email = request.email().trim().toLowerCase(Locale.ROOT);
+
+        if (!EMAIL_PATTERN.matcher(email).matches()) {
+            throw new IllegalArgumentException("E-mail inválido");
+        }
+
+        if (usuarioRepository.findByUsername(email).isPresent()) {
+            throw new ConflictException("Email já cadastrado");
+        }
+
+        NivelAcesso nivel = nivelAcessoRepository.findByNomeIgnoreCase("user")
+                .filter(item -> "ATIVO".equalsIgnoreCase(item.getStatusNivelAcesso()))
+                .orElseThrow(() -> new IllegalStateException("Nível de acesso USER indisponível"));
+
+        Usuario cliente = new Usuario();
+        cliente.setNome(nome);
+        cliente.setUsername(email);
+        cliente.setPassword(passwordEncoder.encode(request.password()));
+        cliente.setNivelAcesso(nivel);
+        cliente.setStatusUsuario("ATIVO");
+        cliente.setDataCadastro(LocalDateTime.now());
+
+        Usuario salvo = usuarioRepository.save(cliente);
+        return new ClienteCadastroResponse(
+                salvo.getId(), salvo.getNome(), salvo.getUsername(),
+                "USER", salvo.getStatusUsuario());
     }
 
     private void validarCadastro(Usuario usuario) {

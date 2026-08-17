@@ -42,6 +42,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/error").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/auth/register/client").permitAll()
                 .requestMatchers(HttpMethod.POST,
                         "/usuarios",
                         "/usuarios/esqueci-senha",
@@ -50,6 +51,7 @@ public class SecurityConfig {
                         "/saloes",
                         "/avaliacoes/salao/**",
                         "/actuator/health").permitAll()
+                .requestMatchers(HttpMethod.GET, "/catalogo/saloes/*/funcionarios").permitAll()
                 .requestMatchers(HttpMethod.GET, "/servicos/me")
                     .hasRole("MANAGER")
                 .requestMatchers(HttpMethod.GET,

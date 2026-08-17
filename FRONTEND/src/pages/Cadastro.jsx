@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Scissors, User, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import Navbar from '../components/Navbar';
+import { cadastrarGerente } from '../service/api';
 import './Auth.css';
 
 const Cadastro = () => {
@@ -38,29 +39,17 @@ const Cadastro = () => {
 
 
     try {
-      const response = await fetch("http://localhost:8080/usuarios", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await response.json();
-
-
-      if (!response.ok) {
-        throw new Error(
-          data.error ||
-          data.message ||
-          "Erro ao cadastrar usuário."
-        );
-      }
+      await cadastrarGerente(payload);
 
       navigate("/login");
 
     } catch (err) {
-      setErro(err.message);
+      setErro(
+        err.response?.data?.error ||
+        err.response?.data?.message ||
+        err.message ||
+        "Erro ao cadastrar usuário."
+      );
     } finally {
       setLoading(false);
     }
