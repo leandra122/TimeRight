@@ -1,0 +1,2 @@
+import { Text } from 'react-native'; import { Card, uiStyles } from './UI'; import { dateTime, money } from '../utils/format';
+export default function AppointmentCard({ item, onPress }) { return <Card onPress={onPress}><Text style={{ fontSize: 17, fontWeight: '800' }}>{item.salao?.nome}</Text><Text>{item.servico?.nome} • {item.duracao} min</Text><Text>{item.funcionario?.nome}</Text><Text>{dateTime(item.dataHora)}</Text><Text>{money(item.servico?.preco)} • {item.status}</Text>{item.observacoes ? <Text style={uiStyles.subtitle}>{item.observacoes}</Text> : null}</Card>; }
