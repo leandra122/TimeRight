@@ -25,7 +25,6 @@ export function StateMessage({ loading, error, empty, onRetry }) {
   return null;
 }
 
-export const uiStyles = styles;
 const styles = StyleSheet.create({
   titleWrap: { marginBottom: spacing.lg }, title: { fontSize: 28, fontWeight: '800', color: colors.text }, subtitle: { color: colors.muted, marginTop: spacing.xs, fontSize: 15, lineHeight: 21 },
   field: { marginBottom: spacing.md }, label: { color: colors.text, fontWeight: '600', marginBottom: spacing.xs }, input: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, minHeight: 50, paddingHorizontal: spacing.md, color: colors.text },
@@ -33,3 +32,5 @@ const styles = StyleSheet.create({
   card: { backgroundColor: colors.card, borderRadius: radius.md, padding: spacing.md, marginBottom: spacing.md, borderWidth: 1, borderColor: colors.border },
   state: { alignItems: 'center', gap: spacing.md, padding: spacing.xl }, error: { color: colors.danger, textAlign: 'center' }, empty: { color: colors.muted, textAlign: 'center', padding: spacing.xl },
 });
+
+export const uiStyles = styles;

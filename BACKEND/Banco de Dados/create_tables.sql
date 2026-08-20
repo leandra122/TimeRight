@@ -185,42 +185,25 @@ GO
 -- TRIGGER (regra de negócio)
 -- SOMENTE USER PODE AGENDAR
 -- =========================
-CREATE TRIGGER trg_agendamento_user
-ON Agendamento
-INSTEAD OF INSERT
+CREATE OR ALTER TRIGGER dbo.trg_agendamento_user
+ON dbo.Agendamento
+AFTER INSERT
 AS
 BEGIN
     SET NOCOUNT ON;
 
     IF EXISTS (
         SELECT 1
-        FROM inserted i
-        INNER JOIN Usuario u ON i.usuario_id = u.id
-        INNER JOIN NivelAcesso n ON u.nivel_acesso_id = n.id
-        WHERE UPPER(n.nome) <> 'USER'
+        FROM inserted AS i
+        LEFT JOIN dbo.Usuario AS u ON i.usuario_id = u.id
+        LEFT JOIN dbo.NivelAcesso AS n ON u.nivel_acesso_id = n.id
+        WHERE u.id IS NULL
+           OR n.id IS NULL
+           OR UPPER(LTRIM(RTRIM(n.nome))) <> 'USER'
     )
     BEGIN
-        RAISERROR('Apenas usuários do tipo USER podem realizar agendamentos.',16,1);
-        RETURN;
-    END
-
-    INSERT INTO Agendamento
-    (
-        usuario_id,
-        funcionario_id,
-        servico_id,
-        data_hora,
-        duracao,
-        status
-    )
-    SELECT
-        usuario_id,
-        funcionario_id,
-        servico_id,
-        data_hora,
-        duracao,
-        status
-    FROM inserted;
+        ;THROW 50001, 'Apenas usuários do tipo USER podem realizar agendamentos.', 1;
+    END;
 END;
 GO
 
