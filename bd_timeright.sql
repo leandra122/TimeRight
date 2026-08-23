@@ -7,6 +7,7 @@ DROP TABLE IF EXISTS Avaliacao;
 DROP TABLE IF EXISTS Agendamento;
 DROP TABLE IF EXISTS Funcionario;
 DROP TABLE IF EXISTS Servico;
+DROP TABLE IF EXISTS HorarioFuncionamentoSalao;
 DROP TABLE IF EXISTS Salao;
 DROP TABLE IF EXISTS Usuario;
 DROP TABLE IF EXISTS NivelAcesso;
@@ -74,6 +75,27 @@ CREATE TABLE Salao (
         CHECK (limite_agendamento_dias BETWEEN 1 AND 365)
 );
 CREATE INDEX IX_Salao_GerenteId ON Salao(gerente_id);
+GO
+
+-- HORÁRIOS DE FUNCIONAMENTO DO SALÃO
+CREATE TABLE HorarioFuncionamentoSalao (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    salao_id INT NOT NULL,
+    dia_semana INT NOT NULL,
+    hora_inicio TIME(0) NOT NULL,
+    hora_fim TIME(0) NOT NULL,
+
+    CONSTRAINT FK_HorarioFuncionamentoSalao_Salao
+        FOREIGN KEY (salao_id) REFERENCES Salao(id) ON DELETE CASCADE,
+    CONSTRAINT CK_HorarioFuncionamentoSalao_DiaSemana
+        CHECK (dia_semana BETWEEN 1 AND 7),
+    CONSTRAINT CK_HorarioFuncionamentoSalao_Intervalo
+        CHECK (hora_inicio < hora_fim)
+);
+CREATE UNIQUE INDEX UX_HorarioFuncionamentoSalao_Periodo
+    ON HorarioFuncionamentoSalao(salao_id, dia_semana, hora_inicio, hora_fim);
+CREATE INDEX IX_HorarioFuncionamentoSalao_SalaoDia
+    ON HorarioFuncionamentoSalao(salao_id, dia_semana, hora_inicio);
 GO
 
 -- SERVIÇO

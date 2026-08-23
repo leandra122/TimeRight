@@ -3,6 +3,22 @@
   background: var(--off-white);
 }
 
+/* Horários de funcionamento */
+.horarios-page { max-width: 980px; }
+.horarios-salao-select { max-width: 420px; }
+.horarios-semana { display: grid; gap: 14px; margin-top: 20px; }
+.horario-dia-card { background: #fff; border: 1px solid #eadde1; border-radius: 14px; padding: 18px; }
+.horario-dia-cabecalho { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
+.horario-fechado { display: flex; align-items: center; gap: 8px; }
+.horario-periodo { display: grid; grid-template-columns: 1fr 1fr auto; align-items: end; gap: 12px; margin-bottom: 12px; }
+.horario-periodo label { display: grid; gap: 6px; font-weight: 600; }
+.horario-periodo input { min-height: 42px; border: 1px solid #d8c7cc; border-radius: 8px; padding: 8px 10px; }
+.horarios-salvar { margin-top: 22px; min-width: 190px; }
+@media (max-width: 680px) {
+  .horario-periodo { grid-template-columns: 1fr 1fr; }
+  .horario-periodo .btn-secondary { grid-column: 1 / -1; }
+}
+
 .admin-container {
   max-width: 1000px;
   margin: 0 auto;

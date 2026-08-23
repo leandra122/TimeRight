@@ -18,10 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.timeright.tcc.dto.SalaoServicosDTO;
 import com.timeright.tcc.dto.ConfiguracaoAgendamentoSalaoRequest;
 import com.timeright.tcc.dto.ConfiguracaoAgendamentoSalaoResponse;
+import com.timeright.tcc.dto.HorariosFuncionamentoSalaoRequest;
+import com.timeright.tcc.dto.HorariosFuncionamentoSalaoResponse;
 import com.timeright.tcc.integration.CnpjConsultaException;
 import com.timeright.tcc.integration.CnpjConsultaGateway;
 import com.timeright.tcc.model.entity.Salao;
 import com.timeright.tcc.services.SalaoService;
+import com.timeright.tcc.services.HorarioFuncionamentoSalaoService;
 
 @RestController
 @RequestMapping("/saloes")
@@ -30,10 +33,13 @@ public class SalaoController {
 
     private final SalaoService salaoService;
     private final CnpjConsultaGateway cnpjGateway;
+    private final HorarioFuncionamentoSalaoService horarioFuncionamentoSalaoService;
 
-    public SalaoController(SalaoService salaoService, CnpjConsultaGateway cnpjGateway) {
+    public SalaoController(SalaoService salaoService, CnpjConsultaGateway cnpjGateway,
+            HorarioFuncionamentoSalaoService horarioFuncionamentoSalaoService) {
         this.salaoService = salaoService;
         this.cnpjGateway = cnpjGateway;
+        this.horarioFuncionamentoSalaoService = horarioFuncionamentoSalaoService;
     }
 
     // =========================
@@ -117,5 +123,18 @@ public class SalaoController {
             @RequestBody ConfiguracaoAgendamentoSalaoRequest configuracao) {
         return ResponseEntity.ok(
                 salaoService.atualizarConfiguracaoAgendamento(id, configuracao));
+    }
+
+    @GetMapping("/{id}/horarios-funcionamento")
+    public ResponseEntity<HorariosFuncionamentoSalaoResponse> buscarHorariosFuncionamento(
+            @PathVariable Long id) {
+        return ResponseEntity.ok(horarioFuncionamentoSalaoService.buscar(id));
+    }
+
+    @PutMapping("/{id}/horarios-funcionamento")
+    public ResponseEntity<HorariosFuncionamentoSalaoResponse> atualizarHorariosFuncionamento(
+            @PathVariable Long id,
+            @RequestBody HorariosFuncionamentoSalaoRequest horarios) {
+        return ResponseEntity.ok(horarioFuncionamentoSalaoService.atualizar(id, horarios));
     }
 }

@@ -17,6 +17,7 @@ const atalhosAdmin = [
 ];
 
 const atalhosManager = [
+  { to: '/manager/horarios', icon: <Clock size={24} />, titulo: 'Horários de funcionamento', desc: 'Configure a semana de cada salão' },
   { to: '/manager/cadastro-salao', icon: <Store size={24} />, titulo: 'Cadastrar Salão', desc: 'Adicione um novo estabelecimento' },
   { to: '/manager/painel', icon: <Calendar size={24} />, titulo: 'Painel', desc: 'Veja e edite os agendamentos' },
   { to: '/manager/funcionarios', icon: <UserCog size={24} />, titulo: 'Gerenciar Equipe', desc: 'Cadastre e gerencie funcionários' },

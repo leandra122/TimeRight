@@ -45,6 +45,10 @@ export const buscarSalao = (id) => api.get(`/saloes/${id}`);
 export const atualizarSalao = (id, dados) => api.put(`/saloes/${id}`, dados);
 export const consultarCnpj = (cnpj) => api.get(`/saloes/cnpj/${cnpj}`);
 export const cadastrarSalaoComServicos = (dados) => api.post('/saloes/com-servicos', dados);
+export const buscarHorariosFuncionamento = (salaoId) =>
+  api.get(`/saloes/${salaoId}/horarios-funcionamento`);
+export const salvarHorariosFuncionamento = (salaoId, dados) =>
+  api.put(`/saloes/${salaoId}/horarios-funcionamento`, dados);
 
 // SERVIÇO
 export const listarServicos = () => api.get('/servicos');

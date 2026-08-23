@@ -15,6 +15,7 @@ const GerenciarUsuarios = lazy(() => import('./pages/GerenciarUsuarios'));
 const GerenciarFuncionarios = lazy(() => import('./pages/GerenciarFuncionarios'));
 const CadastroSalaoGerente = lazy(() => import('./pages/CadastroSalaoGerente'));
 const AgendaFuncionario = lazy(() => import('./pages/AgendaFuncionario'));
+const HorariosFuncionamento = lazy(() => import('./pages/HorariosFuncionamento'));
 
 const destinoPorTipo = {
   admin: '/admin',
@@ -51,6 +52,7 @@ function App() {
             <Route path="/manager/cadastro-salao" element={<RotaProtegida tipo="manager"><CadastroSalaoGerente /></RotaProtegida>} />
             <Route path="/manager/painel" element={<RotaProtegida tipo="manager"><Painel /></RotaProtegida>} />
             <Route path="/manager/funcionarios" element={<RotaProtegida tipo="manager"><GerenciarFuncionarios /></RotaProtegida>} />
+            <Route path="/manager/horarios" element={<RotaProtegida tipo="manager"><HorariosFuncionamento /></RotaProtegida>} />
 
             <Route path="/employee/agenda" element={<RotaProtegida tipo="employee"><AgendaFuncionario /></RotaProtegida>} />
 
