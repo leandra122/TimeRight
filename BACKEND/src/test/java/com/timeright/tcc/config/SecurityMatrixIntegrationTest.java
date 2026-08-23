@@ -118,7 +118,24 @@ class SecurityMatrixIntegrationTest {
             mockMvc.perform(get("/api/client/agendamentos")
                             .header("Authorization", bearer(token(role))))
                     .andExpect(status().isForbidden());
+            mockMvc.perform(get("/api/client/disponibilidade")
+                            .param("funcionarioId", "1")
+                            .param("servicoId", "1")
+                            .param("data", "2026-08-25")
+                            .header("Authorization", bearer(token(role))))
+                    .andExpect(status().isForbidden());
         }
+        mockMvc.perform(get("/api/client/disponibilidade")
+                        .param("funcionarioId", "1")
+                        .param("servicoId", "1")
+                        .param("data", "2026-08-25"))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/client/disponibilidade")
+                        .param("funcionarioId", "1")
+                        .param("servicoId", "1")
+                        .param("data", "2026-08-25")
+                        .header("Authorization", "Bearer token-invalido"))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test

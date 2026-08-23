@@ -14,6 +14,9 @@ export const catalogApi = {
 
 export const appointmentsApi = {
   list: () => api.get('/api/client/agendamentos'),
+  availability: (funcionarioId, servicoId, data) => api.get('/api/client/disponibilidade', {
+    params: { funcionarioId, servicoId, data },
+  }),
   create: (payload) => api.post('/api/client/agendamentos', payload),
   cancel: (id) => api.patch(`/api/client/agendamentos/${id}/cancelar`),
 };

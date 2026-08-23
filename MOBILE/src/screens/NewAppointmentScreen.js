@@ -1,14 +1,21 @@
-import { useState } from 'react';
-import { Platform, Text, View } from 'react-native';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Platform, Pressable, Text, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Screen from '../components/Screen';
 import { Button, Field, Title, uiStyles } from '../components/UI';
 import { appointmentsApi } from '../api/services';
 import { getApiError } from '../api/client';
-import { dateTime, money, toApiDateTime } from '../utils/format';
+import { money } from '../utils/format';
+import { colors } from '../styles/theme';
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
-const TIME_PATTERN = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+function toLocalDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
 
 function isValidDate(value) {
   if (!DATE_PATTERN.test(value)) return false;
@@ -19,161 +26,282 @@ function isValidDate(value) {
     && parsed.getDate() === day;
 }
 
-function formatWebDateTime(dateValue, timeValue) {
-  if (!isValidDate(dateValue) || !TIME_PATTERN.test(timeValue)) return '';
-  const [year, month, day] = dateValue.split('-');
-  return `${day}/${month}/${year} ${timeValue}`;
+function initialDate() {
+  const value = new Date();
+  value.setDate(value.getDate() + 1);
+  value.setHours(12, 0, 0, 0);
+  return value;
+}
+
+function displayDate(value) {
+  if (!isValidDate(value)) return 'Data ainda não selecionada';
+  const [year, month, day] = value.split('-');
+  return `${day}/${month}/${year}`;
+}
+
+function availabilityContext(data, funcionarioId, servicoId) {
+  return { data, funcionarioId, servicoId };
+}
+
+function isSameContext(first, second) {
+  return first?.data === second?.data
+    && first?.funcionarioId === second?.funcionarioId
+    && first?.servicoId === second?.servicoId;
 }
 
 export default function NewAppointmentScreen({ route, navigation }) {
   const { salon, service, employee } = route.params;
-  const [date, setDate] = useState(() => {
-    const initial = new Date();
-    initial.setDate(initial.getDate() + 1);
-    initial.setHours(10, 0, 0, 0);
-    return initial;
-  });
-  const [webDate, setWebDate] = useState('');
-  const [webTime, setWebTime] = useState('');
-  const [picker, setPicker] = useState(null);
+  const firstDate = useRef(initialDate()).current;
+  const [date, setDate] = useState(firstDate);
+  const [selectedDate, setSelectedDate] = useState(() => toLocalDate(firstDate));
+  const [pickerVisible, setPickerVisible] = useState(false);
+  const [slots, setSlots] = useState([]);
+  const [selectedTime, setSelectedTime] = useState('');
+  const [availabilityLoading, setAvailabilityLoading] = useState(false);
+  const [availabilityError, setAvailabilityError] = useState('');
   const [notes, setNotes] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const requestSequence = useRef(0);
+  const submitSequence = useRef(0);
+  const mounted = useRef(true);
+  const navigationStarted = useRef(false);
+  const currentContext = useRef(availabilityContext(
+    toLocalDate(firstDate), employee.id, service.id,
+  ));
 
-  const webSelectionValid = isValidDate(webDate) && TIME_PATTERN.test(webTime);
-  const webValidationMessage = Platform.OS === 'web' && !webSelectionValid
-    ? 'Selecione uma data e um horário válidos para continuar.'
-    : '';
+  const loadAvailability = useCallback(async (context) => {
+    const requestId = ++requestSequence.current;
+    const canApply = () => mounted.current
+      && requestId === requestSequence.current
+      && isSameContext(currentContext.current, context);
 
-  const change = (_, value) => {
-    if (Platform.OS !== 'ios') setPicker(null);
-    if (!value) return;
-
-    const next = new Date(date);
-    if (picker === 'date') {
-      next.setFullYear(value.getFullYear(), value.getMonth(), value.getDate());
-    } else {
-      next.setHours(value.getHours(), value.getMinutes(), 0, 0);
+    if (canApply()) {
+      setSelectedTime('');
+      setSlots([]);
+      setAvailabilityError('');
     }
-    setDate(next);
-  };
-
-  const changeWebDate = (event) => {
-    const value = event.target.value;
-    setWebDate(DATE_PATTERN.test(value) && isValidDate(value) ? value : '');
-    setError('');
-  };
-
-  const changeWebTime = (event) => {
-    const value = event.target.value;
-    setWebTime(TIME_PATTERN.test(value) ? value : '');
-    setError('');
-  };
-
-  async function submit() {
-    if (loading) return;
-    if (Platform.OS === 'web' && !webSelectionValid) {
-      setError('Selecione uma data e um horário válidos antes de confirmar.');
+    if (!isValidDate(context.data)) {
+      if (canApply()) setAvailabilityLoading(false);
       return;
     }
+    if (canApply()) setAvailabilityLoading(true);
+    try {
+      const response = await appointmentsApi.availability(
+        context.funcionarioId, context.servicoId, context.data,
+      );
+      if (!canApply()) return;
+      setSlots(Array.isArray(response.data?.horarios) ? response.data.horarios : []);
+    } catch (requestError) {
+      if (!canApply()) return;
+      setAvailabilityError(getApiError(
+        requestError, 'Não foi possível carregar os horários disponíveis.',
+      ));
+    } finally {
+      if (canApply()) setAvailabilityLoading(false);
+    }
+  }, []);
 
-    const selectedDateTime = Platform.OS === 'web'
-      ? `${webDate}T${webTime}:00`
-      : toApiDateTime(date);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      requestSequence.current += 1;
+      submitSequence.current += 1;
+    };
+  }, []);
 
-    setLoading(true);
+  useEffect(() => {
+    const context = availabilityContext(selectedDate, employee.id, service.id);
+    currentContext.current = context;
+    requestSequence.current += 1;
+    setSelectedTime('');
+    setSlots([]);
+    setAvailabilityError('');
+    setAvailabilityLoading(false);
+    setError('');
+    loadAvailability(context);
+  }, [employee.id, loadAvailability, selectedDate, service.id]);
+
+  function changeDate(nextDate, nativeDate = null) {
+    if (submitting) return;
+    const context = availabilityContext(nextDate, employee.id, service.id);
+    currentContext.current = context;
+    requestSequence.current += 1;
+    setSelectedTime('');
+    setSlots([]);
+    setAvailabilityError('');
+    setAvailabilityLoading(false);
+    setError('');
+    if (nativeDate) setDate(nativeDate);
+    setSelectedDate(nextDate);
+  }
+
+  function changeNativeDate(_, value) {
+    if (submitting) return;
+    setPickerVisible(Platform.OS === 'ios');
+    if (!value) return;
+    const normalized = new Date(value);
+    normalized.setHours(12, 0, 0, 0);
+    changeDate(toLocalDate(normalized), normalized);
+  }
+
+  function changeWebDate(event) {
+    if (submitting) return;
+    const value = event.target.value;
+    changeDate(isValidDate(value) ? value : '');
+  }
+
+  async function submit() {
+    if (submitting || !selectedTime || !isValidDate(selectedDate)) return;
+    const submittedContext = availabilityContext(selectedDate, employee.id, service.id);
+    const submittedTime = selectedTime;
+    if (!isSameContext(currentContext.current, submittedContext)) return;
+    const submitId = ++submitSequence.current;
+    setSubmitting(true);
     setError('');
     try {
       const { data } = await appointmentsApi.create({
-        funcionarioId: employee.id,
-        servicoId: service.id,
-        dataHora: selectedDateTime,
+        funcionarioId: submittedContext.funcionarioId,
+        servicoId: submittedContext.servicoId,
+        dataHora: `${submittedContext.data}T${submittedTime}`,
         observacoes: notes.trim() || null,
       });
+      if (!mounted.current || submitId !== submitSequence.current
+        || !isSameContext(currentContext.current, submittedContext)
+        || navigationStarted.current) return;
+      navigationStarted.current = true;
       navigation.replace('AppointmentConfirmation', { appointment: data });
-    } catch (e) {
-      setError(e.response?.status === 409
-        ? 'Esse horário ficou indisponível. Escolha outro horário.'
-        : getApiError(e, 'Não foi possível criar o agendamento.'));
+    } catch (submitError) {
+      const canApply = mounted.current
+        && submitId === submitSequence.current
+        && isSameContext(currentContext.current, submittedContext);
+      if (!canApply) return;
+      if (submitError.response?.status === 409) {
+        setError('Esse horário ficou indisponível. Escolha outro horário.');
+        setSelectedTime('');
+        await loadAvailability(submittedContext);
+      } else {
+        setError(getApiError(submitError, 'Não foi possível criar o agendamento.'));
+      }
     } finally {
-      setLoading(false);
+      if (mounted.current && submitId === submitSequence.current) setSubmitting(false);
     }
   }
 
-  const summaryDateTime = Platform.OS === 'web'
-    ? formatWebDateTime(webDate, webTime)
-    : dateTime(date);
-
   return (
     <Screen>
-      <Title subtitle="O horário será validado pelas regras do estabelecimento.">
+      <Title subtitle="Escolha um horário disponível do estabelecimento.">
         Revise seu agendamento
       </Title>
       <Text style={{ fontWeight: '800' }}>{salon.nome}</Text>
       <Text>{service.nome} • {money(service.preco)} • {service.duracao} min</Text>
       <Text>{employee.nome}</Text>
       <Text style={{ marginVertical: 16, fontSize: 18 }}>
-        {summaryDateTime || 'Data e horário ainda não selecionados'}
+        {displayDate(selectedDate)}
+        {selectedTime ? ` às ${selectedTime.slice(0, 5)}` : ''}
       </Text>
 
+      <Text style={uiStyles.label}>Data</Text>
       {Platform.OS === 'web' ? (
-        <View style={{ flexDirection: 'row', gap: 8, marginBottom: 16 }}>
-          <View style={{ flex: 1 }}>
-            <Text style={uiStyles.label}>Data</Text>
-            <input
-              aria-label="Data do agendamento"
-              type="date"
-              value={webDate}
-              onChange={changeWebDate}
-              style={{ ...uiStyles.input, width: '100%', boxSizing: 'border-box' }}
-            />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={uiStyles.label}>Hora</Text>
-            <input
-              aria-label="Hora do agendamento"
-              type="time"
-              value={webTime}
-              onChange={changeWebTime}
-              step="60"
-              style={{ ...uiStyles.input, width: '100%', boxSizing: 'border-box' }}
-            />
-          </View>
-        </View>
+        <input
+          aria-label="Data do agendamento"
+          type="date"
+          value={selectedDate}
+          onChange={changeWebDate}
+          disabled={submitting}
+          style={{ ...uiStyles.input, width: '100%', boxSizing: 'border-box', marginBottom: 16 }}
+        />
       ) : (
         <>
-          <View style={{ flexDirection: 'row', gap: 8 }}>
-            <View style={{ flex: 1 }}>
-              <Button title="Escolher data" secondary onPress={() => setPicker('date')} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Button title="Escolher hora" secondary onPress={() => setPicker('time')} />
-            </View>
-          </View>
-          {picker ? (
+          <Button
+            title="Escolher data"
+            secondary
+            disabled={submitting}
+            onPress={() => { if (!submitting) setPickerVisible(true); }}
+          />
+          {pickerVisible ? (
             <DateTimePicker
               value={date}
-              mode={picker}
-              minimumDate={picker === 'date' ? new Date() : undefined}
-              is24Hour
-              onChange={change}
+              mode="date"
+              minimumDate={new Date()}
+              onChange={changeNativeDate}
+              disabled={submitting}
             />
           ) : null}
         </>
       )}
 
-      {webValidationMessage ? <Text style={uiStyles.error}>{webValidationMessage}</Text> : null}
+      <Text style={[uiStyles.label, { marginTop: 16 }]}>Horários disponíveis</Text>
+      {availabilityLoading ? (
+        <View style={{ alignItems: 'center', padding: 20 }}>
+          <ActivityIndicator color={colors.primary} />
+          <Text>Carregando horários...</Text>
+        </View>
+      ) : null}
+      {!availabilityLoading && availabilityError ? (
+        <View>
+          <Text style={uiStyles.error}>{availabilityError}</Text>
+          <Button
+            title="Tentar novamente"
+            secondary
+            disabled={submitting}
+            onPress={() => loadAvailability(currentContext.current)}
+          />
+        </View>
+      ) : null}
+      {!availabilityLoading && !availabilityError && isValidDate(selectedDate)
+        && slots.length === 0 ? (
+          <Text style={{ color: colors.muted, textAlign: 'center', padding: 20 }}>
+            Nenhum horário disponível para esta data
+          </Text>
+        ) : null}
+      {!availabilityLoading && !availabilityError && slots.length > 0 ? (
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
+          {slots.map((slot) => {
+            const selected = selectedTime === slot;
+            return (
+              <Pressable
+                key={slot}
+                accessibilityRole="button"
+                accessibilityLabel={`Selecionar horário ${slot.slice(0, 5)}`}
+                accessibilityState={{ selected }}
+                disabled={submitting}
+                onPress={() => {
+                  if (submitting) return;
+                  setSelectedTime(slot);
+                  setError('');
+                }}
+                style={{
+                  borderWidth: 1,
+                  borderColor: colors.primary,
+                  backgroundColor: selected ? colors.primary : colors.card,
+                  borderRadius: 10,
+                  paddingHorizontal: 16,
+                  paddingVertical: 12,
+                }}
+              >
+                <Text style={{ color: selected ? '#fff' : colors.primary, fontWeight: '800' }}>
+                  {slot.slice(0, 5)}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      ) : null}
+
       <Field
         label="Observações (opcional)"
         value={notes}
         onChangeText={setNotes}
         multiline
         maxLength={255}
+        editable={!submitting}
       />
       {error ? <Text style={uiStyles.error}>{error}</Text> : null}
       <Button
-        title={loading ? 'Confirmando...' : 'Confirmar agendamento'}
-        disabled={loading || (Platform.OS === 'web' && !webSelectionValid)}
+        title={submitting ? 'Confirmando...' : 'Confirmar agendamento'}
+        disabled={submitting || availabilityLoading || !selectedTime}
         onPress={submit}
       />
     </Screen>

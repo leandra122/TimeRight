@@ -1,6 +1,7 @@
 package com.timeright.tcc.services;
 
 import java.time.Clock;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -14,6 +15,7 @@ import com.timeright.tcc.dto.ClienteAgendamentoResponse;
 import com.timeright.tcc.dto.ClienteAgendamentoResponse.FuncionarioResumo;
 import com.timeright.tcc.dto.ClienteAgendamentoResponse.SalaoResumo;
 import com.timeright.tcc.dto.ClienteAgendamentoResponse.ServicoResumo;
+import com.timeright.tcc.dto.ClienteDisponibilidadeResponse;
 import com.timeright.tcc.exception.ConflictException;
 import com.timeright.tcc.exception.ResourceNotFoundException;
 import com.timeright.tcc.model.entity.Agendamento;
@@ -39,6 +41,7 @@ public class ClienteAgendamentoService {
     private final FuncionarioRepository funcionarioRepository;
     private final ServicoRepository servicoRepository;
     private final AgendamentoRepository agendamentoRepository;
+    private final DisponibilidadeAgendamentoService disponibilidadeService;
     private final Clock clock;
 
     public ClienteAgendamentoService(AuthenticatedUserService authenticatedUserService,
@@ -46,12 +49,14 @@ public class ClienteAgendamentoService {
                                      FuncionarioRepository funcionarioRepository,
                                      ServicoRepository servicoRepository,
                                      AgendamentoRepository agendamentoRepository,
+                                     DisponibilidadeAgendamentoService disponibilidadeService,
                                      Clock clock) {
         this.authenticatedUserService = authenticatedUserService;
         this.usuarioRepository = usuarioRepository;
         this.funcionarioRepository = funcionarioRepository;
         this.servicoRepository = servicoRepository;
         this.agendamentoRepository = agendamentoRepository;
+        this.disponibilidadeService = disponibilidadeService;
         this.clock = clock;
     }
 
@@ -60,36 +65,12 @@ public class ClienteAgendamentoService {
         Usuario cliente = requireClienteAtivo();
         Funcionario funcionario = funcionarioRepository.findByIdForUpdate(request.funcionarioId())
                 .orElseThrow(() -> new ResourceNotFoundException("Funcionário não encontrado"));
-        if (!"ATIVO".equalsIgnoreCase(funcionario.getStatus())) {
-            throw new IllegalArgumentException("Funcionário indisponível");
-        }
-
         Servico servico = servicoRepository.findById(request.servicoId())
                 .orElseThrow(() -> new ResourceNotFoundException("Serviço não encontrado"));
-        if (!"ATIVO".equalsIgnoreCase(servico.getStatus())) {
-            throw new IllegalArgumentException("Serviço indisponível");
-        }
-
-        Salao salao = funcionario.getSalao();
-        if (salao == null || !"ATIVO".equalsIgnoreCase(salao.getStatus())) {
-            throw new IllegalArgumentException("Salão indisponível");
-        }
-        if (servico.getSalao() == null || !salao.getId().equals(servico.getSalao().getId())) {
-            throw new IllegalArgumentException("Funcionário e serviço devem pertencer ao mesmo salão");
-        }
-
+        validarRecursos(funcionario, servico);
         Integer duracao = servico.getDuracao();
-        if (duracao == null || duracao <= 0) {
-            throw new IllegalArgumentException("Serviço possui duração inválida");
-        }
-
-        LocalDateTime dataHora = normalizarParaSegundos(request.dataHora());
-        validarHorario(dataHora, salao);
-        LocalDateTime fim = dataHora.plusMinutes(duracao);
-        if (agendamentoRepository.contarConflitosCliente(
-                funcionario.getId(), dataHora, fim) > 0) {
-            throw new ConflictException("Horário indisponível");
-        }
+        LocalDateTime dataHora =
+                disponibilidadeService.validarParaCriacao(funcionario, servico, request.dataHora());
 
         Agendamento agendamento = new Agendamento();
         agendamento.setUsuario(cliente);
@@ -100,6 +81,18 @@ public class ClienteAgendamentoService {
         agendamento.setStatus(AGENDADO);
         agendamento.setObservacoes(normalizarObservacoes(request.observacoes()));
         return toResponse(agendamentoRepository.save(agendamento));
+    }
+
+    @Transactional(readOnly = true)
+    public ClienteDisponibilidadeResponse consultarDisponibilidade(
+            Long funcionarioId, Long servicoId, LocalDate data) {
+        requireClienteAtivo();
+        Funcionario funcionario = funcionarioRepository.findById(funcionarioId)
+                .orElseThrow(() -> new ResourceNotFoundException("Funcionário não encontrado"));
+        Servico servico = servicoRepository.findById(servicoId)
+                .orElseThrow(() -> new ResourceNotFoundException("Serviço não encontrado"));
+        validarRecursos(funcionario, servico);
+        return disponibilidadeService.consultar(funcionario, servico, data);
     }
 
     @Transactional(readOnly = true)
@@ -147,23 +140,23 @@ public class ClienteAgendamentoService {
         return usuario;
     }
 
-    private void validarHorario(LocalDateTime dataHora, Salao salao) {
-        Integer antecedencia = salao.getAntecedenciaMinimaMinutos();
-        Integer limiteDias = salao.getLimiteAgendamentoDias();
-        if (antecedencia == null || antecedencia < 0 || antecedencia > 10080
-                || limiteDias == null || limiteDias < 1 || limiteDias > 365) {
-            throw new IllegalArgumentException("Configuração de agendamento inválida");
+    private void validarRecursos(Funcionario funcionario, Servico servico) {
+        if (!"ATIVO".equalsIgnoreCase(funcionario.getStatus())) {
+            throw new IllegalArgumentException("Funcionário indisponível");
         }
-
-        LocalDateTime agora = agoraNormalizado();
-        if (dataHora.isBefore(agora)) {
-            throw new IllegalArgumentException("Data e hora não podem estar no passado");
+        if (!"ATIVO".equalsIgnoreCase(servico.getStatus())) {
+            throw new IllegalArgumentException("Serviço indisponível");
         }
-        if (dataHora.isBefore(agora.plusMinutes(antecedencia))) {
-            throw new IllegalArgumentException("Antecedência mínima não atendida");
+        Salao salao = funcionario.getSalao();
+        if (salao == null || !"ATIVO".equalsIgnoreCase(salao.getStatus())) {
+            throw new IllegalArgumentException("Salão indisponível");
         }
-        if (dataHora.isAfter(agora.plusDays(limiteDias))) {
-            throw new IllegalArgumentException("Data e hora excedem o limite de agendamento");
+        if (servico.getSalao() == null || !salao.getId().equals(servico.getSalao().getId())) {
+            throw new IllegalArgumentException(
+                    "Funcionário e serviço devem pertencer ao mesmo salão");
+        }
+        if (servico.getDuracao() == null || servico.getDuracao() <= 0) {
+            throw new IllegalArgumentException("Serviço possui duração inválida");
         }
     }
 

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -23,12 +24,14 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.timeright.tcc.model.entity.Funcionario;
+import com.timeright.tcc.model.entity.HorarioFuncionamentoSalao;
 import com.timeright.tcc.model.entity.NivelAcesso;
 import com.timeright.tcc.model.entity.Salao;
 import com.timeright.tcc.model.entity.Servico;
 import com.timeright.tcc.model.entity.Usuario;
 import com.timeright.tcc.model.repository.AgendamentoRepository;
 import com.timeright.tcc.model.repository.FuncionarioRepository;
+import com.timeright.tcc.model.repository.HorarioFuncionamentoSalaoRepository;
 import com.timeright.tcc.model.repository.NivelAcessoRepository;
 import com.timeright.tcc.model.repository.SalaoRepository;
 import com.timeright.tcc.model.repository.ServicoRepository;
@@ -48,6 +51,7 @@ class ClienteAgendamentoConcurrencyIntegrationTest {
     @Autowired private UsuarioRepository usuarioRepository;
     @Autowired private SalaoRepository salaoRepository;
     @Autowired private FuncionarioRepository funcionarioRepository;
+    @Autowired private HorarioFuncionamentoSalaoRepository horarioRepository;
     @Autowired private ServicoRepository servicoRepository;
     @Autowired private AgendamentoRepository agendamentoRepository;
 
@@ -71,7 +75,8 @@ class ClienteAgendamentoConcurrencyIntegrationTest {
         Funcionario funcionario = funcionario(salao, contaFuncionario);
         Servico servico = servico(salao);
         LocalDateTime horario = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"))
-                .plusDays(1).withNano(0);
+                .plusDays(1).withMinute(0).withSecond(0).withNano(0);
+        funcionamento(salao, horario.getDayOfWeek().getValue());
         String token = jwtService.emitirToken(cliente);
         String body = objectMapper.writeValueAsString(new Payload(
                 funcionario.getId(), servico.getId(), horario, "Concorrência"));
@@ -151,6 +156,15 @@ class ClienteAgendamentoConcurrencyIntegrationTest {
         servico.setStatus("ATIVO");
         servico.setSalao(salao);
         return servicoRepository.saveAndFlush(servico);
+    }
+
+    private void funcionamento(Salao salao, int diaSemana) {
+        HorarioFuncionamentoSalao horario = new HorarioFuncionamentoSalao();
+        horario.setSalao(salao);
+        horario.setDiaSemana(diaSemana);
+        horario.setHoraInicio(LocalTime.MIN);
+        horario.setHoraFim(LocalTime.of(23, 59, 59));
+        horarioRepository.saveAndFlush(horario);
     }
 
     private record Payload(Long funcionarioId, Long servicoId,

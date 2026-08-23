@@ -12,5 +12,8 @@ public interface HorarioFuncionamentoSalaoRepository
     List<HorarioFuncionamentoSalao> findBySalaoIdOrderByDiaSemanaAscHoraInicioAscIdAsc(
             Long salaoId);
 
+    List<HorarioFuncionamentoSalao> findBySalaoIdAndDiaSemanaOrderByHoraInicioAscIdAsc(
+            Long salaoId, Integer diaSemana);
+
     void deleteBySalaoId(Long salaoId);
 }

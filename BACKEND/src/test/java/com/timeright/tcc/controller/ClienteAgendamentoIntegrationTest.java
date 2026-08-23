@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -34,12 +35,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.timeright.tcc.config.TimeConfig;
 import com.timeright.tcc.model.entity.Agendamento;
 import com.timeright.tcc.model.entity.Funcionario;
+import com.timeright.tcc.model.entity.HorarioFuncionamentoSalao;
 import com.timeright.tcc.model.entity.NivelAcesso;
 import com.timeright.tcc.model.entity.Salao;
 import com.timeright.tcc.model.entity.Servico;
 import com.timeright.tcc.model.entity.Usuario;
 import com.timeright.tcc.model.repository.AgendamentoRepository;
 import com.timeright.tcc.model.repository.FuncionarioRepository;
+import com.timeright.tcc.model.repository.HorarioFuncionamentoSalaoRepository;
 import com.timeright.tcc.model.repository.NivelAcessoRepository;
 import com.timeright.tcc.model.repository.SalaoRepository;
 import com.timeright.tcc.model.repository.ServicoRepository;
@@ -67,6 +70,7 @@ class ClienteAgendamentoIntegrationTest {
     @Autowired private UsuarioRepository usuarioRepository;
     @Autowired private SalaoRepository salaoRepository;
     @Autowired private FuncionarioRepository funcionarioRepository;
+    @Autowired private HorarioFuncionamentoSalaoRepository horarioRepository;
     @Autowired private ServicoRepository servicoRepository;
     @Autowired private AgendamentoRepository agendamentoRepository;
     @MockBean private Clock clock;
@@ -88,6 +92,9 @@ class ClienteAgendamentoIntegrationTest {
         salao = salao("Salao Principal", "ATIVO", 120, 60);
         funcionario = funcionario("Ana", salao, "ATIVO");
         servico = servico("Corte", salao, "ATIVO", 45);
+        for (int dia = 1; dia <= 7; dia++) {
+            horario(salao, dia, LocalTime.MIN, LocalTime.of(23, 59, 59));
+        }
     }
 
     @Test
@@ -157,12 +164,12 @@ class ClienteAgendamentoIntegrationTest {
     @Test
     void aplicaLimitesTemporaisInclusivosNoFusoDoMvp() throws Exception {
         criar(token(cliente), request(funcionario, servico, NOW.plusMinutes(120), null), 201);
-        criar(token(cliente), request(funcionario, servico, NOW.plusMinutes(119), null), 400);
+        criar(token(cliente), request(funcionario, servico, NOW.plusMinutes(119), null), 409);
 
         Funcionario segundo = funcionario("Bia", salao, "ATIVO");
         criar(token(cliente), request(segundo, servico, NOW.plusDays(60), null), 201);
-        criar(token(cliente), request(segundo, servico, NOW.plusDays(60).plusSeconds(1), null), 400);
-        criar(token(cliente), request(segundo, servico, NOW.minusSeconds(1), null), 400);
+        criar(token(cliente), request(segundo, servico, NOW.plusDays(60).plusSeconds(1), null), 409);
+        criar(token(cliente), request(segundo, servico, NOW.minusSeconds(1), null), 409);
     }
 
     @Test
@@ -182,24 +189,25 @@ class ClienteAgendamentoIntegrationTest {
 
         Funcionario anterior = funcionario("Anterior", salao, "ATIVO");
         criar(token(cliente), request(
-                anterior, servico, NOW.plusMinutes(119).plusNanos(999_000_000), null), 400);
+                anterior, servico, NOW.plusMinutes(119).plusNanos(999_000_000), null), 409);
     }
 
     @Test
     void detectaSobreposicoesEPreservaHorariosEncostados() throws Exception {
         LocalDateTime inicio = NOW.plusHours(4);
-        agendamento(cliente, funcionario, servico, inicio, 45, "AGENDADO");
+        agendamento(cliente, funcionario, servico, inicio, 60, "AGENDADO");
 
         criar(token(cliente), request(funcionario, servico, inicio, null), 409);
         criar(token(cliente), request(funcionario, servico, inicio.plusMinutes(20), null), 409);
 
         Funcionario encaixeAntes = funcionario("Daniela", salao, "ATIVO");
-        agendamento(cliente, encaixeAntes, servico, inicio, 45, "AGENDADO");
-        criar(token(cliente), request(encaixeAntes, servico, inicio.minusMinutes(45), null), 201);
+        agendamento(cliente, encaixeAntes, servico, inicio, 60, "AGENDADO");
+        Servico sessenta = servico("Sessenta", salao, "ATIVO", 60);
+        criar(token(cliente), request(encaixeAntes, sessenta, inicio.minusMinutes(60), null), 201);
 
         Servico longo = servico("Longo", salao, "ATIVO", 120);
         criar(token(cliente), request(funcionario, longo, inicio.minusMinutes(30), null), 409);
-        criar(token(cliente), request(funcionario, servico, inicio.plusMinutes(45), null), 201);
+        criar(token(cliente), request(funcionario, servico, inicio.plusMinutes(60), null), 201);
 
         Funcionario outroFuncionario = funcionario("Carlos", salao, "ATIVO");
         criar(token(cliente), request(outroFuncionario, servico, inicio, null), 201);
@@ -274,6 +282,131 @@ class ClienteAgendamentoIntegrationTest {
         assertThat(lock.value()).isEqualTo(LockModeType.PESSIMISTIC_WRITE);
     }
 
+    @Test
+    void disponibilidadeGeraGradePorPeriodosSemDuplicarNemAtravessarIntervalo() throws Exception {
+        horarioRepository.deleteAll();
+        LocalDateTime data = NOW.plusDays(1);
+        int dia = data.getDayOfWeek().getValue();
+        horario(salao, dia, LocalTime.of(9, 0), LocalTime.of(12, 0));
+        horario(salao, dia, LocalTime.of(13, 0), LocalTime.of(17, 0));
+        servico.setDuracao(60);
+        servicoRepository.saveAndFlush(servico);
+
+        agendamento(cliente, funcionario, servico, data.withHour(10), 60, "AGENDADO");
+        agendamento(cliente, funcionario, servico, data.withHour(13), 60, "CANCELADO");
+        Funcionario outro = funcionario("Outro profissional", salao, "ATIVO");
+        agendamento(cliente, outro, servico, data.withHour(14), 60, "AGENDADO");
+
+        JsonNode json = disponibilidade(cliente, funcionario, servico, data.toLocalDate(), 200);
+
+        assertThat(json.get("fusoHorario").asText()).isEqualTo("America/Sao_Paulo");
+        assertThat(json.get("intervaloMinutos").asInt()).isEqualTo(30);
+        assertThat(json.get("salaoId").asLong()).isEqualTo(salao.getId());
+        java.util.List<String> horarios = horarios(json);
+        assertThat(horarios)
+                .doesNotContain("09:30:00", "10:00:00", "10:30:00", "12:00:00")
+                .contains("09:00:00", "11:00:00", "13:00:00", "16:00:00");
+        assertThat(horarios).isSorted().doesNotHaveDuplicates();
+        assertThat(json.toString()).doesNotContain(
+                "email", "password", "token", "nivelAcesso", "gerente", "usuario");
+    }
+
+    @Test
+    void disponibilidadeRespeitaJanelaInclusivaEPrecisaoDeSegundos() throws Exception {
+        horarioRepository.deleteAll();
+        horario(salao, NOW.getDayOfWeek().getValue(),
+                LocalTime.of(14, 0, 0, 999_000_000), LocalTime.of(15, 0, 0, 999_000_000));
+        servico.setDuracao(60);
+        servicoRepository.saveAndFlush(servico);
+
+        JsonNode minimo = disponibilidade(cliente, funcionario, servico, NOW.toLocalDate(), 200);
+        assertThat(horarios(minimo)).containsExactly("14:00:00");
+
+        LocalDateTime maximo = NOW.plusDays(60);
+        horario(salao, maximo.getDayOfWeek().getValue(), LocalTime.of(12, 0), LocalTime.of(13, 0));
+        JsonNode limite = disponibilidade(cliente, funcionario, servico, maximo.toLocalDate(), 200);
+        assertThat(horarios(limite)).contains("12:00:00");
+
+        disponibilidade(cliente, funcionario, servico, NOW.minusDays(1).toLocalDate(), 400);
+        disponibilidade(cliente, funcionario, servico, NOW.plusDays(61).toLocalDate(), 400);
+    }
+
+    @Test
+    void disponibilidadeFechadaSemConfiguracaoRetornaListaVazia() throws Exception {
+        horarioRepository.deleteAll();
+        JsonNode json = disponibilidade(
+                cliente, funcionario, servico, NOW.plusDays(1).toLocalDate(), 200);
+        assertThat(json.get("horarios").isEmpty()).isTrue();
+    }
+
+    @Test
+    void disponibilidadeRejeitaContaERecursosInvalidosOuInconsistentes() throws Exception {
+        cliente.setStatusUsuario("INATIVO");
+        usuarioRepository.saveAndFlush(cliente);
+        disponibilidade(cliente, funcionario, servico, NOW.plusDays(1).toLocalDate(), 403);
+        cliente.setStatusUsuario("ATIVO");
+        usuarioRepository.saveAndFlush(cliente);
+        userRole.setStatusNivelAcesso("INATIVO");
+        nivelAcessoRepository.saveAndFlush(userRole);
+        disponibilidade(cliente, funcionario, servico, NOW.plusDays(1).toLocalDate(), 403);
+        userRole.setStatusNivelAcesso("ATIVO");
+        nivelAcessoRepository.saveAndFlush(userRole);
+
+        funcionario.setStatus("INATIVO");
+        funcionarioRepository.saveAndFlush(funcionario);
+        disponibilidade(cliente, funcionario, servico, NOW.plusDays(1).toLocalDate(), 400);
+        funcionario.setStatus("ATIVO");
+        funcionarioRepository.saveAndFlush(funcionario);
+
+        servico.setStatus("INATIVO");
+        servicoRepository.saveAndFlush(servico);
+        disponibilidade(cliente, funcionario, servico, NOW.plusDays(1).toLocalDate(), 400);
+        servico.setStatus("ATIVO");
+        servico.setDuracao(0);
+        servicoRepository.saveAndFlush(servico);
+        disponibilidade(cliente, funcionario, servico, NOW.plusDays(1).toLocalDate(), 400);
+
+        Salao outroSalao = salao("Outro disponibilidade", "ATIVO", 120, 60);
+        Servico externo = servico("Externo disponibilidade", outroSalao, "ATIVO", 30);
+        disponibilidade(cliente, funcionario, externo, NOW.plusDays(1).toLocalDate(), 400);
+    }
+
+    @Test
+    void disponibilidadeMantemBloqueioConservadorParaDuracaoLegadaInvalida() throws Exception {
+        LocalDateTime data = NOW.plusDays(1).withHour(9);
+        agendamento(cliente, funcionario, servico, data, 0, "AGENDADO");
+
+        JsonNode json = disponibilidade(
+                cliente, funcionario, servico, data.toLocalDate(), 200);
+
+        assertThat(horarios(json))
+                .contains("08:00:00")
+                .doesNotContain("09:00:00", "09:30:00", "12:00:00", "23:00:00");
+    }
+
+    @Test
+    void postAceitaSomenteSlotGeradoERevalidaOcupacao() throws Exception {
+        horarioRepository.deleteAll();
+        LocalDateTime data = NOW.plusDays(1);
+        int dia = data.getDayOfWeek().getValue();
+        horario(salao, dia, LocalTime.of(9, 0), LocalTime.of(12, 0));
+        horario(salao, dia, LocalTime.of(13, 0), LocalTime.of(17, 0));
+        servico.setDuracao(60);
+        servicoRepository.saveAndFlush(servico);
+
+        criar(token(cliente), request(funcionario, servico, data.withHour(9), null), 201);
+        criar(token(cliente), request(funcionario, servico, data.withHour(9).withMinute(30), null), 409);
+        criar(token(cliente), request(funcionario, servico, data.withHour(12), null), 409);
+        criar(token(cliente), request(funcionario, servico, data.withHour(11).withMinute(30), null), 409);
+        criar(token(cliente), request(funcionario, servico, data.withHour(13).withMinute(15), null), 409);
+
+        Funcionario segundo = funcionario("Segundo slot", salao, "ATIVO");
+        JsonNode antes = disponibilidade(cliente, segundo, servico, data.toLocalDate(), 200);
+        assertThat(horarios(antes)).contains("14:00:00");
+        agendamento(cliente, segundo, servico, data.withHour(14), 60, "AGENDADO");
+        criar(token(cliente), request(segundo, servico, data.withHour(14), null), 409);
+    }
+
     private String criar(String token, String body, int expectedStatus) throws Exception {
         return mockMvc.perform(post("/api/client/agendamentos")
                         .header("Authorization", bearer(token))
@@ -286,6 +419,25 @@ class ClienteAgendamentoIntegrationTest {
         mockMvc.perform(patch("/api/client/agendamentos/{id}/cancelar", id)
                         .header("Authorization", bearer(token(user))))
                 .andExpect(status().is(expectedStatus));
+    }
+
+    private JsonNode disponibilidade(
+            Usuario user, Funcionario f, Servico s, java.time.LocalDate data,
+            int expectedStatus) throws Exception {
+        String body = mockMvc.perform(get("/api/client/disponibilidade")
+                        .param("funcionarioId", f.getId().toString())
+                        .param("servicoId", s.getId().toString())
+                        .param("data", data.toString())
+                        .header("Authorization", bearer(token(user))))
+                .andExpect(status().is(expectedStatus))
+                .andReturn().getResponse().getContentAsString();
+        return body.isBlank() ? objectMapper.createObjectNode() : objectMapper.readTree(body);
+    }
+
+    private java.util.List<String> horarios(JsonNode response) {
+        java.util.List<String> valores = new java.util.ArrayList<>();
+        response.path("horarios").forEach(item -> valores.add(item.asText()));
+        return valores;
     }
 
     private String request(Funcionario f, Servico s, LocalDateTime dataHora,
@@ -370,6 +522,15 @@ class ClienteAgendamentoIntegrationTest {
         agendamento.setStatus(status);
         agendamento.setObservacoes("Teste");
         return agendamentoRepository.saveAndFlush(agendamento);
+    }
+
+    private void horario(Salao salao, int dia, LocalTime inicio, LocalTime fim) {
+        HorarioFuncionamentoSalao horario = new HorarioFuncionamentoSalao();
+        horario.setSalao(salao);
+        horario.setDiaSemana(dia);
+        horario.setHoraInicio(inicio);
+        horario.setHoraFim(fim);
+        horarioRepository.saveAndFlush(horario);
     }
 
     private String email(String prefixo) {
