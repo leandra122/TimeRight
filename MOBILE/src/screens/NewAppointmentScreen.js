@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Platform, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Screen from '../components/Screen';
-import { Button, Field, Title, uiStyles } from '../components/UI';
+import { Badge, Button, Card, Field, SectionHeader, Title, uiStyles } from '../components/UI';
 import { appointmentsApi } from '../api/services';
 import { getApiError } from '../api/client';
 import { money } from '../utils/format';
-import { colors } from '../styles/theme';
+import { colors, radius, spacing } from '../styles/theme';
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -66,6 +66,7 @@ export default function NewAppointmentScreen({ route, navigation }) {
   const submitSequence = useRef(0);
   const mounted = useRef(true);
   const navigationStarted = useRef(false);
+  const currentSelection = useRef({ funcionarioId: employee.id, servicoId: service.id });
   const currentContext = useRef(availabilityContext(
     toLocalDate(firstDate), employee.id, service.id,
   ));
@@ -112,7 +113,17 @@ export default function NewAppointmentScreen({ route, navigation }) {
   }, []);
 
   useEffect(() => {
-    const context = availabilityContext(selectedDate, employee.id, service.id);
+    const selectionChanged = currentSelection.current.funcionarioId !== employee.id
+      || currentSelection.current.servicoId !== service.id;
+    let contextDate = selectedDate;
+    if (selectionChanged) {
+      const resetDate = initialDate();
+      contextDate = toLocalDate(resetDate);
+      currentSelection.current = { funcionarioId: employee.id, servicoId: service.id };
+      setDate(resetDate);
+      setSelectedDate(contextDate);
+    }
+    const context = availabilityContext(contextDate, employee.id, service.id);
     currentContext.current = context;
     requestSequence.current += 1;
     setSelectedTime('');
@@ -191,18 +202,14 @@ export default function NewAppointmentScreen({ route, navigation }) {
 
   return (
     <Screen>
-      <Title subtitle="Escolha um horário disponível do estabelecimento.">
-        Revise seu agendamento
-      </Title>
-      <Text style={{ fontWeight: '800' }}>{salon.nome}</Text>
-      <Text>{service.nome} • {money(service.preco)} • {service.duracao} min</Text>
-      <Text>{employee.nome}</Text>
-      <Text style={{ marginVertical: 16, fontSize: 18 }}>
-        {displayDate(selectedDate)}
-        {selectedTime ? ` às ${selectedTime.slice(0, 5)}` : ''}
-      </Text>
+      <Title eyebrow="Etapas 3 e 4 de 5" subtitle="A disponibilidade é consultada em tempo real.">Data e horário</Title>
+      <Card>
+        <View style={styles.summaryRow}><View style={styles.summaryIcon}><Text style={styles.summaryNumber}>1</Text></View><View style={styles.summaryContent}><Text style={styles.summaryLabel}>Serviço</Text><Text style={styles.summaryTitle}>{service.nome}</Text><Text style={uiStyles.subtitle}>{service.duracao} min · {money(service.preco)}</Text></View></View>
+        <View style={styles.summaryDivider} />
+        <View style={styles.summaryRow}><View style={styles.summaryIcon}><Text style={styles.summaryNumber}>2</Text></View><View style={styles.summaryContent}><Text style={styles.summaryLabel}>Profissional e salão</Text><Text style={styles.summaryTitle}>{employee.nome}</Text><Text style={uiStyles.subtitle}>{salon.nome}</Text></View></View>
+      </Card>
 
-      <Text style={uiStyles.label}>Data</Text>
+      <SectionHeader title="3. Escolha a data" />
       {Platform.OS === 'web' ? (
         <input
           aria-label="Data do agendamento"
@@ -232,11 +239,11 @@ export default function NewAppointmentScreen({ route, navigation }) {
         </>
       )}
 
-      <Text style={[uiStyles.label, { marginTop: 16 }]}>Horários disponíveis</Text>
+      <SectionHeader title="4. Escolha o horário" />
       {availabilityLoading ? (
-        <View style={{ alignItems: 'center', padding: 20 }}>
+        <View style={styles.loading}>
           <ActivityIndicator color={colors.primary} />
-          <Text>Carregando horários...</Text>
+          <Text style={uiStyles.subtitle}>Carregando horários...</Text>
         </View>
       ) : null}
       {!availabilityLoading && availabilityError ? (
@@ -252,12 +259,12 @@ export default function NewAppointmentScreen({ route, navigation }) {
       ) : null}
       {!availabilityLoading && !availabilityError && isValidDate(selectedDate)
         && slots.length === 0 ? (
-          <Text style={{ color: colors.muted, textAlign: 'center', padding: 20 }}>
+          <Text style={styles.empty}>
             Nenhum horário disponível para esta data
           </Text>
         ) : null}
       {!availabilityLoading && !availabilityError && slots.length > 0 ? (
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
+        <View style={styles.slots}>
           {slots.map((slot) => {
             const selected = selectedTime === slot;
             return (
@@ -274,11 +281,15 @@ export default function NewAppointmentScreen({ route, navigation }) {
                 }}
                 style={{
                   borderWidth: 1,
-                  borderColor: colors.primary,
-                  backgroundColor: selected ? colors.primary : colors.card,
-                  borderRadius: 10,
-                  paddingHorizontal: 16,
-                  paddingVertical: 12,
+                  borderColor: selected ? colors.primaryDark : colors.border,
+                  backgroundColor: selected ? colors.primaryDark : colors.card,
+                  borderRadius: radius.pill,
+                  minHeight: 46,
+                  minWidth: 88,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  paddingHorizontal: spacing.md,
+                  paddingVertical: spacing.sm,
                 }}
               >
                 <Text style={{ color: selected ? '#fff' : colors.primary, fontWeight: '800' }}>
@@ -290,6 +301,12 @@ export default function NewAppointmentScreen({ route, navigation }) {
         </View>
       ) : null}
 
+      <SectionHeader title="5. Confira e confirme" />
+      <View style={styles.finalSummary}>
+        <View><Text style={styles.summaryLabel}>Data</Text><Text style={styles.finalValue}>{displayDate(selectedDate)}</Text></View>
+        <View><Text style={styles.summaryLabel}>Horário</Text><Text style={styles.finalValue}>{selectedTime ? selectedTime.slice(0, 5) : 'Selecione acima'}</Text></View>
+        {selectedTime ? <Badge tone="success">Disponível</Badge> : null}
+      </View>
       <Field
         label="Observações (opcional)"
         value={notes}
@@ -301,9 +318,25 @@ export default function NewAppointmentScreen({ route, navigation }) {
       {error ? <Text style={uiStyles.error}>{error}</Text> : null}
       <Button
         title={submitting ? 'Confirmando...' : 'Confirmar agendamento'}
+        icon="checkmark-circle-outline"
         disabled={submitting || availabilityLoading || !selectedTime}
         onPress={submit}
       />
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  summaryRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  summaryIcon: { width: 36, height: 36, borderRadius: 13, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' },
+  summaryNumber: { color: colors.primaryDark, fontWeight: '900' },
+  summaryContent: { flex: 1 },
+  summaryLabel: { color: colors.muted, fontSize: 12, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.6 },
+  summaryTitle: { color: colors.text, fontWeight: '900', fontSize: 16, marginTop: 2 },
+  summaryDivider: { height: 1, backgroundColor: colors.border, marginVertical: spacing.sm },
+  loading: { alignItems: 'center', gap: spacing.sm, padding: spacing.lg },
+  empty: { color: colors.muted, textAlign: 'center', padding: spacing.lg, backgroundColor: colors.secondarySoft, borderRadius: radius.md },
+  slots: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.md },
+  finalSummary: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: spacing.md, backgroundColor: colors.primarySoft, borderRadius: radius.lg, padding: spacing.md, marginBottom: spacing.md },
+  finalValue: { color: colors.text, fontWeight: '900', fontSize: 17, marginTop: 2 },
+});

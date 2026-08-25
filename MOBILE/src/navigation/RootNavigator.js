@@ -1,9 +1,9 @@
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
-import { colors } from '../styles/theme';
+import { colors, shadows } from '../styles/theme';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import HomeScreen from '../screens/HomeScreen';
@@ -18,13 +18,21 @@ import AppointmentDetailsScreen from '../screens/AppointmentDetailsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tabs = createBottomTabNavigator();
-const icons = { Home: 'home-outline', Buscar: 'search-outline', Salões: 'business-outline', Agenda: 'calendar-outline', Perfil: 'person-outline' };
+const icons = { Home: 'home-outline', Buscar: 'search-outline', Agenda: 'calendar-outline', Perfil: 'person-outline' };
 
 function MainTabs() {
-  return <Tabs.Navigator screenOptions={({ route }) => ({ headerShown: false, tabBarActiveTintColor: colors.primaryDark, tabBarIcon: ({ color, size }) => <Ionicons name={icons[route.name]} color={color} size={size} /> })}>
-    <Tabs.Screen name="Home" component={HomeScreen} />
+  return <Tabs.Navigator screenOptions={({ route }) => ({
+    headerShown: false,
+    tabBarActiveTintColor: colors.primaryDark,
+    tabBarInactiveTintColor: colors.muted,
+    tabBarHideOnKeyboard: true,
+    tabBarLabelStyle: styles.tabLabel,
+    tabBarStyle: styles.tabBar,
+    tabBarItemStyle: styles.tabItem,
+    tabBarIcon: ({ color, size, focused }) => <View style={focused && styles.activeIcon}><Ionicons name={focused ? icons[route.name].replace('-outline', '') : icons[route.name]} color={color} size={focused ? size + 1 : size} /></View>,
+  })}>
+    <Tabs.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: 'Início' }} />
     <Tabs.Screen name="Buscar" component={SearchScreen} />
-    <Tabs.Screen name="Salões" component={SalonsScreen} />
     <Tabs.Screen name="Agenda" component={AgendaScreen} />
     <Tabs.Screen name="Perfil" component={ProfileScreen} />
   </Tabs.Navigator>;
@@ -36,6 +44,7 @@ export default function RootNavigator() {
   return <Stack.Navigator screenOptions={{ headerTintColor: colors.primaryDark, headerStyle: { backgroundColor: colors.background } }}>
     {session ? <>
       <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
+      <Stack.Screen name="Salons" component={SalonsScreen} options={{ title: 'Salões' }} />
       <Stack.Screen name="SalonDetails" component={SalonDetailsScreen} options={{ title: 'Detalhes do salão' }} />
       <Stack.Screen name="NewAppointment" component={NewAppointmentScreen} options={{ title: 'Novo agendamento' }} />
       <Stack.Screen name="AppointmentConfirmation" component={AppointmentConfirmationScreen} options={{ title: 'Agendamento confirmado', headerBackVisible: false }} />
@@ -46,3 +55,10 @@ export default function RootNavigator() {
     </>}
   </Stack.Navigator>;
 }
+
+const styles = StyleSheet.create({
+  tabBar: { height: 72, paddingTop: 7, paddingBottom: 9, backgroundColor: colors.card, borderTopColor: colors.border, ...shadows.card },
+  tabItem: { minHeight: 54 },
+  tabLabel: { fontSize: 12, fontWeight: '700' },
+  activeIcon: { minWidth: 40, height: 28, paddingHorizontal: 9, borderRadius: 14, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' },
+});
