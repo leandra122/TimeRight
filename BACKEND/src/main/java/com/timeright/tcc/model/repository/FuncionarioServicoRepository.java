@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import com.timeright.tcc.model.entity.Funcionario;
 import com.timeright.tcc.model.entity.FuncionarioServico;
 import com.timeright.tcc.model.entity.FuncionarioServicoId;
+import com.timeright.tcc.model.entity.Servico;
 
 public interface FuncionarioServicoRepository
         extends JpaRepository<FuncionarioServico, FuncionarioServicoId> {
@@ -16,6 +17,13 @@ public interface FuncionarioServicoRepository
     List<FuncionarioServico> findByIdFuncionarioId(Long funcionarioId);
 
     List<FuncionarioServico> findByIdServicoId(Long servicoId);
+
+    @Query("""
+            SELECT s FROM Servico s
+            JOIN FuncionarioServico fs ON fs.id.servicoId = s.id
+            WHERE fs.id.funcionarioId = :funcionarioId
+            """)
+    List<Servico> findServicosByFuncionarioId(@Param("funcionarioId") Long funcionarioId);
 
     @Query("SELECT fs.funcionario FROM FuncionarioServico fs WHERE fs.id.servicoId = :servicoId")
     List<Funcionario> findFuncionariosByServicoId(@Param("servicoId") Long servicoId);
