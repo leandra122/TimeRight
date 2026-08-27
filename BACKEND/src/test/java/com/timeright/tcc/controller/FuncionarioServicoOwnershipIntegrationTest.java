@@ -12,6 +12,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDateTime;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,12 +24,16 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.timeright.tcc.model.entity.Agendamento;
 import com.timeright.tcc.model.entity.Funcionario;
+import com.timeright.tcc.model.entity.FuncionarioServico;
 import com.timeright.tcc.model.entity.NivelAcesso;
 import com.timeright.tcc.model.entity.Salao;
 import com.timeright.tcc.model.entity.Servico;
 import com.timeright.tcc.model.entity.Usuario;
+import com.timeright.tcc.model.repository.AgendamentoRepository;
 import com.timeright.tcc.model.repository.FuncionarioRepository;
+import com.timeright.tcc.model.repository.FuncionarioServicoRepository;
 import com.timeright.tcc.model.repository.NivelAcessoRepository;
 import com.timeright.tcc.model.repository.SalaoRepository;
 import com.timeright.tcc.model.repository.ServicoRepository;
@@ -46,7 +52,9 @@ class FuncionarioServicoOwnershipIntegrationTest {
     @Autowired private UsuarioRepository usuarioRepository;
     @Autowired private SalaoRepository salaoRepository;
     @Autowired private FuncionarioRepository funcionarioRepository;
+    @Autowired private FuncionarioServicoRepository funcionarioServicoRepository;
     @Autowired private ServicoRepository servicoRepository;
+    @Autowired private AgendamentoRepository agendamentoRepository;
 
     private Usuario manager;
     private Usuario outroManager;
@@ -251,6 +259,18 @@ class FuncionarioServicoOwnershipIntegrationTest {
     void gerenteAlteraStatusEExcluiSomenteServicoProprio() throws Exception {
         Servico proprio = servico("Próprio", salaoUm);
         Servico alheio = servico("Alheio", salaoAlheio);
+        Funcionario funcionario = funcionario("Profissional", "historico@teste.com", salaoUm);
+        funcionarioServicoRepository.saveAndFlush(new FuncionarioServico(funcionario, proprio));
+        Usuario cliente = usuario("USER", "cliente-historico@teste.com");
+        Agendamento historico = new Agendamento();
+        historico.setUsuario(cliente);
+        historico.setFuncionario(funcionario);
+        historico.setServico(proprio);
+        historico.setDataHora(LocalDateTime.of(2025, 1, 10, 10, 0));
+        historico.setDuracao(30);
+        historico.setStatus("CONCLUIDO");
+        historico.setObservacoes("Preservar");
+        historico = agendamentoRepository.saveAndFlush(historico);
         mockMvc.perform(patch("/servicos/{id}/status", proprio.getId())
                         .header("Authorization", bearer(manager))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -262,7 +282,14 @@ class FuncionarioServicoOwnershipIntegrationTest {
         mockMvc.perform(delete("/servicos/{id}", proprio.getId())
                         .header("Authorization", bearer(manager)))
                 .andExpect(status().isOk());
-        assertFalse(servicoRepository.existsById(proprio.getId()));
+        assertTrue(servicoRepository.existsById(proprio.getId()));
+        assertEquals("INATIVO", servicoRepository.findById(proprio.getId()).orElseThrow().getStatus());
+        assertTrue(funcionarioServicoRepository.existsByIdFuncionarioIdAndIdServicoId(
+                funcionario.getId(), proprio.getId()));
+        Agendamento preservado = agendamentoRepository.findById(historico.getId()).orElseThrow();
+        assertEquals("CONCLUIDO", preservado.getStatus());
+        assertEquals("Preservar", preservado.getObservacoes());
+        assertEquals(proprio.getId(), preservado.getServico().getId());
         assertTrue(servicoRepository.existsById(alheio.getId()));
     }
 

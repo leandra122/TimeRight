@@ -93,7 +93,9 @@ public class ServicoService {
 
     @Transactional
     public void deletar(Long id) {
-        servicoRepository.delete(buscarParaMutacao(id));
+        Servico servico = buscarParaMutacao(id);
+        servico.setStatus("INATIVO");
+        servicoRepository.save(servico);
     }
 
     private Servico buscarParaMutacao(Long id) {

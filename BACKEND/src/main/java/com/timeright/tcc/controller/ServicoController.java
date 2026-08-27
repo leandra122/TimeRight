@@ -67,6 +67,6 @@ public class ServicoController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, String>> deletar(@PathVariable Long id) {
         servicoService.deletar(id);
-        return ResponseEntity.ok(Map.of("message", "Serviço deletado com sucesso"));
+        return ResponseEntity.ok(Map.of("message", "Serviço inativado com sucesso"));
     }
 }

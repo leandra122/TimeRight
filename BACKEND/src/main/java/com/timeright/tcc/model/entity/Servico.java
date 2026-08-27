@@ -3,7 +3,8 @@ package com.timeright.tcc.model.entity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Servico")
+@Table(name = "Servico", uniqueConstraints = @UniqueConstraint(
+        name = "UX_Servico_IdSalao", columnNames = {"id", "salao_id"}))
 public class Servico {
 
     @Id
@@ -28,6 +29,9 @@ public class Servico {
     @ManyToOne
     @JoinColumn(name = "salao_id", nullable = false)
     private Salao salao;
+
+    @Column(name = "salao_id", nullable = false, insertable = false, updatable = false)
+    private Long salaoId;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

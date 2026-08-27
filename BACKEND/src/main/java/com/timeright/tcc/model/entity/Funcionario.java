@@ -14,7 +14,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
-@Table(name = "Funcionario")
+@Table(name = "Funcionario", uniqueConstraints = @jakarta.persistence.UniqueConstraint(
+        name = "UX_Funcionario_IdSalao", columnNames = {"id", "salao_id"}))
 public class Funcionario {
 
     @Id
@@ -44,6 +45,10 @@ public class Funcionario {
     @JoinColumn(name = "salao_id", nullable = false)
     @JsonIgnoreProperties({"cnpj", "telefone", "email", "endereco", "status"})
     private Salao salao;
+
+    @Column(name = "salao_id", nullable = false, insertable = false, updatable = false)
+    @JsonIgnore
+    private Long salaoId;
 
     @OneToOne
     @JoinColumn(name = "usuario_id", unique = true)

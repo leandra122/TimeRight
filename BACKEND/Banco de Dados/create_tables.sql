@@ -6,6 +6,7 @@ GO
 -- =========================
 DROP TABLE IF EXISTS Avaliacao;
 DROP TABLE IF EXISTS Agendamento;
+DROP TABLE IF EXISTS FuncionarioServico;
 DROP TABLE IF EXISTS Funcionario;
 DROP TABLE IF EXISTS Servico;
 DROP TABLE IF EXISTS HorarioFuncionamentoSalao;
@@ -118,6 +119,8 @@ CREATE TABLE Servico (
     status VARCHAR(20) NOT NULL,
     salao_id INT NOT NULL,
 
+    CONSTRAINT UX_Servico_IdSalao UNIQUE (id, salao_id),
+
     CONSTRAINT FK_Servico_Salao
         FOREIGN KEY (salao_id)
         REFERENCES Salao(id)
@@ -139,6 +142,8 @@ CREATE TABLE Funcionario (
     salao_id INT NOT NULL,
     usuario_id INT NULL,
 
+    CONSTRAINT UX_Funcionario_IdSalao UNIQUE (id, salao_id),
+
     CONSTRAINT FK_Funcionario_Salao
         FOREIGN KEY (salao_id)
         REFERENCES Salao(id)
@@ -151,6 +156,31 @@ CREATE TABLE Funcionario (
 CREATE UNIQUE INDEX UX_Funcionario_UsuarioId
     ON Funcionario(usuario_id)
     WHERE usuario_id IS NOT NULL;
+GO
+
+-- =========================
+-- ATRIBUICAO FUNCIONARIO-SERVICO
+-- =========================
+CREATE TABLE FuncionarioServico (
+    funcionario_id INT NOT NULL,
+    servico_id INT NOT NULL,
+    salao_id INT NOT NULL,
+
+    CONSTRAINT PK_FuncionarioServico
+        PRIMARY KEY (funcionario_id, servico_id),
+
+    CONSTRAINT FK_FuncionarioServico_FuncionarioSalao
+        FOREIGN KEY (funcionario_id, salao_id)
+        REFERENCES Funcionario(id, salao_id),
+
+    CONSTRAINT FK_FuncionarioServico_ServicoSalao
+        FOREIGN KEY (servico_id, salao_id)
+        REFERENCES Servico(id, salao_id)
+);
+CREATE INDEX IX_FuncionarioServico_Funcionario
+    ON FuncionarioServico(funcionario_id);
+CREATE INDEX IX_FuncionarioServico_Servico
+    ON FuncionarioServico(servico_id);
 GO
 
 -- =========================
@@ -239,6 +269,7 @@ SELECT * FROM Usuario;
 SELECT * FROM Salao;
 SELECT * FROM Servico;
 SELECT * FROM Funcionario;
+SELECT * FROM FuncionarioServico;
 SELECT * FROM Agendamento;
 SELECT * FROM Avaliacao;
 GO
