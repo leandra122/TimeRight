@@ -6,9 +6,20 @@ import './DashboardAdmin.css';
 
 const CNPJ_VAZIO = {
   nome: '', cnpj: '', razaoSocial: '', nomeFantasia: '', situacaoCadastral: '',
-  email: '', endereco: '', cep: '', logradouro: '', bairro: '', cidade: '', uf: '', telefone: '',
+  email: '', endereco: '', cep: '', logradouro: '', numero: '', complemento: '',
+  bairro: '', cidade: '', uf: '', pontoReferencia: '', telefone: '',
   servicos: [],
 };
+
+const comporEndereco = (dados) => [
+  dados.logradouro,
+  dados.numero,
+  dados.bairro,
+  dados.cidade,
+  dados.uf,
+].map((parte) => (parte == null ? '' : String(parte).trim()))
+  .filter((parte) => parte.length > 0)
+  .join(', ');
 
 const mascararCnpj = (v) => {
   const d = v.replace(/\D/g, '').slice(0, 14);
@@ -132,7 +143,15 @@ const CadastroSalaoGerente = () => {
           situacaoCadastral: salao.situacaoCadastral,
           email:             salao.email,
           telefone:          salao.telefone,
-          endereco:          salao.endereco,
+          cep:               salao.cep,
+          logradouro:        salao.logradouro,
+          numero:            salao.numero,
+          complemento:       salao.complemento,
+          bairro:            salao.bairro,
+          cidade:            salao.cidade,
+          uf:                salao.uf,
+          pontoReferencia:   salao.pontoReferencia,
+          endereco:          comporEndereco(salao) || salao.endereco,
           status:            'ATIVO',
           servicos: salao.servicos.map(s => ({
             nome: s.nome, descricao: s.descricao,
@@ -260,6 +279,17 @@ const CadastroSalaoGerente = () => {
                   <label>Logradouro</label>
                   <input name="logradouro" placeholder="Rua / Avenida" value={salao.logradouro} onChange={handleChange} />
                 </div>
+                <div className="form-group" style={{ maxWidth: 160 }}>
+                  <label>Número</label>
+                  <input name="numero" placeholder="Ex: 123" value={salao.numero} onChange={handleChange} required />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Complemento</label>
+                  <input name="complemento" placeholder="Sala, bloco, andar (opcional)" value={salao.complemento} onChange={handleChange} />
+                </div>
                 <div className="form-group">
                   <label>Bairro</label>
                   <input name="bairro" placeholder="Bairro" value={salao.bairro} onChange={handleChange} />
@@ -275,6 +305,11 @@ const CadastroSalaoGerente = () => {
                   <label>UF</label>
                   <input name="uf" placeholder="SP" value={salao.uf} onChange={handleChange} maxLength={2} />
                 </div>
+              </div>
+
+              <div className="form-group">
+                <label>Ponto de referência</label>
+                <input name="pontoReferencia" placeholder="Ex: ao lado da praça central" value={salao.pontoReferencia} onChange={handleChange} />
               </div>
             </div>
 

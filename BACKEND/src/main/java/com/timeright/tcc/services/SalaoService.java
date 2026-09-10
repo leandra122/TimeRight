@@ -78,9 +78,9 @@ public class SalaoService {
         salao.setCnpj(consulta.getCnpj());
         salao.setEmail(dto.email);
         salao.setTelefone(dto.telefone);
-        salao.setEndereco(dto.endereco);
         salao.setStatus(dto.status != null ? dto.status : "ATIVO");
         salao.setGerente(gerente);
+        preencherDadosCadastrais(salao, dto);
 
         Salao salaoSalvo = salaoRepository.save(salao);
 
@@ -100,6 +100,46 @@ public class SalaoService {
         }
 
         return salaoSalvo;
+    }
+
+    private void preencherDadosCadastrais(Salao salao, SalaoServicosDTO dto) {
+        salao.setRazaoSocial(limpar(dto.razaoSocial));
+        salao.setNomeFantasia(limpar(dto.nomeFantasia));
+        salao.setSituacaoCadastral(limpar(dto.situacaoCadastral));
+        salao.setCep(limpar(dto.cep));
+        salao.setLogradouro(limpar(dto.logradouro));
+        salao.setNumero(limpar(dto.numero));
+        salao.setComplemento(limpar(dto.complemento));
+        salao.setBairro(limpar(dto.bairro));
+        salao.setCidade(limpar(dto.cidade));
+        salao.setUf(limpar(dto.uf));
+        salao.setPontoReferencia(limpar(dto.pontoReferencia));
+        salao.setEndereco(comporEndereco(dto));
+    }
+
+    private String limpar(String valor) {
+        if (valor == null) return null;
+        String normalizado = valor.trim();
+        return normalizado.isEmpty() ? null : normalizado;
+    }
+
+    private String comporEndereco(SalaoServicosDTO dto) {
+        if (dto.endereco != null && !dto.endereco.isBlank()) {
+            return dto.endereco.trim();
+        }
+        StringBuilder endereco = new StringBuilder();
+        adicionarParte(endereco, dto.logradouro);
+        adicionarParte(endereco, dto.numero);
+        adicionarParte(endereco, dto.bairro);
+        adicionarParte(endereco, dto.cidade);
+        adicionarParte(endereco, dto.uf);
+        return endereco.toString();
+    }
+
+    private void adicionarParte(StringBuilder endereco, String valor) {
+        if (valor == null || valor.isBlank()) return;
+        if (endereco.length() > 0) endereco.append(", ");
+        endereco.append(valor.trim());
     }
 
     // =========================
@@ -140,6 +180,17 @@ public class SalaoService {
         if (dados.getEmail() != null) existente.setEmail(dados.getEmail());
         if (dados.getEndereco() != null) existente.setEndereco(dados.getEndereco());
         if (dados.getStatus() != null) existente.setStatus(dados.getStatus());
+        if (dados.getRazaoSocial() != null) existente.setRazaoSocial(dados.getRazaoSocial());
+        if (dados.getNomeFantasia() != null) existente.setNomeFantasia(dados.getNomeFantasia());
+        if (dados.getSituacaoCadastral() != null) existente.setSituacaoCadastral(dados.getSituacaoCadastral());
+        if (dados.getCep() != null) existente.setCep(dados.getCep());
+        if (dados.getLogradouro() != null) existente.setLogradouro(dados.getLogradouro());
+        if (dados.getNumero() != null) existente.setNumero(dados.getNumero());
+        if (dados.getComplemento() != null) existente.setComplemento(dados.getComplemento());
+        if (dados.getBairro() != null) existente.setBairro(dados.getBairro());
+        if (dados.getCidade() != null) existente.setCidade(dados.getCidade());
+        if (dados.getUf() != null) existente.setUf(dados.getUf());
+        if (dados.getPontoReferencia() != null) existente.setPontoReferencia(dados.getPontoReferencia());
         return salaoRepository.save(existente);
     }
 
