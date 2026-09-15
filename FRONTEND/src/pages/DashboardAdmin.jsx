@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import ServicosSalao from '../components/ServicosSalao';
 import {
   Store, Calendar, PenLine, Users, UserCog, PowerOff,
   TrendingUp, Clock, CheckCircle, Star, Scissors
@@ -31,6 +32,9 @@ const DashboardAdmin = () => {
   const [stats, setStats] = useState(null);
   const [loadingStats, setLoadingStats] = useState(true);
   const [saloes, setSaloes] = useState([]);
+  const [salvandoServico, setSalvandoServico] = useState(false);
+  const [revisaoServicos, setRevisaoServicos] = useState(0);
+  const [erroSaloes, setErroSaloes] = useState('');
   const [salaoSelecionadoId, setSalaoSelecionadoId] = useState('');
 
   useEffect(() => {
@@ -48,7 +52,8 @@ const DashboardAdmin = () => {
         setSalaoSelecionadoId(data[0]?.id?.toString() || '');
         if (!data.length) setLoadingStats(false);
       })
-      .catch(() => {
+      .catch((error) => {
+        setErroSaloes(error.response?.data?.error || error.response?.data?.message || 'Não foi possível carregar seus salões.');
         setSaloes([]);
         setStats(null);
         setLoadingStats(false);
@@ -71,7 +76,7 @@ const DashboardAdmin = () => {
     };
 
     carregarStatsSalao();
-  }, [salaoSelecionadoId, user?.tipo]);
+  }, [salaoSelecionadoId, user?.tipo, revisaoServicos]);
 
   const handleDesativar = () => {
     desativarSalao();
@@ -101,6 +106,7 @@ const DashboardAdmin = () => {
           <div className="form-group">
             <label htmlFor="salao-dashboard">Salão exibido no painel</label>
             <select
+              disabled={salvandoServico}
               id="salao-dashboard"
               value={salaoSelecionadoId}
               onChange={(event) => setSalaoSelecionadoId(event.target.value)}
@@ -112,7 +118,8 @@ const DashboardAdmin = () => {
           </div>
         )}
 
-        {user?.tipo === 'manager' && !loadingStats && saloes.length === 0 && (
+        {erroSaloes && <div className="msg-erro" role="alert">{erroSaloes}</div>}
+        {user?.tipo === 'manager' && !erroSaloes && !loadingStats && saloes.length === 0 && (
           <div className="aviso-unico-cadastro">
             Nenhum salão cadastrado. Use o atalho abaixo para criar seu primeiro estabelecimento.
           </div>
@@ -181,6 +188,15 @@ const DashboardAdmin = () => {
           </div>
         </div>
 
+        {user?.tipo === 'manager' && salaoSelecionadoId && saloes.some((item) => String(item.id) === salaoSelecionadoId) && (
+          <ServicosSalao
+            key={salaoSelecionadoId}
+            salaoId={salaoSelecionadoId}
+            salaoNome={saloes.find((item) => String(item.id) === salaoSelecionadoId)?.nome}
+            onSalvandoChange={setSalvandoServico}
+            onSalvo={() => setRevisaoServicos((valor) => valor + 1)}
+          />
+        )}
         <div className="admin-section-title">Acesso rápido</div>
         <div className="admin-atalhos">
           {atalhos.map((a, i) => (

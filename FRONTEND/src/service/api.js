@@ -53,6 +53,8 @@ export const salvarHorariosFuncionamento = (salaoId, dados) =>
 // SERVIÇO
 export const listarServicos = () => api.get('/servicos');
 export const listarMeusServicos = () => api.get('/servicos/me');
+export const cadastrarServico = (dados) => api.post('/servicos', dados);
+export const atualizarServico = (id, dados) => api.put('/servicos/' + id, dados);
 export const buscarServico = (id) => api.get(`/servicos/${id}`);
 export const listarServicosPorSalao = (salaoId) => api.get(`/servicos/salao/${salaoId}`);
 
