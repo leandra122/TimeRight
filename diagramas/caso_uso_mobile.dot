@@ -1,0 +1,140 @@
+digraph TimeRightMobile {
+
+    graph [
+        rankdir=LR,
+        bgcolor="white",
+        pad=0.5,
+        nodesep=0.35,
+        ranksep=1.0,
+        fontname="Arial"
+    ];
+
+    node [
+        fontname="Arial",
+        fontsize=11
+    ];
+
+    edge [
+        fontname="Arial",
+        fontsize=9,
+        dir=none
+    ];
+
+    cliente [
+        shape=plaintext,
+        label="CLIENTE"
+    ];
+
+    subgraph cluster_timeright {
+        label="TimeRight — Ambiente Mobile";
+        fontname="Arial";
+        fontsize=14;
+        style="rounded";
+        color="black";
+        penwidth=1.5;
+        margin=25;
+
+        login [
+            shape=ellipse,
+            label="Efetuar Login"
+        ];
+
+        cadastro [
+            shape=ellipse,
+            label="Cadastrar-se"
+        ];
+
+        perfil [
+            shape=ellipse,
+            label="Gerenciar Perfil"
+        ];
+
+        saloes [
+            shape=ellipse,
+            label="Consultar Salões"
+        ];
+
+        detalhes_salao [
+            shape=ellipse,
+            label="Visualizar Detalhes\ndo Salão"
+        ];
+
+        mapa [
+            shape=ellipse,
+            label="Visualizar Localização\nno Mapa"
+        ];
+
+        servicos [
+            shape=ellipse,
+            label="Consultar Serviços"
+        ];
+
+        profissionais [
+            shape=ellipse,
+            label="Consultar Profissionais\nHabilitados"
+        ];
+
+        disponibilidade [
+            shape=ellipse,
+            label="Consultar\nDisponibilidade"
+        ];
+
+        agendar [
+            shape=ellipse,
+            label="Realizar\nAgendamento"
+        ];
+
+        agenda [
+            shape=ellipse,
+            label="Consultar Próximos\nAgendamentos"
+        ];
+
+        reagendar [
+            shape=ellipse,
+            label="Reagendar\nAtendimento"
+        ];
+
+        cancelar [
+            shape=ellipse,
+            label="Cancelar\nAgendamento"
+        ];
+
+        historico [
+            shape=ellipse,
+            label="Consultar Histórico"
+        ];
+
+        fav_salao [
+            shape=ellipse,
+            label="Favoritar Salão"
+        ];
+
+        fav_func [
+            shape=ellipse,
+            label="Favoritar Funcionário"
+        ];
+
+        avaliar [
+            shape=ellipse,
+            label="Avaliar Atendimento"
+        ];
+    }
+
+    cliente -> cadastro;
+    cliente -> login;
+    cliente -> perfil;
+    cliente -> saloes;
+    cliente -> detalhes_salao;
+    cliente -> mapa;
+    cliente -> servicos;
+    cliente -> profissionais;
+    cliente -> disponibilidade;
+    cliente -> agendar;
+    cliente -> agenda;
+    cliente -> reagendar;
+    cliente -> cancelar;
+    cliente -> historico;
+    cliente -> fav_salao;
+    cliente -> fav_func;
+    cliente -> avaliar;
+}

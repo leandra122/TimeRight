@@ -1,0 +1,205 @@
+digraph DER_TimeRight {
+
+    graph [
+        rankdir=LR,
+        bgcolor="white",
+        pad=0.3,
+        nodesep=0.6,
+        ranksep=1.0,
+        splines=ortho
+    ];
+
+    node [
+        shape=plain,
+        fontname="Arial"
+    ];
+
+    edge [
+        fontname="Arial",
+        fontsize=9,
+        color="#555555"
+    ];
+
+    NivelAcesso [label=<
+        <TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0">
+            <TR><TD BGCOLOR="#4F81BD"><FONT COLOR="white"><B>NivelAcesso</B></FONT></TD></TR>
+            <TR><TD ALIGN="LEFT"><B>PK</B> id</TD></TR>
+            <TR><TD ALIGN="LEFT">nome</TD></TR>
+            <TR><TD ALIGN="LEFT">status</TD></TR>
+        </TABLE>
+    >];
+
+    Usuario [label=<
+        <TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0">
+            <TR><TD BGCOLOR="#4F81BD"><FONT COLOR="white"><B>Usuario</B></FONT></TD></TR>
+            <TR><TD ALIGN="LEFT"><B>PK</B> id</TD></TR>
+            <TR><TD ALIGN="LEFT">nome</TD></TR>
+            <TR><TD ALIGN="LEFT">username</TD></TR>
+            <TR><TD ALIGN="LEFT">password</TD></TR>
+            <TR><TD ALIGN="LEFT">data_cadastro</TD></TR>
+            <TR><TD ALIGN="LEFT">data_atualizacao</TD></TR>
+            <TR><TD ALIGN="LEFT"><B>FK</B> nivel_acesso_id</TD></TR>
+            <TR><TD ALIGN="LEFT">status</TD></TR>
+            <TR><TD ALIGN="LEFT">reset_token</TD></TR>
+            <TR><TD ALIGN="LEFT">reset_token_expiracao</TD></TR>
+        </TABLE>
+    >];
+
+    Salao [label=<
+        <TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0">
+            <TR><TD BGCOLOR="#4F81BD"><FONT COLOR="white"><B>Salao</B></FONT></TD></TR>
+            <TR><TD ALIGN="LEFT"><B>PK</B> id</TD></TR>
+            <TR><TD ALIGN="LEFT">nome</TD></TR>
+            <TR><TD ALIGN="LEFT">cnpj</TD></TR>
+            <TR><TD ALIGN="LEFT">email</TD></TR>
+            <TR><TD ALIGN="LEFT">telefone</TD></TR>
+            <TR><TD ALIGN="LEFT">status</TD></TR>
+            <TR><TD ALIGN="LEFT"><B>FK</B> gerente_id</TD></TR>
+            <TR><TD ALIGN="LEFT">antecedencia_minima_minutos</TD></TR>
+            <TR><TD ALIGN="LEFT">limite_agendamento_dias</TD></TR>
+            <TR><TD ALIGN="LEFT">razao_social</TD></TR>
+            <TR><TD ALIGN="LEFT">nome_fantasia</TD></TR>
+            <TR><TD ALIGN="LEFT">situacao_cadastral</TD></TR>
+            <TR><TD ALIGN="LEFT">estabelecimento_verificado</TD></TR>
+            <TR><TD ALIGN="LEFT">cep</TD></TR>
+            <TR><TD ALIGN="LEFT">logradouro</TD></TR>
+            <TR><TD ALIGN="LEFT">numero</TD></TR>
+            <TR><TD ALIGN="LEFT">complemento</TD></TR>
+            <TR><TD ALIGN="LEFT">bairro</TD></TR>
+            <TR><TD ALIGN="LEFT">cidade</TD></TR>
+            <TR><TD ALIGN="LEFT">uf</TD></TR>
+            <TR><TD ALIGN="LEFT">ponto_referencia</TD></TR>
+        </TABLE>
+    >];
+
+    HorarioFuncionamento [label=<
+        <TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0">
+            <TR><TD BGCOLOR="#4F81BD"><FONT COLOR="white"><B>HorarioFuncionamentoSalao</B></FONT></TD></TR>
+            <TR><TD ALIGN="LEFT"><B>PK</B> id</TD></TR>
+            <TR><TD ALIGN="LEFT"><B>FK</B> salao_id</TD></TR>
+            <TR><TD ALIGN="LEFT">dia_semana</TD></TR>
+            <TR><TD ALIGN="LEFT">hora_inicio</TD></TR>
+            <TR><TD ALIGN="LEFT">hora_fim</TD></TR>
+        </TABLE>
+    >];
+
+    Servico [label=<
+        <TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0">
+            <TR><TD BGCOLOR="#4F81BD"><FONT COLOR="white"><B>Servico</B></FONT></TD></TR>
+            <TR><TD ALIGN="LEFT"><B>PK</B> id</TD></TR>
+            <TR><TD ALIGN="LEFT">nome</TD></TR>
+            <TR><TD ALIGN="LEFT">descricao</TD></TR>
+            <TR><TD ALIGN="LEFT">preco</TD></TR>
+            <TR><TD ALIGN="LEFT">duracao</TD></TR>
+            <TR><TD ALIGN="LEFT">status</TD></TR>
+            <TR><TD ALIGN="LEFT"><B>FK</B> salao_id</TD></TR>
+        </TABLE>
+    >];
+
+    Funcionario [label=<
+        <TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0">
+            <TR><TD BGCOLOR="#4F81BD"><FONT COLOR="white"><B>Funcionario</B></FONT></TD></TR>
+            <TR><TD ALIGN="LEFT"><B>PK</B> id</TD></TR>
+            <TR><TD ALIGN="LEFT">nome</TD></TR>
+            <TR><TD ALIGN="LEFT">email</TD></TR>
+            <TR><TD ALIGN="LEFT">senha</TD></TR>
+            <TR><TD ALIGN="LEFT">observacoes</TD></TR>
+            <TR><TD ALIGN="LEFT">funcao</TD></TR>
+            <TR><TD ALIGN="LEFT">status</TD></TR>
+            <TR><TD ALIGN="LEFT"><B>FK</B> salao_id</TD></TR>
+            <TR><TD ALIGN="LEFT"><B>FK</B> usuario_id</TD></TR>
+        </TABLE>
+    >];
+
+    FuncionarioServico [label=<
+        <TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0">
+            <TR><TD BGCOLOR="#4F81BD"><FONT COLOR="white"><B>FuncionarioServico</B></FONT></TD></TR>
+            <TR><TD ALIGN="LEFT"><B>PK/FK</B> funcionario_id</TD></TR>
+            <TR><TD ALIGN="LEFT"><B>PK/FK</B> servico_id</TD></TR>
+            <TR><TD ALIGN="LEFT"><B>FK</B> salao_id</TD></TR>
+        </TABLE>
+    >];
+
+    Agendamento [label=<
+        <TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0">
+            <TR><TD BGCOLOR="#4F81BD"><FONT COLOR="white"><B>Agendamento</B></FONT></TD></TR>
+            <TR><TD ALIGN="LEFT"><B>PK</B> id</TD></TR>
+            <TR><TD ALIGN="LEFT"><B>FK</B> usuario_id</TD></TR>
+            <TR><TD ALIGN="LEFT"><B>FK</B> funcionario_id</TD></TR>
+            <TR><TD ALIGN="LEFT"><B>FK</B> servico_id</TD></TR>
+            <TR><TD ALIGN="LEFT">data_hora</TD></TR>
+            <TR><TD ALIGN="LEFT">duracao</TD></TR>
+            <TR><TD ALIGN="LEFT">status</TD></TR>
+            <TR><TD ALIGN="LEFT">observacoes</TD></TR>
+        </TABLE>
+    >];
+
+    Avaliacao [label=<
+        <TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0">
+            <TR><TD BGCOLOR="#4F81BD"><FONT COLOR="white"><B>Avaliacao</B></FONT></TD></TR>
+            <TR><TD ALIGN="LEFT"><B>PK</B> id</TD></TR>
+            <TR><TD ALIGN="LEFT"><B>FK</B> usuario_id</TD></TR>
+            <TR><TD ALIGN="LEFT"><B>FK</B> salao_id</TD></TR>
+            <TR><TD ALIGN="LEFT"><B>FK</B> agendamento_id</TD></TR>
+            <TR><TD ALIGN="LEFT">nota</TD></TR>
+            <TR><TD ALIGN="LEFT">comentario</TD></TR>
+            <TR><TD ALIGN="LEFT">data_avaliacao</TD></TR>
+        </TABLE>
+    >];
+
+    NivelAcesso -> Usuario [
+        label=" 1 : N "
+    ];
+
+    Usuario -> Salao [
+        label=" gerente 1 : N "
+    ];
+
+    Usuario -> Funcionario [
+        label=" 1 : 0..1 "
+    ];
+
+    Salao -> HorarioFuncionamento [
+        label=" 1 : N "
+    ];
+
+    Salao -> Servico [
+        label=" 1 : N "
+    ];
+
+    Salao -> Funcionario [
+        label=" 1 : N "
+    ];
+
+    Funcionario -> FuncionarioServico [
+        label=" 1 : N "
+    ];
+
+    Servico -> FuncionarioServico [
+        label=" 1 : N "
+    ];
+
+    Usuario -> Agendamento [
+        label=" cliente 1 : N "
+    ];
+
+    Funcionario -> Agendamento [
+        label=" 1 : N "
+    ];
+
+    Servico -> Agendamento [
+        label=" 1 : N "
+    ];
+
+    Usuario -> Avaliacao [
+        label=" 1 : N "
+    ];
+
+    Salao -> Avaliacao [
+        label=" 1 : N "
+    ];
+
+    Agendamento -> Avaliacao [
+        label=" 1 : 0..1 "
+    ];
+}

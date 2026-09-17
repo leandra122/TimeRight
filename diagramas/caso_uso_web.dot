@@ -1,0 +1,123 @@
+digraph TimeRightWeb {
+
+    graph [
+        rankdir=LR,
+        bgcolor="white",
+        pad=0.5,
+        nodesep=0.35,
+        ranksep=1.0,
+        fontname="Arial"
+    ];
+
+    node [
+        fontname="Arial",
+        fontsize=11
+    ];
+
+    edge [
+        fontname="Arial",
+        fontsize=9,
+        dir=none
+    ];
+
+    gerente [
+        shape=plaintext,
+        label="GERENTE"
+    ];
+
+    funcionario [
+        shape=plaintext,
+        label="FUNCIONÁRIO"
+    ];
+
+    subgraph cluster_timeright {
+        label="TimeRight — Ambiente Web";
+        fontname="Arial";
+        fontsize=14;
+        style="rounded";
+        color="black";
+        penwidth=1.5;
+        margin=25;
+
+        login [
+            shape=ellipse,
+            label="Efetuar Login"
+        ];
+
+        saloes [
+            shape=ellipse,
+            label="Gerenciar Salões"
+        ];
+
+        imagens [
+            shape=ellipse,
+            label="Gerenciar Imagens\ndo Salão"
+        ];
+
+        servicos [
+            shape=ellipse,
+            label="Gerenciar Serviços"
+        ];
+
+        funcionarios [
+            shape=ellipse,
+            label="Gerenciar Funcionários"
+        ];
+
+        func_servico [
+            shape=ellipse,
+            label="Associar Funcionário\na Serviço"
+        ];
+
+        funcionamento [
+            shape=ellipse,
+            label="Configurar Horários\nde Funcionamento"
+        ];
+
+        agenda_gerente [
+            shape=ellipse,
+            label="Consultar Agenda\nSemanal"
+        ];
+
+        agendamentos [
+            shape=ellipse,
+            label="Gerenciar\nAgendamentos"
+        ];
+
+        bloqueios [
+            shape=ellipse,
+            label="Bloquear Períodos"
+        ];
+
+        agenda_func [
+            shape=ellipse,
+            label="Consultar Própria\nAgenda"
+        ];
+
+        detalhes [
+            shape=ellipse,
+            label="Visualizar Detalhes\ndo Atendimento"
+        ];
+
+        status [
+            shape=ellipse,
+            label="Atualizar Situação\ndo Atendimento"
+        ];
+    }
+
+    gerente -> login;
+    gerente -> saloes;
+    gerente -> imagens;
+    gerente -> servicos;
+    gerente -> funcionarios;
+    gerente -> func_servico;
+    gerente -> funcionamento;
+    gerente -> agenda_gerente;
+    gerente -> agendamentos;
+    gerente -> bloqueios;
+
+    funcionario -> login;
+    funcionario -> agenda_func;
+    funcionario -> detalhes;
+    funcionario -> status;
+}
