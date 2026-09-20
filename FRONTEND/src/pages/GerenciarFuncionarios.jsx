@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../context/AuthContext';
-import { Plus, Pencil, Trash2, Check, X, ToggleLeft, ToggleRight } from 'lucide-react';
+import { Plus, Pencil, Trash2, Check, X, ToggleLeft, ToggleRight, BriefcaseBusiness, Clock3, CircleDollarSign, UserRound, LoaderCircle, AlertCircle } from 'lucide-react';
 import {
   listarFuncionariosGlobais, listarMeusFuncionarios, cadastrarFuncionario,
   atualizarFuncionario, atualizarStatusFuncionario, excluirFuncionario,
   listarMeusSaloes,
+  listarMeusServicos, listarServicosFuncionario, salvarServicosFuncionario,
 } from '../service/api';
 import './DashboardAdmin.css';
 
@@ -21,6 +22,11 @@ const GerenciarFuncionarios = () => {
   const [cadastrando, setCadastrando] = useState(false);
   const [novoForm, setNovoForm] = useState(formVazio);
   const [confirmarExcluir, setConfirmarExcluir] = useState(null);
+  const [gerenciandoServicos, setGerenciandoServicos] = useState(null);
+  const [servicosDoFuncionario, setServicosDoFuncionario] = useState([]);
+  const [servicosSelecionados, setServicosSelecionados] = useState(new Set());
+  const [carregandoServicos, setCarregandoServicos] = useState(false);
+  const [erroServicos, setErroServicos] = useState('');
   const [mensagem, setMensagem] = useState(null);
   const [erro, setErro] = useState(null);
   const [carregando, setCarregando] = useState(true);
@@ -34,11 +40,12 @@ const GerenciarFuncionarios = () => {
   const carregar = useCallback(async () => {
     try {
       if (podeGerenciar) {
-        const [{ data: funcs }, { data: sal }] = await Promise.all([
-          listarMeusFuncionarios(), listarMeusSaloes(),
+        const [{ data: funcs }, { data: sal }, { data: serv }] = await Promise.all([
+          listarMeusFuncionarios(), listarMeusSaloes(), listarMeusServicos(),
         ]);
         setFuncionarios(funcs);
         setSaloes(sal);
+        setServicosDoFuncionario(serv);
       } else {
         const { data } = await listarFuncionariosGlobais();
         setFuncionarios(data);
@@ -70,6 +77,40 @@ const GerenciarFuncionarios = () => {
     try { await excluirFuncionario(id); setConfirmarExcluir(null); exibirMensagem('Funcionário excluído com sucesso.'); carregar(); }
     catch (err) { setConfirmarExcluir(null); exibirMensagem(err.response?.data?.error || 'Não é possível excluir: funcionário possui vínculos.', 'erro'); }
   };
+
+  const abrirGerenciarServicos = async (funcionario) => {
+    setGerenciandoServicos(funcionario);
+    setCarregandoServicos(true);
+    setErroServicos('');
+    try {
+      const { data } = await listarServicosFuncionario(funcionario.id);
+      setServicosSelecionados(new Set((data.servicos || []).map(servico => servico.id)));
+    } catch (err) {
+      setErroServicos(err.response?.data?.error || 'Não foi possível carregar os serviços deste funcionário.');
+    } finally { setCarregandoServicos(false); }
+  };
+
+  const alternarServico = (servicoId) => setServicosSelecionados(atual => {
+    const proximo = new Set(atual);
+    if (proximo.has(servicoId)) proximo.delete(servicoId); else proximo.add(servicoId);
+    return proximo;
+  });
+
+  const salvarAssociacoes = async () => {
+    try {
+      await salvarServicosFuncionario(gerenciandoServicos.id, [...servicosSelecionados]);
+      setGerenciandoServicos(null);
+      exibirMensagem('Serviços do funcionário atualizados com sucesso.');
+    } catch (err) { exibirMensagem(err.response?.data?.error || 'Erro ao salvar serviços.', 'erro'); }
+  };
+
+  const servicosAtivosDoSalao = gerenciandoServicos
+    ? servicosDoFuncionario.filter(servico => servico.salao?.id === gerenciandoServicos.salao?.id && servico.status === 'ATIVO')
+    : [];
+
+  const formatarPreco = (preco) => Number(preco || 0).toLocaleString('pt-BR', {
+    style: 'currency', currency: 'BRL',
+  });
 
   const salvarNovo = async (e) => {
     e.preventDefault();
@@ -113,7 +154,7 @@ const GerenciarFuncionarios = () => {
         ) : (
           <div className="card admin-card">
             <div className="agenda-tabela">
-              <div className="tabela-header" style={{ gridTemplateColumns: '2fr 2fr 1.5fr 1fr 1.2fr' }}>
+              <div className="tabela-header" style={{ gridTemplateColumns: '2fr 2fr 1.5fr 1fr 1.8fr' }}>
                 <span>Nome</span><span>Email</span><span>Função</span><span>Status</span><span>Ações</span>
               </div>
 
@@ -122,7 +163,7 @@ const GerenciarFuncionarios = () => {
               )}
 
               {funcionarios.map(f => (
-                <div key={f.id} className="tabela-linha" style={{ gridTemplateColumns: '2fr 2fr 1.5fr 1fr 1.2fr' }}>
+                <div key={f.id} className="tabela-linha" style={{ gridTemplateColumns: '2fr 2fr 1.5fr 1fr 1.8fr' }}>
                   {podeGerenciar && editando === f.id ? (
                     <>
                       <input className="input-hora" value={editForm.nome} onChange={e => setEditForm(ef => ({ ...ef, nome: e.target.value }))} />
@@ -149,6 +190,7 @@ const GerenciarFuncionarios = () => {
                         {podeGerenciar && (
                           <>
                             <button className="btn-acao" onClick={() => iniciarEdicao(f)} title="Editar"><Pencil size={13} /></button>
+                            <button className="btn-acao" onClick={() => abrirGerenciarServicos(f)} title="Gerenciar serviços"><BriefcaseBusiness size={13} /></button>
                             <button className="btn-acao cancelar-acao" onClick={() => setConfirmarExcluir(f)} title="Excluir"><Trash2 size={13} /></button>
                           </>
                         )}
@@ -200,6 +242,46 @@ const GerenciarFuncionarios = () => {
                 <button type="submit" className="btn-primary">Cadastrar</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {podeGerenciar && gerenciandoServicos && (
+        <div className="modal-overlay" onClick={() => setGerenciandoServicos(null)}>
+          <div className="modal-card card modal-servicos" onClick={e => e.stopPropagation()}>
+            <div className="modal-servicos-cabecalho">
+              <div className="modal-servicos-icone"><BriefcaseBusiness size={20} /></div>
+              <div>
+                <h3>Gerenciar serviços</h3>
+                <div className="modal-servicos-funcionario"><UserRound size={14} />{gerenciandoServicos.nome}</div>
+              </div>
+            </div>
+            <p className="modal-servicos-apoio">Selecione os serviços que este funcionário está habilitado a realizar.</p>
+
+            <div className="modal-servicos-lista" aria-live="polite">
+              {carregandoServicos ? (
+                <div className="modal-servicos-estado"><LoaderCircle size={20} className="modal-servicos-spinner" />Carregando serviços...</div>
+              ) : erroServicos ? (
+                <div className="modal-servicos-estado erro"><AlertCircle size={20} />{erroServicos}</div>
+              ) : servicosAtivosDoSalao.length === 0 ? (
+                <div className="modal-servicos-estado">Nenhum serviço ativo disponível neste salão.</div>
+              ) : servicosAtivosDoSalao.map(servico => {
+                const selecionado = servicosSelecionados.has(servico.id);
+                return (
+                  <label key={servico.id} className={`modal-servico-item ${selecionado ? 'selecionado' : ''}`}>
+                    <span className="modal-servico-check"><input type="checkbox" checked={selecionado} onChange={() => alternarServico(servico.id)} /></span>
+                    <span className="modal-servico-conteudo">
+                      <span className="modal-servico-nome">{servico.nome}</span>
+                      <span className="modal-servico-meta"><span><CircleDollarSign size={14} />{formatarPreco(servico.preco)}</span><span><Clock3 size={14} />{servico.duracao} min</span></span>
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+            <div className="modal-botoes modal-servicos-rodape">
+              <button className="btn-secondary" onClick={() => setGerenciandoServicos(null)}>Cancelar</button>
+              <button className="btn-primary" onClick={salvarAssociacoes} disabled={carregandoServicos || !!erroServicos}>Salvar alterações</button>
+            </div>
           </div>
         </div>
       )}

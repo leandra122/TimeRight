@@ -9,7 +9,9 @@ export const catalogApi = {
   salons: () => api.get('/saloes'),
   salon: (id) => api.get(`/saloes/${id}`),
   services: (salonId) => api.get(`/servicos/salao/${salonId}`),
-  employees: (salonId) => api.get(`/catalogo/saloes/${salonId}/funcionarios`),
+  employees: (salonId, serviceId) => api.get(`/catalogo/saloes/${salonId}/funcionarios`, {
+    params: { servicoId: serviceId },
+  }),
 };
 
 export const appointmentsApi = {

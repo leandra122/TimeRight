@@ -23,13 +23,17 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.timeright.tcc.model.entity.Funcionario;
+import com.timeright.tcc.model.entity.FuncionarioServico;
 import com.timeright.tcc.model.entity.NivelAcesso;
 import com.timeright.tcc.model.entity.Salao;
 import com.timeright.tcc.model.entity.Usuario;
+import com.timeright.tcc.model.entity.Servico;
 import com.timeright.tcc.model.repository.FuncionarioRepository;
+import com.timeright.tcc.model.repository.FuncionarioServicoRepository;
 import com.timeright.tcc.model.repository.NivelAcessoRepository;
 import com.timeright.tcc.model.repository.SalaoRepository;
 import com.timeright.tcc.model.repository.UsuarioRepository;
+import com.timeright.tcc.model.repository.ServicoRepository;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -44,6 +48,8 @@ class ClienteCadastroCatalogoIntegrationTest {
     @Autowired private UsuarioRepository usuarioRepository;
     @Autowired private SalaoRepository salaoRepository;
     @Autowired private FuncionarioRepository funcionarioRepository;
+    @Autowired private FuncionarioServicoRepository funcionarioServicoRepository;
+    @Autowired private ServicoRepository servicoRepository;
 
     @BeforeEach
     void prepararNiveis() {
@@ -144,13 +150,19 @@ class ClienteCadastroCatalogoIntegrationTest {
         Funcionario zeca = funcionario("Zeca", "zeca@teste.com", "Barbeiro", "ATIVO", principal);
         Funcionario inativo = funcionario("Bia", "bia@teste.com", "Esteticista", "INATIVO", principal);
         Funcionario externo = funcionario("Carlos", "carlos@teste.com", "Barbeiro", "ATIVO", outro);
+        Servico corte = servico("Corte", principal, "ATIVO");
+        funcionarioServicoRepository.saveAllAndFlush(java.util.List.of(
+                new FuncionarioServico(ana1, corte),
+                new FuncionarioServico(ana2, corte),
+                new FuncionarioServico(zeca, corte)));
         assertThat(inativo.getId()).isNotNull();
         assertThat(externo.getId()).isNotNull();
 
         long primeiroId = Math.min(ana1.getId(), ana2.getId());
         long segundoId = Math.max(ana1.getId(), ana2.getId());
 
-        mockMvc.perform(get("/catalogo/saloes/{id}/funcionarios", principal.getId()))
+        mockMvc.perform(get("/catalogo/saloes/{id}/funcionarios", principal.getId())
+                        .param("servicoId", corte.getId().toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(3))
                 .andExpect(jsonPath("$[0].id").value(primeiroId))
@@ -170,9 +182,9 @@ class ClienteCadastroCatalogoIntegrationTest {
     void catalogoIndisponivelRetorna404EListagemGlobalContinuaProtegida() throws Exception {
         Salao inativo = salao("Salao Inativo", "INATIVO", "10000000000300");
 
-        mockMvc.perform(get("/catalogo/saloes/{id}/funcionarios", 999999L))
+        mockMvc.perform(get("/catalogo/saloes/{id}/funcionarios", 999999L).param("servicoId", "1"))
                 .andExpect(status().isNotFound());
-        mockMvc.perform(get("/catalogo/saloes/{id}/funcionarios", inativo.getId()))
+        mockMvc.perform(get("/catalogo/saloes/{id}/funcionarios", inativo.getId()).param("servicoId", "1"))
                 .andExpect(status().isNotFound());
         mockMvc.perform(get("/funcionarios"))
                 .andExpect(status().isUnauthorized());
@@ -220,6 +232,17 @@ class ClienteCadastroCatalogoIntegrationTest {
         funcionario.setSalao(salao);
         funcionario.setUsuario(usuarioFuncionario(nome, email));
         return funcionarioRepository.saveAndFlush(funcionario);
+    }
+
+    private Servico servico(String nome, Salao salao, String status) {
+        Servico servico = new Servico();
+        servico.setNome(nome);
+        servico.setDescricao("Descrição");
+        servico.setPreco(50.0);
+        servico.setDuracao(30);
+        servico.setStatus(status);
+        servico.setSalao(salao);
+        return servicoRepository.saveAndFlush(servico);
     }
 
     private Usuario usuarioFuncionario(String nome, String email) {

@@ -3,6 +3,7 @@ package com.timeright.tcc.controller;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -165,6 +166,50 @@ class EmployeeAgendaIntegrationTest {
                 .andExpect(status().isOk()).andExpect(content().json("[]"));
     }
 
+    @Test
+    void employeeConcluiAtendimentoProprioPassadoEStatusEAtualizado() throws Exception {
+        Usuario cliente = usuario("USER", nivel("USER"));
+        Agendamento atendimento = agendamento(funcionario, servico, cliente,
+                LocalDateTime.of(2020, 1, 1, 9, 0), "AGENDADO");
+
+        mockMvc.perform(patch("/funcionarios/me/agendamentos/{id}/concluir", atendimento.getId())
+                        .header("Authorization", bearer(employee)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("CONCLUIDO"));
+        org.junit.jupiter.api.Assertions.assertEquals("CONCLUIDO",
+                agendamentoRepository.findById(atendimento.getId()).orElseThrow().getStatus());
+    }
+
+    @Test
+    void employeeNaoConcluiAtendimentoDeOutroProfissional() throws Exception {
+        Usuario cliente = usuario("USER", nivel("USER"));
+        Usuario outroEmployee = usuario("EMPLOYEE", employeeRole);
+        Funcionario outro = funcionario("Outro", outroEmployee, salao);
+        Agendamento alheio = agendamento(outro, servico, cliente,
+                LocalDateTime.of(2020, 1, 1, 9, 0), "AGENDADO");
+
+        mockMvc.perform(patch("/funcionarios/me/agendamentos/{id}/concluir", alheio.getId())
+                        .header("Authorization", bearer(employee)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void employeeNaoConcluiAtendimentoFuturoCanceladoOuJaConcluido() throws Exception {
+        Usuario cliente = usuario("USER", nivel("USER"));
+        Agendamento futuro = agendamento(funcionario, servico, cliente,
+                LocalDateTime.of(2030, 1, 1, 9, 0), "AGENDADO");
+        Agendamento cancelado = agendamento(funcionario, servico, cliente,
+                LocalDateTime.of(2020, 1, 1, 9, 0), "CANCELADO");
+        Agendamento concluido = agendamento(funcionario, servico, cliente,
+                LocalDateTime.of(2020, 1, 1, 10, 0), "CONCLUIDO");
+
+        for (Agendamento item : new Agendamento[] { futuro, cancelado, concluido }) {
+            mockMvc.perform(patch("/funcionarios/me/agendamentos/{id}/concluir", item.getId())
+                            .header("Authorization", bearer(employee)))
+                    .andExpect(status().isConflict());
+        }
+    }
+
     private NivelAcesso nivel(String nome) {
         NivelAcesso nivel = new NivelAcesso();
         nivel.setNome(nome);
@@ -206,8 +251,13 @@ class EmployeeAgendaIntegrationTest {
 
     private Agendamento agendamento(Funcionario profissional, Servico servicoItem,
                                     Usuario cliente, LocalDateTime dataHora) {
+        return agendamento(profissional, servicoItem, cliente, dataHora, "CONFIRMADO");
+    }
+
+    private Agendamento agendamento(Funcionario profissional, Servico servicoItem,
+                                    Usuario cliente, LocalDateTime dataHora, String status) {
         Agendamento item = new Agendamento();
-        item.setDataHora(dataHora); item.setDuracao(servicoItem.getDuracao()); item.setStatus("CONFIRMADO");
+        item.setDataHora(dataHora); item.setDuracao(servicoItem.getDuracao()); item.setStatus(status);
         item.setObservacoes("Preparar materiais"); item.setUsuario(cliente);
         item.setFuncionario(profissional); item.setServico(servicoItem);
         return agendamentoRepository.save(item);

@@ -294,6 +294,44 @@ class FuncionarioServicoOwnershipIntegrationTest {
     }
 
     @Test
+    void gerenteGerenciaSomenteServicosAtivosDoSalaoDoFuncionario() throws Exception {
+        Funcionario proprio = funcionario("Próprio", "servicos-proprio@teste.com", salaoUm);
+        Funcionario alheio = funcionario("Alheio", "servicos-alheio@teste.com", salaoAlheio);
+        Servico habilitado = servico("Corte", salaoUm);
+        Servico externo = servico("Externo", salaoAlheio);
+        Servico inativo = servico("Inativo", salaoUm);
+        inativo.setStatus("INATIVO");
+        servicoRepository.saveAndFlush(inativo);
+
+        mockMvc.perform(put("/funcionarios/{id}/servicos", proprio.getId())
+                        .header("Authorization", bearer(manager))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"servicoIds\":[" + habilitado.getId() + "]}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.servicos", hasSize(1)))
+                .andExpect(jsonPath("$.servicos[0].id").value(habilitado.getId()));
+        mockMvc.perform(get("/funcionarios/{id}/servicos", proprio.getId())
+                        .header("Authorization", bearer(manager)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.servicos[0].id").value(habilitado.getId()));
+        mockMvc.perform(put("/funcionarios/{id}/servicos", proprio.getId())
+                        .header("Authorization", bearer(manager))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"servicoIds\":[" + externo.getId() + "]}"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(put("/funcionarios/{id}/servicos", proprio.getId())
+                        .header("Authorization", bearer(manager))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"servicoIds\":[" + inativo.getId() + "]}"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(put("/funcionarios/{id}/servicos", alheio.getId())
+                        .header("Authorization", bearer(manager))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"servicoIds\":[" + habilitado.getId() + "]}"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     void adminNaoExecutaMutacoesDeServico() throws Exception {
         Servico servico = servico("Global", salaoUm);
         mockMvc.perform(post("/servicos").header("Authorization", bearer(admin))

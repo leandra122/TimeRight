@@ -81,6 +81,8 @@ public class SecurityConfig {
                     .hasRole("ADMIN")
                 .requestMatchers(HttpMethod.GET, "/funcionarios/me/agendamentos")
                     .hasRole("EMPLOYEE")
+                .requestMatchers(HttpMethod.PATCH, "/funcionarios/me/agendamentos/*/concluir")
+                    .hasRole("EMPLOYEE")
                 .requestMatchers(HttpMethod.GET, "/funcionarios/me")
                     .hasRole("MANAGER")
                 .requestMatchers(HttpMethod.GET, "/funcionarios/*/servicos")

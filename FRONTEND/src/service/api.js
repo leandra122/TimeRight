@@ -68,6 +68,9 @@ export const atualizarFuncionario = (id, dados) => api.put(`/funcionarios/${id}`
 export const atualizarStatusFuncionario = (id, status) => api.patch(`/funcionarios/${id}/status`, { status });
 export const excluirFuncionario = (id) => api.delete(`/funcionarios/${id}`);
 export const listarMinhaAgendaFuncionario = () => api.get('/funcionarios/me/agendamentos');
+export const concluirAtendimentoFuncionario = (id) => api.patch(`/funcionarios/me/agendamentos/${id}/concluir`);
+export const listarServicosFuncionario = (id) => api.get(`/funcionarios/${id}/servicos`);
+export const salvarServicosFuncionario = (id, servicoIds) => api.put(`/funcionarios/${id}/servicos`, { servicoIds });
 
 // AGENDAMENTO
 export const listarAgendamentosGlobais = () => api.get('/agendamentos');

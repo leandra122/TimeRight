@@ -166,6 +166,39 @@
 /* ── Card ── */
 .admin-card { width: 100%; }
 .admin-card h2 { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+
+/* ── Serviços do funcionário ── */
+.modal-servicos { max-width: 520px; padding: 0; overflow: hidden; }
+.modal-servicos-cabecalho { display: flex; align-items: center; gap: 12px; padding: 24px 24px 12px; }
+.modal-servicos-icone { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: var(--brand-pale); color: var(--brand); }
+.modal-servicos h3 { margin: 0; }
+.modal-servicos-funcionario { display: flex; align-items: center; gap: 5px; margin-top: 5px; color: var(--text-soft); font-size: 13px; font-weight: 600; }
+.modal-servicos-apoio { margin: 0; padding: 0 24px 18px; color: var(--text-soft); font-size: 13px; line-height: 1.5; border-bottom: 1px solid var(--border); }
+.modal-servicos-lista { max-height: 320px; overflow-y: auto; padding: 16px 24px; display: grid; gap: 9px; }
+.modal-servico-item { display: flex; align-items: center; gap: 12px; padding: 13px 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--white); cursor: pointer; transition: border-color .18s ease, background .18s ease, box-shadow .18s ease; }
+.modal-servico-item:hover { border-color: var(--brand); background: var(--brand-pale); }
+.modal-servico-item.selecionado { border-color: var(--brand); background: var(--brand-pale); box-shadow: 0 2px 8px rgba(118, 74, 38, .08); }
+.modal-servico-check { display: flex; align-items: center; }
+.modal-servico-check input { width: 17px; height: 17px; accent-color: var(--brand); cursor: pointer; }
+.modal-servico-conteudo { min-width: 0; display: grid; gap: 6px; }
+.modal-servico-nome { color: var(--text); font-size: 14px; font-weight: 700; }
+.modal-servico-meta { display: flex; flex-wrap: wrap; gap: 12px; color: var(--text-soft); font-size: 12px; }
+.modal-servico-meta span { display: inline-flex; align-items: center; gap: 4px; }
+.modal-servicos-estado { min-height: 110px; display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--text-soft); text-align: center; font-size: 13px; }
+.modal-servicos-estado.erro { color: #d93025; }
+.modal-servicos-spinner { animation: modal-servicos-rotacionar .85s linear infinite; }
+.modal-servicos-rodape { margin: 0; padding: 16px 24px 24px; border-top: 1px solid var(--border); }
+
+@keyframes modal-servicos-rotacionar { to { transform: rotate(360deg); } }
+
+.detalhes-atendimento { display: grid; gap: 11px; margin-top: 18px; }
+.detalhes-atendimento p { display: flex; justify-content: space-between; align-items: center; gap: 16px; color: var(--text-soft); font-size: 13px; }
+.detalhes-atendimento strong { color: var(--text); font-weight: 600; }
+.confirmar-conclusao { margin-top: 18px; padding: 14px; border-radius: 10px; background: var(--brand-pale); color: var(--text); font-size: 13px; }
+.confirmar-conclusao .modal-botoes { margin-top: 12px; }
+.cal-filtros { display: flex; gap: 12px; margin-bottom: 16px; }
+.cal-filtros select { min-width: 210px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 9px; background: var(--white); color: var(--text); font: 13px 'Poppins', sans-serif; }
+@media (max-width: 680px) { .cal-filtros { display: grid; }.cal-filtros select { width: 100%; min-width: 0; } }
 .admin-subtitulo { font-size: 13px; color: var(--text-soft); margin-bottom: 22px; line-height: 1.5; }
 
 /* ── Tabela ── */

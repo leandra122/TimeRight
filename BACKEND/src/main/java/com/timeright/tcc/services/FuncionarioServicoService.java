@@ -82,6 +82,12 @@ public class FuncionarioServicoService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public boolean funcionarioRealizaServico(Long funcionarioId, Long servicoId) {
+        return funcionarioServicoRepository
+                .existsByIdFuncionarioIdAndIdServicoId(funcionarioId, servicoId);
+    }
+
     private AuthenticatedUser requireManager() {
         AuthenticatedUser authenticated = authenticatedUserService.getCurrentUser();
         if (!"MANAGER".equals(authenticated.role())) {

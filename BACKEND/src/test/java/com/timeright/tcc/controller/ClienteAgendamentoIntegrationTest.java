@@ -35,6 +35,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.timeright.tcc.config.TimeConfig;
 import com.timeright.tcc.model.entity.Agendamento;
 import com.timeright.tcc.model.entity.Funcionario;
+import com.timeright.tcc.model.entity.FuncionarioServico;
 import com.timeright.tcc.model.entity.HorarioFuncionamentoSalao;
 import com.timeright.tcc.model.entity.NivelAcesso;
 import com.timeright.tcc.model.entity.Salao;
@@ -42,6 +43,7 @@ import com.timeright.tcc.model.entity.Servico;
 import com.timeright.tcc.model.entity.Usuario;
 import com.timeright.tcc.model.repository.AgendamentoRepository;
 import com.timeright.tcc.model.repository.FuncionarioRepository;
+import com.timeright.tcc.model.repository.FuncionarioServicoRepository;
 import com.timeright.tcc.model.repository.HorarioFuncionamentoSalaoRepository;
 import com.timeright.tcc.model.repository.NivelAcessoRepository;
 import com.timeright.tcc.model.repository.SalaoRepository;
@@ -70,6 +72,7 @@ class ClienteAgendamentoIntegrationTest {
     @Autowired private UsuarioRepository usuarioRepository;
     @Autowired private SalaoRepository salaoRepository;
     @Autowired private FuncionarioRepository funcionarioRepository;
+    @Autowired private FuncionarioServicoRepository funcionarioServicoRepository;
     @Autowired private HorarioFuncionamentoSalaoRepository horarioRepository;
     @Autowired private ServicoRepository servicoRepository;
     @Autowired private AgendamentoRepository agendamentoRepository;
@@ -159,6 +162,23 @@ class ClienteAgendamentoIntegrationTest {
         servico.setDuracao(0);
         servicoRepository.saveAndFlush(servico);
         criar(token(cliente), request(funcionario, servico, NOW.plusHours(7), null), 400);
+    }
+
+    @Test
+    void apiRejeitaProfissionalNaoHabilitadoEServicosInativosOuDeOutroSalao() throws Exception {
+        Funcionario naoHabilitado = funcionario("Sem habilitação", salao, "ATIVO");
+        funcionarioServicoRepository.deleteByIdFuncionarioId(naoHabilitado.getId());
+        funcionarioServicoRepository.flush();
+        criar(token(cliente), request(naoHabilitado, servico, NOW.plusHours(3), null), 400);
+
+        criar(token(cliente), request(funcionario, servico, NOW.plusHours(3), null), 201);
+
+        Servico inativo = servico("Inativo", salao, "INATIVO", 30);
+        criar(token(cliente), request(funcionario, inativo, NOW.plusHours(4), null), 400);
+
+        Salao outroSalao = salao("Outro salão", "ATIVO", 120, 60);
+        Servico externo = servico("Externo", outroSalao, "ATIVO", 30);
+        criar(token(cliente), request(funcionario, externo, NOW.plusHours(5), null), 400);
     }
 
     @Test
@@ -497,7 +517,11 @@ class ClienteAgendamentoIntegrationTest {
         funcionario.setStatus(status);
         funcionario.setSalao(salao);
         funcionario.setUsuario(usuario(nome, email, employeeRole, status));
-        return funcionarioRepository.saveAndFlush(funcionario);
+        Funcionario salvo = funcionarioRepository.saveAndFlush(funcionario);
+        if (servico != null && salao.getId().equals(servico.getSalao().getId())) {
+            funcionarioServicoRepository.saveAndFlush(new FuncionarioServico(salvo, servico));
+        }
+        return salvo;
     }
 
     private Servico servico(String nome, Salao salao, String status, int duracao) {
@@ -508,7 +532,13 @@ class ClienteAgendamentoIntegrationTest {
         servico.setDuracao(duracao);
         servico.setStatus(status);
         servico.setSalao(salao);
-        return servicoRepository.saveAndFlush(servico);
+        Servico salvo = servicoRepository.saveAndFlush(servico);
+        funcionarioRepository.findBySalaoIdAndStatusIgnoreCaseOrderByNomeAscIdAsc(
+                salao.getId(), "ATIVO").forEach(funcionarioDoSalao -> {
+                    funcionarioServicoRepository.save(new FuncionarioServico(funcionarioDoSalao, salvo));
+                });
+        funcionarioServicoRepository.flush();
+        return salvo;
     }
 
     private Agendamento agendamento(Usuario user, Funcionario f, Servico s,

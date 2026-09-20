@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.timeright.tcc.dto.FuncionarioCatalogoResponse;
@@ -23,7 +24,7 @@ public class CatalogoController {
 
     @GetMapping("/saloes/{salaoId}/funcionarios")
     public ResponseEntity<List<FuncionarioCatalogoResponse>> listarFuncionarios(
-            @PathVariable Long salaoId) {
-        return ResponseEntity.ok(catalogoFuncionarioService.listarAtivosPorSalao(salaoId));
+            @PathVariable Long salaoId, @RequestParam Long servicoId) {
+        return ResponseEntity.ok(catalogoFuncionarioService.listarAtivosPorSalao(salaoId, servicoId));
     }
 }

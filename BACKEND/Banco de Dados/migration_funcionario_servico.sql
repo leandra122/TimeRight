@@ -80,17 +80,6 @@ BEGIN TRY
         CREATE INDEX IX_FuncionarioServico_Servico
             ON dbo.FuncionarioServico(servico_id);
 
-    INSERT INTO dbo.FuncionarioServico (funcionario_id, servico_id, salao_id)
-    SELECT f.id, s.id, f.salao_id
-    FROM dbo.Funcionario AS f
-    INNER JOIN dbo.Servico AS s ON s.salao_id = f.salao_id
-    WHERE NOT EXISTS (
-        SELECT 1
-        FROM dbo.FuncionarioServico AS fs
-        WHERE fs.funcionario_id = f.id
-          AND fs.servico_id = s.id
-    );
-
     COMMIT TRANSACTION;
 END TRY
 BEGIN CATCH

@@ -30,6 +30,19 @@ public interface FuncionarioRepository extends JpaRepository<Funcionario, Long> 
     List<Funcionario> findBySalaoIdAndStatusIgnoreCaseOrderByNomeAscIdAsc(
             Long salaoId, String status);
 
+    @Query("""
+            SELECT DISTINCT f FROM Funcionario f
+            JOIN FuncionarioServico fs ON fs.id.funcionarioId = f.id
+            JOIN Servico s ON s.id = fs.id.servicoId
+            WHERE f.salao.id = :salaoId AND UPPER(f.status) = UPPER(:status)
+              AND s.id = :servicoId AND fs.salaoId = :salaoId
+              AND UPPER(s.status) = 'ATIVO'
+            ORDER BY f.nome ASC, f.id ASC
+            """)
+    List<Funcionario> findAtivosHabilitadosPorServico(
+            @Param("salaoId") Long salaoId, @Param("servicoId") Long servicoId,
+            @Param("status") String status);
+
     Optional<Funcionario> findByIdAndSalaoGerenteId(Long id, Long gerenteId);
 
     boolean existsByIdAndSalaoGerenteId(Long id, Long gerenteId);

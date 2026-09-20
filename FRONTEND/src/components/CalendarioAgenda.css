@@ -1,0 +1,25 @@
+.calendario { padding: 0; overflow: hidden; }
+.cal-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 16px 18px; border-bottom: 1px solid var(--border); }
+.cal-navegacao, .cal-visoes { display: flex; align-items: center; gap: 7px; }
+.cal-navegacao h2 { display: flex; align-items: center; gap: 7px; margin: 0 0 0 6px; font-size: 16px; text-transform: capitalize; }
+.cal-hoje { padding: 7px 11px; font-size: 12px; }
+.cal-visoes { padding: 3px; background: var(--off-white); border-radius: 9px; }
+.cal-visoes button { border: 0; background: transparent; padding: 6px 9px; border-radius: 6px; color: var(--text-soft); font: 600 12px 'Poppins', sans-serif; cursor: pointer; }
+.cal-visoes button.ativo { background: var(--white); color: var(--brand-dark); box-shadow: var(--shadow-sm); }
+.cal-cabecalho-dias, .cal-grade-mes { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.cal-cabecalho-dias { border-bottom: 1px solid var(--border); color: var(--text-soft); font-size: 11px; font-weight: 600; text-align: center; }
+.cal-cabecalho-dias span { padding: 9px 3px; }
+.cal-dia-mes { min-height: 112px; padding: 7px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); overflow: hidden; }
+.cal-dia-mes:nth-child(7n) { border-right: 0; }
+.cal-dia-mes > span { display: inline-grid; place-items: center; width: 24px; height: 24px; margin-bottom: 4px; border-radius: 50%; font-size: 12px; font-weight: 600; }
+.cal-dia-mes > span.hoje, .cal-cabecalho-tempo .hoje b { background: var(--brand); color: var(--white); }
+.cal-dia-mes.fora { background: #fcfcfc; color: var(--gray-mid); }
+.cal-evento { display: block; width: 100%; margin: 2px 0; padding: 3px 5px; border: 0; border-radius: 5px; overflow: hidden; text-align: left; white-space: nowrap; text-overflow: ellipsis; font: 11px 'Poppins', sans-serif; cursor: pointer; }
+.cal-evento b { font-weight: 700; }.cal-evento span { opacity: .88; }.cal-agendado { background: #ffe1ea; color: #9d3c5b; }.cal-concluido { background: #e8f5e9; color: #2e7d32; }.cal-cancelado { background: #fce4ec; color: #c62828; text-decoration: line-through; }
+.cal-dia-mes small { display: block; padding: 2px 5px; color: var(--text-soft); font-size: 10px; }
+.cal-tempo-wrap { overflow: auto; max-height: 660px; }.cal-tempo { min-width: 720px; }.cal-tempo.cal-dia { min-width: 360px; }
+.cal-cabecalho-tempo { position: sticky; top: 0; z-index: 4; display: grid; grid-template-columns: 54px repeat(var(--dias), minmax(100px, 1fr)); background: var(--white); border-bottom: 1px solid var(--border); }
+.cal-cabecalho-tempo span { min-height: 43px; padding: 10px 5px; border-left: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--text-soft); }.cal-cabecalho-tempo b { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; color: var(--text); }
+.cal-corpo-tempo { display: grid; grid-template-columns: 54px repeat(var(--dias), minmax(100px, 1fr)); }.cal-horas { display: grid; grid-template-rows: repeat(24, 64px); }.cal-horas span { padding: 0 7px; transform: translateY(-8px); color: var(--text-soft); font-size: 10px; text-align: right; }
+.cal-coluna-dia { position: relative; height: 1536px; border-left: 1px solid var(--border); }.cal-coluna-dia i { display: block; height: 64px; border-bottom: 1px solid var(--border); }.cal-evento-tempo { position: absolute; z-index: 2; padding: 5px 6px; border: 0; border-radius: 6px; overflow: hidden; text-align: left; font: 11px 'Poppins', sans-serif; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,.08); }.cal-evento-tempo b, .cal-evento-tempo span, .cal-evento-tempo small { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }.cal-evento-tempo b { font-weight: 700; }.cal-evento-tempo small { margin-top: 2px; font-size: 10px; }
+@media (max-width: 680px) { .cal-toolbar { align-items: flex-start; flex-direction: column; }.cal-navegacao { width: 100%; }.cal-navegacao h2 { flex: 1; font-size: 14px; }.cal-visoes { align-self: flex-end; }.cal-dia-mes { min-height: 84px; padding: 4px; }.cal-evento { font-size: 9px; }.cal-evento span { display: none; } }

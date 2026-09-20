@@ -20,15 +20,14 @@ export default function SalonDetailsScreen({ route, navigation }) {
     setLoading(true);
     setError('');
     try {
-      const [salon, services, employees] = await Promise.all([
+      const [salon, services] = await Promise.all([
         catalogApi.salon(salonId),
         catalogApi.services(salonId),
-        catalogApi.employees(salonId),
       ]);
       setData({
         salon: salon.data,
         services: (services.data || []).filter(isActive),
-        employees: employees.data || [],
+        employees: [],
       });
     } catch (requestError) {
       setError(getApiError(requestError, 'Não foi possível carregar o salão.'));
@@ -38,6 +37,13 @@ export default function SalonDetailsScreen({ route, navigation }) {
   }, [salonId]);
 
   useEffect(() => { load(); }, [load]);
+
+  useEffect(() => {
+    if (!service) return;
+    catalogApi.employees(salonId, service.id)
+      .then(({ data: employees }) => setData(current => ({ ...current, employees: employees || [] })))
+      .catch((requestError) => setError(getApiError(requestError, 'Não foi possível carregar os profissionais.')));
+  }, [salonId, service]);
   if (loading || error || !data) return <Screen><StateMessage loading={loading} error={error} onRetry={load} /></Screen>;
 
   function selectService(nextService) {

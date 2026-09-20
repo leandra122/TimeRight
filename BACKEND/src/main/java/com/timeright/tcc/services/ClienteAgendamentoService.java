@@ -42,6 +42,7 @@ public class ClienteAgendamentoService {
     private final ServicoRepository servicoRepository;
     private final AgendamentoRepository agendamentoRepository;
     private final DisponibilidadeAgendamentoService disponibilidadeService;
+    private final FuncionarioServicoService funcionarioServicoService;
     private final Clock clock;
 
     public ClienteAgendamentoService(AuthenticatedUserService authenticatedUserService,
@@ -50,6 +51,7 @@ public class ClienteAgendamentoService {
                                      ServicoRepository servicoRepository,
                                      AgendamentoRepository agendamentoRepository,
                                      DisponibilidadeAgendamentoService disponibilidadeService,
+                                     FuncionarioServicoService funcionarioServicoService,
                                      Clock clock) {
         this.authenticatedUserService = authenticatedUserService;
         this.usuarioRepository = usuarioRepository;
@@ -57,6 +59,7 @@ public class ClienteAgendamentoService {
         this.servicoRepository = servicoRepository;
         this.agendamentoRepository = agendamentoRepository;
         this.disponibilidadeService = disponibilidadeService;
+        this.funcionarioServicoService = funcionarioServicoService;
         this.clock = clock;
     }
 
@@ -154,6 +157,10 @@ public class ClienteAgendamentoService {
         if (servico.getSalao() == null || !salao.getId().equals(servico.getSalao().getId())) {
             throw new IllegalArgumentException(
                     "Funcionário e serviço devem pertencer ao mesmo salão");
+        }
+        if (!funcionarioServicoService.funcionarioRealizaServico(
+                funcionario.getId(), servico.getId())) {
+            throw new IllegalArgumentException("Funcionário não está habilitado para este serviço");
         }
         if (servico.getDuracao() == null || servico.getDuracao() <= 0) {
             throw new IllegalArgumentException("Serviço possui duração inválida");

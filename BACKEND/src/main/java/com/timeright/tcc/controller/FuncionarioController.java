@@ -43,6 +43,11 @@ public class FuncionarioController {
         return ResponseEntity.ok(employeeAgendaService.listarAgendaPropria());
     }
 
+    @PatchMapping("/me/agendamentos/{id}/concluir")
+    public ResponseEntity<EmployeeAgendamentoDTO> concluirAtendimento(@PathVariable Long id) {
+        return ResponseEntity.ok(employeeAgendaService.concluir(id));
+    }
+
     // LISTAR
     @GetMapping
     public ResponseEntity<List<Funcionario>> listar() {
