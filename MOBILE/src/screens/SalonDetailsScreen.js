@@ -1,3 +1,4 @@
+import SalonPhotos from '../components/SalonPhotos';
 import { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -53,8 +54,18 @@ export default function SalonDetailsScreen({ route, navigation }) {
 
   return (
     <Screen>
-      <View style={styles.cover}><View style={styles.coverIcon}><Ionicons name="storefront-outline" size={34} color={colors.primaryDark} /></View></View>
-      <Title eyebrow="Estabelecimento" subtitle={[data.salon.endereco, data.salon.telefone].filter(Boolean).join(' · ')}>{data.salon.nome}</Title>
+      <SalonPhotos salonId={salonId} />
+      <Title eyebrow="Estabelecimento" subtitle={data.salon.telefone}>{data.salon.nome}</Title>
+      <Card>
+        <Text style={styles.optionTitle}>Endereço</Text>
+        <Text style={uiStyles.subtitle}>{data.salon.logradouro
+          ? [data.salon.logradouro, data.salon.bairro, data.salon.cidade, data.salon.uf].filter(Boolean).join(', ')
+          : data.salon.endereco}</Text>
+        {data.salon.numero?.trim() ? <Text style={uiStyles.subtitle}>Número: {data.salon.numero}</Text> : null}
+        {data.salon.complemento?.trim() ? <Text style={uiStyles.subtitle}>Complemento: {data.salon.complemento}</Text> : null}
+        {data.salon.pontoReferencia?.trim() ? <Text style={uiStyles.subtitle}>Ponto de referência: {data.salon.pontoReferencia}</Text> : null}
+        {data.salon.cep?.trim() ? <Text style={uiStyles.subtitle}>CEP: {data.salon.cep}</Text> : null}
+      </Card>
       <SectionHeader title="1. Escolha o serviço" />
       <StateMessage empty={!data.services.length ? 'Nenhum serviço ativo disponível.' : null} />
       {data.services.map((item) => {

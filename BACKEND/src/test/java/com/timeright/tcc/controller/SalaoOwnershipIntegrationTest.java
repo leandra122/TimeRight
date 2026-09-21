@@ -220,6 +220,118 @@ class SalaoOwnershipIntegrationTest {
                 .andExpect(status().isNotFound());
     }
 
+
+    @Autowired private jakarta.persistence.EntityManager entityManager;
+
+    @Test
+    void enderecoEstruturadoEhPersistidoERecompostoNaEdicaoParcial() throws Exception {
+        Salao salao = salvarSalao("Endereço", CNPJ_UM, manager);
+        Long id = salao.getId();
+        mockMvc.perform(put("/saloes/{id}", id)
+                        .header("Authorization", bearer(manager))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                            {"logradouro":" Rua Nova ","numero":" 123 ","complemento":" Sala 2 ",
+                             "bairro":"Centro","cidade":"São Paulo","uf":"SP","cep":"01001-000",
+                             "pontoReferencia":" Ao lado da praça ","endereco":"Valor antigo"}
+                            """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.endereco").value("Rua Nova, 123, Sala 2, Centro, São Paulo, SP, Referência: Ao lado da praça"));
+
+        entityManager.flush();
+        entityManager.clear();
+        mockMvc.perform(get("/saloes/{id}", id))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.numero").value("123"))
+                .andExpect(jsonPath("$.complemento").value("Sala 2"))
+                .andExpect(jsonPath("$.pontoReferencia").value("Ao lado da praça"));
+
+        mockMvc.perform(put("/saloes/{id}", id)
+                        .header("Authorization", bearer(manager))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"numero\":\"456\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.endereco").value("Rua Nova, 456, Sala 2, Centro, São Paulo, SP, Referência: Ao lado da praça"));
+
+        mockMvc.perform(put("/saloes/{id}", id)
+                        .header("Authorization", bearer(manager))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"complemento\":\"\",\"pontoReferencia\":\" \"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.endereco").value("Rua Nova, 456, Centro, São Paulo, SP"));
+        entityManager.flush();
+        entityManager.clear();
+        Salao salvo = salaoRepository.findById(id).orElseThrow();
+        org.junit.jupiter.api.Assertions.assertNull(salvo.getComplemento());
+        org.junit.jupiter.api.Assertions.assertNull(salvo.getPontoReferencia());
+        org.junit.jupiter.api.Assertions.assertEquals("456", salvo.getNumero());
+        org.junit.jupiter.api.Assertions.assertEquals("ATIVO", salvo.getStatus());
+        org.junit.jupiter.api.Assertions.assertEquals(manager.getId(), salvo.getGerente().getId());
+    }
+
+    @Test
+    void cadastroComCamposEstruturadosIgnoraEnderecoDesatualizado() throws Exception {
+        mockMvc.perform(post("/saloes/com-servicos")
+                        .header("Authorization", bearer(manager))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                            {"nome":"Novo","cnpj":"04252011000110","email":"novo@teste.com",
+                             "telefone":"11999999999","endereco":"Rua antiga",
+                             "logradouro":"Rua Nova","numero":"12","complemento":"Fundos",
+                             "pontoReferencia":"Praça"}
+                            """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.endereco").value("Rua Nova, 12, Fundos, Referência: Praça"));
+    }
+
+    @Test
+    void alterarNomePreservaEnderecoLegado() throws Exception {
+        Salao salao = salvarSalao("Legado", CNPJ_UM, manager);
+        mockMvc.perform(put("/saloes/{id}", salao.getId())
+                        .header("Authorization", bearer(manager))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"nome\":\"Novo nome\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.endereco").value("Rua Teste, 1"));
+    }
+
+    @Test
+    void gerenteNaoAlteraEnderecoDeOutroSalao() throws Exception {
+        Salao salao = salvarSalao("Alheio", CNPJ_UM, outroManager);
+        mockMvc.perform(put("/saloes/{id}", salao.getId())
+                        .header("Authorization", bearer(manager))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"logradouro\":\"Rua Indevida\",\"numero\":\"999\"}"))
+                .andExpect(status().isForbidden());
+        entityManager.clear();
+        org.junit.jupiter.api.Assertions.assertEquals("Rua Teste, 1",
+                salaoRepository.findById(salao.getId()).orElseThrow().getEndereco());
+    }
+
+    @Test
+    void enderecoCompletoAcimaDoLimiteRetorna400() throws Exception {
+        Salao salao = salvarSalao("Limite", CNPJ_UM, manager);
+        String payloadLongo = "{\"logradouro\":\"" + "R".repeat(150)
+                + "\",\"complemento\":\"" + "C".repeat(60) + "\"}";
+        mockMvc.perform(put("/saloes/{id}", salao.getId())
+                        .header("Authorization", bearer(manager))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payloadLongo))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Endereço completo deve ter no máximo 200 caracteres"));
+    }
+
+    @Test
+    void enderecoLegadoExigeRuaExplicitaParaNaoDuplicarNumero() throws Exception {
+        Salao salao = salvarSalao("Legado", CNPJ_UM, manager);
+        mockMvc.perform(put("/saloes/{id}", salao.getId())
+                        .header("Authorization", bearer(manager))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"numero\":\"456\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").value("Informe o logradouro para atualizar o endereço estruturado"));
+    }
+
     private void criarSalao(Usuario usuario, String cnpj) throws Exception {
         mockMvc.perform(post("/saloes/com-servicos")
                         .header("Authorization", bearer(usuario))

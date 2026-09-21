@@ -1,3 +1,4 @@
+import SalonPhotos from './SalonPhotos';
 import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Card, uiStyles } from './UI';
@@ -7,9 +8,7 @@ export default function SalonCard({ salon, onPress }) {
   return (
     <Card onPress={onPress}>
       <View style={styles.row}>
-        <View style={styles.icon}>
-          <Ionicons name="storefront-outline" size={23} color={colors.primaryDark} />
-        </View>
+        <SalonPhotos salonId={salon.id} thumbnail />
         <View style={styles.content}>
           <Text style={styles.name}>{salon.nome}</Text>
           {salon.endereco ? <Text style={uiStyles.subtitle}>{salon.endereco}</Text> : null}

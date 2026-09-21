@@ -18,6 +18,8 @@ const atalhosAdmin = [
 ];
 
 const atalhosManager = [
+  { to: '/manager/fotos', icon: <Store size={24} />, titulo: 'Fotos do salão', desc: 'Envie fotos e escolha a principal' },
+  { to: '/manager/atualizar-salao', icon: <PenLine size={24} />, titulo: 'Atualizar Salão', desc: 'Consulte e edite o endereço dos seus salões' },
   { to: '/manager/horarios', icon: <Clock size={24} />, titulo: 'Horários de funcionamento', desc: 'Configure a semana de cada salão' },
   { to: '/manager/cadastro-salao', icon: <Store size={24} />, titulo: 'Cadastrar Salão', desc: 'Adicione um novo estabelecimento' },
   { to: '/manager/painel', icon: <Calendar size={24} />, titulo: 'Painel', desc: 'Veja e edite os agendamentos' },

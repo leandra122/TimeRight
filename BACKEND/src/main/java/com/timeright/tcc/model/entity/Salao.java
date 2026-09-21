@@ -37,13 +37,13 @@ public class Salao {
     @Column(nullable = false, length = 20)
     private String status;
 
-    @Column(name = "razao_social", length = 150)
+    @Column(name = "razaoSocial", length = 150)
     private String razaoSocial;
 
-    @Column(name = "nome_fantasia", length = 150)
+    @Column(name = "nomeFantasia", length = 150)
     private String nomeFantasia;
 
-    @Column(name = "situacao_cadastral", length = 50)
+    @Column(name = "situacaoCadastral", length = 50)
     private String situacaoCadastral;
 
     @Column(name = "cep", length = 9)
