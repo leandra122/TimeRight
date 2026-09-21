@@ -114,7 +114,8 @@ public class SalaoService {
         salao.setCidade(limpar(dto.cidade));
         salao.setUf(limpar(dto.uf));
         salao.setPontoReferencia(limpar(dto.pontoReferencia));
-        salao.setEndereco(comporEndereco(dto));
+        salao.setEndereco(salao.getLogradouro() == null ? limpar(dto.endereco) : comporEndereco(salao));
+        validarEndereco(salao);
     }
 
     private String limpar(String valor) {
@@ -123,17 +124,37 @@ public class SalaoService {
         return normalizado.isEmpty() ? null : normalizado;
     }
 
-    private String comporEndereco(SalaoServicosDTO dto) {
-        if (dto.endereco != null && !dto.endereco.isBlank()) {
-            return dto.endereco.trim();
-        }
+    private String comporEndereco(Salao salao) {
         StringBuilder endereco = new StringBuilder();
-        adicionarParte(endereco, dto.logradouro);
-        adicionarParte(endereco, dto.numero);
-        adicionarParte(endereco, dto.bairro);
-        adicionarParte(endereco, dto.cidade);
-        adicionarParte(endereco, dto.uf);
+        adicionarParte(endereco, salao.getLogradouro());
+        adicionarParte(endereco, salao.getNumero());
+        adicionarParte(endereco, salao.getComplemento());
+        adicionarParte(endereco, salao.getBairro());
+        adicionarParte(endereco, salao.getCidade());
+        adicionarParte(endereco, salao.getUf());
+        if (salao.getPontoReferencia() != null) {
+            adicionarParte(endereco, "Referência: " + salao.getPontoReferencia());
+        }
         return endereco.toString();
+    }
+
+    private void validarEndereco(Salao salao) {
+        if (limpar(salao.getEndereco()) == null) throw new IllegalArgumentException("Endereço é obrigatório");
+        validarTamanho(salao.getEndereco(), 200, "Endereço completo");
+        validarTamanho(salao.getLogradouro(), 150, "Logradouro");
+        validarTamanho(salao.getNumero(), 20, "Número");
+        validarTamanho(salao.getComplemento(), 100, "Complemento");
+        validarTamanho(salao.getPontoReferencia(), 150, "Ponto de referência");
+        validarTamanho(salao.getCep(), 9, "CEP");
+        validarTamanho(salao.getBairro(), 100, "Bairro");
+        validarTamanho(salao.getCidade(), 100, "Cidade");
+        validarTamanho(salao.getUf(), 2, "UF");
+    }
+
+    private void validarTamanho(String valor, int limite, String campo) {
+        if (valor != null && valor.length() > limite) {
+            throw new IllegalArgumentException(campo + " deve ter no máximo " + limite + " caracteres");
+        }
     }
 
     private void adicionarParte(StringBuilder endereco, String valor) {
@@ -173,24 +194,47 @@ public class SalaoService {
         salaoRepository.deleteById(id);
     }
 
+    @Transactional
     public Salao atualizar(Long id, Salao dados) {
         Salao existente = buscarAutorizado(id);
         if (dados.getNome() != null) existente.setNome(dados.getNome());
         if (dados.getTelefone() != null) existente.setTelefone(dados.getTelefone());
         if (dados.getEmail() != null) existente.setEmail(dados.getEmail());
-        if (dados.getEndereco() != null) existente.setEndereco(dados.getEndereco());
         if (dados.getStatus() != null) existente.setStatus(dados.getStatus());
         if (dados.getRazaoSocial() != null) existente.setRazaoSocial(dados.getRazaoSocial());
         if (dados.getNomeFantasia() != null) existente.setNomeFantasia(dados.getNomeFantasia());
         if (dados.getSituacaoCadastral() != null) existente.setSituacaoCadastral(dados.getSituacaoCadastral());
-        if (dados.getCep() != null) existente.setCep(dados.getCep());
-        if (dados.getLogradouro() != null) existente.setLogradouro(dados.getLogradouro());
-        if (dados.getNumero() != null) existente.setNumero(dados.getNumero());
-        if (dados.getComplemento() != null) existente.setComplemento(dados.getComplemento());
-        if (dados.getBairro() != null) existente.setBairro(dados.getBairro());
-        if (dados.getCidade() != null) existente.setCidade(dados.getCidade());
-        if (dados.getUf() != null) existente.setUf(dados.getUf());
-        if (dados.getPontoReferencia() != null) existente.setPontoReferencia(dados.getPontoReferencia());
+        boolean enderecoAlterado = dados.getEndereco() != null || dados.getCep() != null
+                || dados.getLogradouro() != null || dados.getNumero() != null
+                || dados.getComplemento() != null || dados.getBairro() != null
+                || dados.getCidade() != null || dados.getUf() != null || dados.getPontoReferencia() != null;
+        if (enderecoAlterado) {
+            if (dados.getCep() != null) existente.setCep(limpar(dados.getCep()));
+            if (dados.getLogradouro() != null) existente.setLogradouro(limpar(dados.getLogradouro()));
+            if (dados.getNumero() != null) existente.setNumero(limpar(dados.getNumero()));
+            if (dados.getComplemento() != null) existente.setComplemento(limpar(dados.getComplemento()));
+            if (dados.getBairro() != null) existente.setBairro(limpar(dados.getBairro()));
+            if (dados.getCidade() != null) existente.setCidade(limpar(dados.getCidade()));
+            if (dados.getUf() != null) existente.setUf(limpar(dados.getUf()));
+            if (dados.getPontoReferencia() != null) existente.setPontoReferencia(limpar(dados.getPontoReferencia()));
+            if (existente.getLogradouro() != null) {
+                String completo = comporEndereco(existente);
+                if (dados.getLogradouro() == null && dados.getEndereco() != null
+                        && !completo.equals(limpar(dados.getEndereco()))) {
+                    throw new IllegalArgumentException("Edite o logradouro e os campos do endereço separadamente");
+                }
+                existente.setEndereco(completo);
+            } else {
+                // Endereços legados livres são preservados; a conversão deve ser explícita.
+                if (dados.getLogradouro() != null || dados.getNumero() != null
+                        || dados.getComplemento() != null || dados.getBairro() != null
+                        || dados.getCidade() != null || dados.getUf() != null || dados.getPontoReferencia() != null) {
+                    throw new IllegalArgumentException("Informe o logradouro para atualizar o endereço estruturado");
+                }
+                if (dados.getEndereco() != null) existente.setEndereco(limpar(dados.getEndereco()));
+            }
+            validarEndereco(existente);
+        }
         return salaoRepository.save(existente);
     }
 

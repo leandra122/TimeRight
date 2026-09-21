@@ -14,9 +14,11 @@ const CNPJ_VAZIO = {
 const comporEndereco = (dados) => [
   dados.logradouro,
   dados.numero,
+  dados.complemento,
   dados.bairro,
   dados.cidade,
   dados.uf,
+  dados.pontoReferencia?.trim() ? 'Referência: ' + dados.pontoReferencia.trim() : '',
 ].map((parte) => (parte == null ? '' : String(parte).trim()))
   .filter((parte) => parte.length > 0)
   .join(', ');

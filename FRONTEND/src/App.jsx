@@ -10,6 +10,7 @@ const Painel = lazy(() => import('./pages/Painel'));
 const DashboardCliente = lazy(() => import('./pages/DashboardCliente'));
 const Perfil = lazy(() => import('./pages/Perfil'));
 const Historico = lazy(() => import('./pages/Historico'));
+const FotosSalao = lazy(() => import('./pages/FotosSalao'));
 const AtualizarSalao = lazy(() => import('./pages/AtualizarSalao'));
 const GerenciarUsuarios = lazy(() => import('./pages/GerenciarUsuarios'));
 const GerenciarFuncionarios = lazy(() => import('./pages/GerenciarFuncionarios'));
@@ -50,6 +51,8 @@ function App() {
 
             <Route path="/manager" element={<RotaProtegida tipo="manager"><DashboardAdmin /></RotaProtegida>} />
             <Route path="/manager/cadastro-salao" element={<RotaProtegida tipo="manager"><CadastroSalaoGerente /></RotaProtegida>} />
+            <Route path="/manager/atualizar-salao" element={<RotaProtegida tipo="manager"><AtualizarSalao /></RotaProtegida>} />
+            <Route path="/manager/fotos" element={<RotaProtegida tipo="manager"><FotosSalao /></RotaProtegida>} />
             <Route path="/manager/painel" element={<RotaProtegida tipo="manager"><Painel /></RotaProtegida>} />
             <Route path="/manager/funcionarios" element={<RotaProtegida tipo="manager"><GerenciarFuncionarios /></RotaProtegida>} />
             <Route path="/manager/horarios" element={<RotaProtegida tipo="manager"><HorariosFuncionamento /></RotaProtegida>} />

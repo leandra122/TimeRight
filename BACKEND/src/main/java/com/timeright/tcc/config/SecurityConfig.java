@@ -60,6 +60,8 @@ public class SecurityConfig {
                         "/servicos",
                         "/servicos/{id}",
                         "/servicos/salao/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/saloes/*/fotos", "/saloes/*/fotos/**").permitAll()
+                .requestMatchers("/saloes/*/fotos", "/saloes/*/fotos/**").hasRole("MANAGER")
                 .requestMatchers(HttpMethod.GET, "/saloes/me")
                     .hasRole("MANAGER")
                 .requestMatchers(HttpMethod.GET, "/saloes/*/configuracao-agendamento")
