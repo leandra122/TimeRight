@@ -68,7 +68,7 @@ public class SecurityConfig {
                     .hasAnyRole("ADMIN", "MANAGER")
                 .requestMatchers(HttpMethod.PUT, "/saloes/*/horarios-funcionamento")
                     .hasAnyRole("ADMIN", "MANAGER")
-                .requestMatchers(HttpMethod.GET, "/saloes/{id}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/saloes/{id}", "/saloes/*/localizacao").permitAll()
                 .requestMatchers(HttpMethod.GET, "/usuarios/clientes")
                     .hasRole("ADMIN")
                 .requestMatchers("/niveis-acesso/**", "/usuarios/**")
@@ -182,7 +182,8 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
                 "http://localhost:3000",
-                "http://localhost:5173"));
+                "http://localhost:5173",
+                "http://localhost:8081"));
         config.setAllowedMethods(List.of(
                 "GET",
                 "POST",

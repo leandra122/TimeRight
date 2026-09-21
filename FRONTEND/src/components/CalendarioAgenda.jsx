@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react';
 import './CalendarioAgenda.css';
+import { distribuirEventosDia } from './agendaSemanal';
 
 const nomesMeses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 const nomesDias = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
@@ -10,9 +11,14 @@ const chaveDia = (data) => `${data.getFullYear()}-${String(data.getMonth() + 1).
 const inicioSemana = (data) => adicionarDias(inicioDia(data), -data.getDay());
 const hora = (data) => `${String(data.getHours()).padStart(2, '0')}:${String(data.getMinutes()).padStart(2, '0')}`;
 
-export default function CalendarioAgenda({ agendamentos, onSelecionar }) {
+export default function CalendarioAgenda({ agendamentos, onSelecionar, profissionais }) {
   const [visao, setVisao] = useState(() => window.innerWidth < 680 ? 'dia' : 'semana');
   const [referencia, setReferencia] = useState(inicioDia(new Date()));
+  const gradeRef = useRef(null);
+  const porProfissional = visao === 'semana' && profissionais !== undefined;
+  useEffect(() => {
+    if (porProfissional && gradeRef.current) gradeRef.current.scrollTop = 8 * 64;
+  }, [porProfissional, referencia]);
 
   useEffect(() => {
     const atualizar = () => { if (window.innerWidth < 680) setVisao('dia'); };
@@ -50,6 +56,33 @@ export default function CalendarioAgenda({ agendamentos, onSelecionar }) {
   const renderGradeTempo = () => {
     const dias = visao === 'dia' ? [referencia] : Array.from({ length: 7 }, (_, index) => adicionarDias(inicioSemana(referencia), index));
     const linhas = Array.from({ length: 24 }, (_, horaAtual) => horaAtual);
+    if (porProfissional) {
+      if (!profissionais.length) return <p className="cal-sem-profissionais" role="status">Nenhum profissional cadastrado para este filtro.</p>;
+      return <>
+        <div className="cal-semana-ajuda"><span>Agenda por profissional · Role para os lados para ver todos os dias e para cima para horários anteriores às 08h.</span><div className="cal-legenda">{['AGENDADO', 'CONCLUIDO', 'CANCELADO'].map(status => <span key={status} className={`cal-${status.toLowerCase()}`}>{status}</span>)}</div></div>
+        <div ref={gradeRef} className="cal-tempo-wrap cal-recursos-wrap" tabIndex={0} role="region" aria-label="Agenda semanal por profissional">
+          <div className="cal-tempo cal-recursos" style={{ '--profissionais': profissionais.length, '--colunas': dias.length * profissionais.length }}>
+            <div className="cal-cabecalho-tempo cal-recursos-cabecalho"><span className="cal-canto">Horário</span>{dias.map(data => <div className="cal-grupo-dia" key={chaveDia(data)} style={{ gridColumn: `span ${profissionais.length}` }}>
+              <div className={`cal-data-recurso ${chaveDia(data) === chaveDia(new Date()) ? 'hoje' : ''}`}>{nomesDias[data.getDay()]} <b>{data.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}</b></div>
+              <div className="cal-nomes-profissionais">{profissionais.map(profissional => <div key={profissional.id} className="cal-nome-profissional" title={`${profissional.nome} · ${profissional.salao?.nome || ''}`}><strong>{profissional.nome}</strong><small>{profissional.salao?.nome}</small></div>)}</div>
+            </div>)}</div>
+            <div className="cal-corpo-tempo cal-recursos-corpo"><div className="cal-horas">{linhas.map(valor => <span key={valor}>{String(valor).padStart(2, '0')}:00</span>)}</div>{dias.flatMap(data => profissionais.map(profissional => {
+              const segmentos = distribuirEventosDia(eventos.filter(evento => String(evento.funcionario?.id) === String(profissional.id)), data);
+              return <div className="cal-coluna-dia cal-coluna-profissional" key={`${chaveDia(data)}-${profissional.id}`} data-dia={chaveDia(data)} data-profissional={profissional.id} aria-label={`${profissional.nome}, ${data.toLocaleDateString('pt-BR')}`}>
+                {linhas.map(valor => <i key={valor} />)}
+                {!segmentos.length && <span className="cal-sem-atendimentos">Sem atendimentos</span>}
+                {segmentos.map(({ evento, inicio, fim, coluna, colunas }) => {
+                  const duracao = evento.duracao ?? evento.servico?.duracao;
+                  const termino = new Date(evento.inicio.getTime() + duracao * 60000);
+                  const descricao = `${profissional.nome} · ${evento.servicoNome || evento.servico?.nome} · ${evento.clienteNome || evento.usuario?.nome} · ${hora(evento.inicio)} – ${hora(termino)} · ${duracao} min · ${evento.status}`;
+                  return <button key={evento.id} data-agendamento={evento.id} onClick={() => onSelecionar(evento)} aria-label={descricao} title={descricao} className={`cal-evento-tempo cal-evento-profissional cal-${evento.status?.toLowerCase()}`} style={{ top: `${inicio / 60 * 64}px`, height: `${(fim - inicio) / 60 * 64}px`, left: `calc(${coluna / colunas * 100}% + 3px)`, width: `calc(${100 / colunas}% - 6px)` }}><b>{hora(evento.inicio)} · {evento.servicoNome || evento.servico?.nome}</b><span>{evento.clienteNome || evento.usuario?.nome}</span><small>{hora(evento.inicio)} – {hora(termino)} · {duracao} min</small></button>;
+                })}
+              </div>;
+            }))}</div>
+          </div>
+        </div>
+      </>;
+    }
     return <div className="cal-tempo-wrap"><div className={`cal-tempo cal-${visao}`} style={{ '--dias': dias.length }}><div className="cal-cabecalho-tempo"><span />{dias.map(data => <span key={chaveDia(data)} className={chaveDia(data) === chaveDia(new Date()) ? 'hoje' : ''}>{nomesDias[data.getDay()]} <b>{data.getDate()}</b></span>)}</div><div className="cal-corpo-tempo"><div className="cal-horas">{linhas.map(valor => <span key={valor}>{String(valor).padStart(2, '0')}:00</span>)}</div>{dias.map(data => <div className="cal-coluna-dia" key={chaveDia(data)}>{linhas.map(valor => <i key={valor} />)}{eventosDoDia(data).map((evento, indice, lista) => {
       const simultaneos = lista.filter(outro => Math.abs(outro.inicio - evento.inicio) < ((outro.duracao || 30) * 60000));
       const ordem = simultaneos.findIndex(outro => outro.id === evento.id);

@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import ServicosSalao from '../components/ServicosSalao';
+import LocalizacaoSalao from '../components/LocalizacaoSalao';
 import {
   Store, Calendar, PenLine, Users, UserCog, PowerOff,
   TrendingUp, Clock, CheckCircle, Star, Scissors
@@ -197,6 +198,9 @@ const DashboardAdmin = () => {
             onSalvo={() => setRevisaoServicos((valor) => valor + 1)}
           />
         )}
+        {user?.tipo === 'manager' && saloes.filter(item => String(item.id) === salaoSelecionadoId).map(item => (
+          <LocalizacaoSalao key={item.id} salao={item} onSalvo={updated => setSaloes(current => current.map(s => s.id === updated.id ? updated : s))} />
+        ))}
         <div className="admin-section-title">Acesso rápido</div>
         <div className="admin-atalhos">
           {atalhos.map((a, i) => (

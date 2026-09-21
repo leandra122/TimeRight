@@ -1,4 +1,24 @@
 .calendario { padding: 0; overflow: hidden; }
+.cal-semana-ajuda { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; padding: 10px 18px; color: var(--text-soft); font-size: 12px; }
+.cal-legenda { display: flex; flex-wrap: wrap; gap: 8px; }
+.cal-legenda span { padding: 2px 7px; border-radius: 5px; font-size: 10px; }
+.cal-sem-profissionais { padding: 24px; color: var(--text-soft); }
+.cal-tempo-wrap.cal-recursos-wrap { max-height: clamp(260px, calc(100dvh - 380px), 600px); }
+.cal-tempo.cal-recursos { min-width: calc(54px + var(--colunas) * 150px); }
+.cal-recursos .cal-recursos-cabecalho, .cal-recursos .cal-recursos-corpo { grid-template-columns: 54px repeat(var(--colunas), minmax(150px, 1fr)); }
+.cal-grupo-dia { border-left: 2px solid var(--border); min-width: 0; }
+.cal-data-recurso { padding: 8px; text-align: center; font-size: 12px; color: var(--text-soft); border-bottom: 1px solid var(--border); }
+.cal-recursos .cal-data-recurso b { width: auto; padding: 0 6px; border-radius: 5px; }
+.cal-nomes-profissionais { display: grid; grid-template-columns: repeat(var(--profissionais), minmax(0, 1fr)); }
+.cal-nome-profissional { padding: 7px 8px; border-left: 1px solid var(--border); min-width: 0; }
+.cal-nome-profissional strong, .cal-nome-profissional small { display: block; overflow-wrap: anywhere; }
+.cal-nome-profissional strong { font-size: 12px; color: var(--text); }
+.cal-nome-profissional small { font-size: 10px; color: var(--text-soft); }
+.cal-recursos .cal-horas, .cal-recursos .cal-canto { position: sticky; left: 0; z-index: 3; background: var(--white); }
+.cal-recursos .cal-canto { align-content: center; font-size: 10px; }
+.cal-recursos .cal-evento-profissional { padding: 1px 5px; min-height: 0; align-content: start; }
+.cal-evento-profissional:focus-visible { outline: 2px solid var(--brand-dark); outline-offset: 1px; z-index: 3; }
+.cal-sem-atendimentos { position: absolute; top: 520px; left: 5px; right: 5px; text-align: center; font-size: 10px; color: var(--text-soft); }
 .cal-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 16px 18px; border-bottom: 1px solid var(--border); }
 .cal-navegacao, .cal-visoes { display: flex; align-items: center; gap: 7px; }
 .cal-navegacao h2 { display: flex; align-items: center; gap: 7px; margin: 0 0 0 6px; font-size: 16px; text-transform: capitalize; }

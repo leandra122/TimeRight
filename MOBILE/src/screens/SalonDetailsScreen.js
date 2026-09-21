@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Screen from '../components/Screen';
+import SalonLocation from '../components/SalonLocation';
 import { Badge, Button, Card, SectionHeader, StateMessage, Title, uiStyles } from '../components/UI';
 import { catalogApi } from '../api/services';
 import { getApiError } from '../api/client';
@@ -55,6 +56,7 @@ export default function SalonDetailsScreen({ route, navigation }) {
     <Screen>
       <View style={styles.cover}><View style={styles.coverIcon}><Ionicons name="storefront-outline" size={34} color={colors.primaryDark} /></View></View>
       <Title eyebrow="Estabelecimento" subtitle={[data.salon.endereco, data.salon.telefone].filter(Boolean).join(' · ')}>{data.salon.nome}</Title>
+      <SalonLocation key={data.salon.id} salon={data.salon} />
       <SectionHeader title="1. Escolha o serviço" />
       <StateMessage empty={!data.services.length ? 'Nenhum serviço ativo disponível.' : null} />
       {data.services.map((item) => {
