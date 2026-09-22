@@ -50,7 +50,7 @@ const Navbar = () => {
               {user.tipo === 'manager' && (
                 <>
                   <Link to="/manager" className="nav-link"><LayoutDashboard size={14} />Início</Link>
-                  <Link to="/manager/cadastro-salao" className="nav-link"><Store size={14} />Salões</Link>
+                  <Link to="/manager/saloes" className="nav-link"><Store size={14} />Salões</Link>
                   <Link to="/manager/painel" className="nav-link"><Calendar size={14} />Painel</Link>
                   <Link to="/manager/funcionarios" className="nav-link"><Users size={14} />Equipe</Link>
                 </>
@@ -100,7 +100,7 @@ const Navbar = () => {
               {user.tipo === 'manager' && (
                 <>
                   <Link to="/manager" className="mobile-link" onClick={() => setMenuOpen(false)}>Início</Link>
-                  <Link to="/manager/cadastro-salao" className="mobile-link" onClick={() => setMenuOpen(false)}>Salões</Link>
+                  <Link to="/manager/saloes" className="mobile-link" onClick={() => setMenuOpen(false)}>Salões</Link>
                   <Link to="/manager/painel" className="mobile-link" onClick={() => setMenuOpen(false)}>Painel</Link>
                   <Link to="/manager/funcionarios" className="mobile-link" onClick={() => setMenuOpen(false)}>Equipe</Link>
                 </>

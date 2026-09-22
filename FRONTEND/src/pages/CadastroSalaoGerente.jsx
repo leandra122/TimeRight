@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { Store, Plus, Trash2, CheckCircle, XCircle, Loader } from 'lucide-react';
 import { cadastrarSalaoComServicos, consultarCnpj } from '../service/api';
@@ -35,11 +36,13 @@ const mascararCnpj = (v) => {
 const apenasDigitos = (v) => v.replace(/\D/g, '');
 
 const CadastroSalaoGerente = () => {
+  const navigate = useNavigate();
   const [salao, setSalao] = useState(CNPJ_VAZIO);
   const [cnpjStatus, setCnpjStatus] = useState('idle');
   const [cnpjErro, setCnpjErro] = useState('');
   const [camposDoServico, setCamposDoServico] = useState({ razaoSocial: false, nomeFantasia: false });
-  const [salaoSalvo, setSalaoSalvo] = useState(false);
+  const [salvando, setSalvando] = useState(false);
+  const enviando = useRef(false);
   const [erroSalvar, setErroSalvar] = useState('');
   const [modalAberto, setModalAberto] = useState(false);
   const [servicoTemp, setServicoTemp] = useState({ nome: '', descricao: '', preco: '', duracao: '' });
@@ -129,6 +132,7 @@ const CadastroSalaoGerente = () => {
 
   const handleSalvar = async (e) => {
     e.preventDefault();
+    if (enviando.current) return;
     setErroSalvar('');
 
     if (cnpjStatus !== 'valido') {
@@ -136,8 +140,10 @@ const CadastroSalaoGerente = () => {
       return;
     }
 
+    enviando.current = true;
+    setSalvando(true);
     try {
-      await cadastrarSalaoComServicos({
+      const { data } = await cadastrarSalaoComServicos({
           nome:              salao.nome,
           cnpj:              apenasDigitos(salao.cnpj),
           razaoSocial:       salao.razaoSocial,
@@ -161,12 +167,12 @@ const CadastroSalaoGerente = () => {
           })),
       });
 
-      setSalaoSalvo(true);
-      setSalao(CNPJ_VAZIO);
-      setCnpjStatus('idle');
-      setTimeout(() => setSalaoSalvo(false), 4000);
+      navigate(`/manager/saloes/${data.data.id}`, { replace: true, state: { cadastrado: true } });
     } catch (err) {
       setErroSalvar(err.response?.data?.error || err.message);
+    } finally {
+      enviando.current = false;
+      setSalvando(false);
     }
   };
 
@@ -181,13 +187,13 @@ const CadastroSalaoGerente = () => {
     <div className="admin-page">
       <Navbar />
       <div className="admin-container">
+        <Link to="/manager/saloes" className="btn-secondary" style={{ marginBottom: 24 }}>Voltar para meus salões</Link>
         <div className="admin-header">
           <h1>Cadastrar Salão</h1>
           <p>Preencha as informações do seu estabelecimento</p>
         </div>
 
-        {salaoSalvo  && <div className="msg-sucesso">Salão cadastrado com sucesso!</div>}
-        {erroSalvar  && <div className="msg-erro">{erroSalvar}</div>}
+        {erroSalvar  && <div className="msg-erro" role="alert">{erroSalvar}</div>}
 
         <div className="card admin-card">
           <form onSubmit={handleSalvar}>
@@ -343,10 +349,10 @@ const CadastroSalaoGerente = () => {
               type="submit"
               className="btn-primary"
               style={{ marginTop: 24 }}
-              disabled={cnpjStatus === 'consultando'}
+              disabled={salvando || cnpjStatus === 'consultando'}
             >
               <Store size={16} />
-              {cnpjStatus === 'consultando' ? 'Validando CNPJ...' : 'Cadastrar Salão'}
+              {salvando ? 'Cadastrando...' : cnpjStatus === 'consultando' ? 'Validando CNPJ...' : 'Cadastrar Salão'}
             </button>
           </form>
         </div>

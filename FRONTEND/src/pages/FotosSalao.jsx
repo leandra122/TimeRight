@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import VoltarPerfilSalao from '../components/VoltarPerfilSalao';
 import Navbar from '../components/Navbar';
 import { api, listarMeusSaloes } from '../service/api';
 import './DashboardAdmin.css';
@@ -86,6 +88,8 @@ function Galeria({ salaoId }) {
   </section>;
 }
 export default function FotosSalao() {
+  const [params] = useSearchParams();
+  const salaoSolicitado = params.get('salaoId');
   const [saloes, setSaloes] = useState([]);
   const [id, setId] = useState('');
   const [erro, setErro] = useState('');
@@ -94,18 +98,24 @@ export default function FotosSalao() {
   useEffect(() => {
     let ativo = true;
     setCarregando(true); setErro('');
-    listarMeusSaloes().then(({ data }) => { if (ativo) { setSaloes(data); setId(String(data[0]?.id || '')); } })
+    listarMeusSaloes().then(({ data }) => { if (ativo) {
+      setSaloes(data);
+      const inicial = salaoSolicitado ? data.find(item => String(item.id) === salaoSolicitado) : data[0];
+      setId(String(inicial?.id || ''));
+    } })
       .catch(() => { if (ativo) setErro('Não foi possível carregar seus salões.'); })
       .finally(() => { if (ativo) setCarregando(false); });
     return () => { ativo = false; };
-  }, [tentativa]);
+  }, [tentativa, salaoSolicitado]);
   return <div className="admin-page"><Navbar /><div className="admin-container">
+    <VoltarPerfilSalao salaoId={id} />
     <div className="admin-header"><h1>Fotos do salão</h1><p>Mostre seu estabelecimento aos clientes.</p></div>
     {carregando && <p role="status">Carregando salões...</p>}
     {erro && <div role="alert" className="msg-erro">{erro}<button onClick={() => setTentativa(v => v + 1)}>Tentar novamente</button></div>}
     {!carregando && !erro && !saloes.length && <p>Cadastre um salão antes de enviar fotos.</p>}
     {saloes.length > 0 && <div className="form-group"><label htmlFor="salao-fotos">Salão</label>
       <select id="salao-fotos" value={id} onChange={e => setId(e.target.value)}>
+        <option value="" disabled>Selecione um dos seus salões</option>
         {saloes.map(s => <option key={s.id} value={s.id}>{s.nome}</option>)}
       </select></div>}
     {id && <Galeria key={id} salaoId={id} />}

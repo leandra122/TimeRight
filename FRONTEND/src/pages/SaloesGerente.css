@@ -1,0 +1,59 @@
+.saloes-page { max-width: 1160px; }
+.saloes-cabecalho { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-bottom: 32px; }
+.saloes-sobretitulo { display: block; color: var(--text-soft); font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 8px; }
+.saloes-page h1 { font-size: clamp(24px, 3vw, 32px); line-height: 1.3; overflow-wrap: anywhere; }
+.saloes-cabecalho p { color: var(--text-soft); font-size: 14px; margin-top: 10px; max-width: 540px; }
+.saloes-contagem { color: var(--text-soft); font-size: 13px; margin-bottom: 16px; }
+.saloes-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.saloes-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; transition: box-shadow .2s; }
+.saloes-card:hover { box-shadow: var(--shadow-md); }
+.saloes-foto { background: var(--brand-pale); aspect-ratio: 16 / 10; overflow: hidden; }
+.saloes-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.saloes-foto-vazia { height: 100%; min-height: 160px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: var(--text-soft); background: linear-gradient(135deg, var(--brand-pale), var(--brand-light)); }
+.saloes-foto-vazia span { font-size: 12px; }
+.saloes-card-corpo { padding: 22px; display: flex; flex-direction: column; align-items: flex-start; gap: 14px; flex: 1; }
+.saloes-card h2 { font-size: 20px; line-height: 1.4; overflow-wrap: anywhere; }
+.saloes-card .btn-secondary { width: 100%; margin-top: auto; justify-content: space-between; }
+.saloes-status { display: inline-flex; align-items: center; gap: 7px; border-radius: 30px; background: var(--gray-light); color: var(--text-soft); padding: 5px 11px; font-size: 12px; font-weight: 600; }
+.saloes-status > span { width: 6px; height: 6px; background: currentColor; border-radius: 50%; }
+.saloes-status--ativo { background: #effaf2; color: #227543; }
+.saloes-endereco { display: flex; align-items: flex-start; gap: 8px; color: var(--text-soft); font-size: 13px; line-height: 1.7; overflow-wrap: anywhere; }
+.saloes-endereco svg { flex-shrink: 0; margin-top: 3px; }
+.saloes-estado { padding: 56px 24px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--white); text-align: center; display: flex; align-items: center; flex-direction: column; gap: 18px; }
+.saloes-estado h2 { font-size: 22px; }
+.saloes-estado p { color: var(--text-soft); max-width: 470px; }
+.saloes-voltar { display: inline-flex; gap: 8px; align-items: center; color: var(--text-soft); font-size: 14px; text-decoration: none; margin-bottom: 24px; }
+.saloes-voltar:hover { color: var(--text); }
+.saloes-perfil-capa { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); border-radius: var(--radius-lg); background: var(--white); overflow: hidden; border: 1px solid var(--border); margin-bottom: 32px; }
+.saloes-perfil-capa .saloes-foto { height: 100%; min-height: 250px; aspect-ratio: auto; }
+.saloes-perfil-titulo { padding: 32px; align-self: center; }
+.saloes-perfil-titulo h1 { margin-bottom: 16px; }
+.saloes-perfil-titulo .saloes-endereco { margin-top: 18px; }
+.saloes-secao-titulo, .saloes-dados h2 { font-size: 19px; margin-bottom: 18px; }
+.saloes-acessos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-bottom: 32px; }
+.saloes-acesso { display: flex; align-items: center; gap: 12px; padding: 20px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--white); color: var(--text); text-decoration: none; }
+.saloes-acesso:hover { border-color: var(--brand); background: var(--brand-pale); }
+.saloes-acesso > svg { flex-shrink: 0; color: #aa4763; }
+.saloes-acesso > svg:last-child { margin-left: auto; }
+.saloes-acesso strong { display: block; font-size: 14px; }
+.saloes-acesso small { display: block; font-size: 12px; color: var(--text-soft); margin-top: 4px; }
+.saloes-dados { padding: 28px; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 28px; }
+.saloes-dados dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.saloes-dados dt { color: var(--text-soft); font-size: 12px; margin-bottom: 5px; }
+.saloes-dados dd { font-size: 14px; overflow-wrap: anywhere; }
+#servicos-salao { scroll-margin-top: 90px; }
+.saloes-page a:focus-visible, .saloes-page button:focus-visible { outline: 3px solid #aa4763; outline-offset: 4px; }
+@media (max-width: 950px) {
+  .saloes-grid, .saloes-acessos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .saloes-cabecalho { align-items: flex-start; flex-direction: column; }
+}
+@media (max-width: 600px) {
+  .saloes-grid, .saloes-acessos, .saloes-perfil-capa, .saloes-dados dl { grid-template-columns: minmax(0, 1fr); }
+  .saloes-page { padding: 28px 16px 48px; }
+  .saloes-cabecalho > .btn-primary { width: 100%; }
+  .saloes-perfil-capa .saloes-foto { aspect-ratio: 16 / 10; min-height: 0; }
+  .saloes-perfil-titulo, .saloes-dados { padding: 22px; }
+  .saloes-page .servicos-header { flex-wrap: wrap; gap: 16px; }
+  .saloes-page .servicos-header h2 { font-size: 19px; overflow-wrap: anywhere; }
+  .saloes-page .servico-item { flex-wrap: wrap; gap: 12px; overflow-wrap: anywhere; }
+}

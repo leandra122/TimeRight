@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import VoltarPerfilSalao from '../components/VoltarPerfilSalao';
 import Navbar from '../components/Navbar';
 import { buscarHorariosFuncionamento, listarMeusSaloes, salvarHorariosFuncionamento } from '../service/api';
 import './DashboardAdmin.css';
@@ -8,6 +10,8 @@ const semanaVazia = () => nomesDias.map((_, index) => ({ diaSemana: index + 1, p
 const mensagemErro = (error, padrao) => error.response?.data?.error || error.response?.data?.message || padrao;
 
 const HorariosFuncionamento = () => {
+  const [params] = useSearchParams();
+  const salaoSolicitado = params.get('salaoId');
   const [saloes, setSaloes] = useState([]);
   const [salaoId, setSalaoId] = useState('');
   const [dias, setDias] = useState(semanaVazia);
@@ -22,8 +26,9 @@ const HorariosFuncionamento = () => {
     listarMeusSaloes().then(({ data }) => {
       if (!ativo) return;
       setSaloes(data);
-      setSalaoId(data[0]?.id?.toString() || '');
-      if (!data.length) setCarregando(false);
+      const inicial = salaoSolicitado ? data.find(item => String(item.id) === salaoSolicitado) : data[0];
+      setSalaoId(inicial?.id?.toString() || '');
+      if (!inicial) setCarregando(false);
     }).catch((error) => {
       if (ativo) {
         setErro(mensagemErro(error, 'Não foi possível carregar seus salões.'));
@@ -31,7 +36,7 @@ const HorariosFuncionamento = () => {
       }
     });
     return () => { ativo = false; };
-  }, []);
+  }, [salaoSolicitado]);
 
   useEffect(() => {
     if (!salaoId) return;
@@ -117,10 +122,12 @@ const HorariosFuncionamento = () => {
   return <div className="admin-page">
     <Navbar />
     <main className="admin-container horarios-page">
+      <VoltarPerfilSalao salaoId={salaoId} />
       <div className="admin-welcome"><div><h1>Horários de funcionamento</h1><p>Configure os períodos semanais de cada salão.</p></div></div>
       {saloes.length > 0 && <div className="form-group horarios-salao-select">
         <label htmlFor="salao-horarios">Salão</label>
         <select id="salao-horarios" value={salaoId} onChange={(event) => trocarSalao(event.target.value)} disabled={salvando}>
+          <option value="" disabled>Selecione um dos seus salões</option>
           {saloes.map((salao) => <option key={salao.id} value={salao.id}>{salao.nome}</option>)}
         </select>
       </div>}

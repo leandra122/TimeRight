@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import VoltarPerfilSalao from '../components/VoltarPerfilSalao';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../context/AuthContext';
 import { Plus, Pencil, Trash2, Check, X, ToggleLeft, ToggleRight, BriefcaseBusiness, Clock3, CircleDollarSign, UserRound, LoaderCircle, AlertCircle } from 'lucide-react';
@@ -15,6 +17,8 @@ const formVazio = { nome: '', email: '', senha: '', funcao: '', observacoes: '',
 const GerenciarFuncionarios = () => {
   const { user } = useAuth();
   const podeGerenciar = user?.tipo === 'manager';
+  const [params, setParams] = useSearchParams();
+  const salaoFiltro = podeGerenciar ? params.get('salaoId') || '' : '';
   const [funcionarios, setFuncionarios] = useState([]);
   const [saloes, setSaloes] = useState([]);
   const [editando, setEditando] = useState(null);
@@ -30,6 +34,7 @@ const GerenciarFuncionarios = () => {
   const [mensagem, setMensagem] = useState(null);
   const [erro, setErro] = useState(null);
   const [carregando, setCarregando] = useState(true);
+  const funcionariosVisiveis = salaoFiltro ? funcionarios.filter(f => String(f.salao?.id) === salaoFiltro) : funcionarios;
 
   const exibirMensagem = (msg, tipo = 'sucesso') => {
     if (tipo === 'sucesso') { setMensagem(msg); setErro(null); }
@@ -125,6 +130,7 @@ const GerenciarFuncionarios = () => {
     <div className="admin-page">
       <Navbar />
       <div className="admin-container">
+        {podeGerenciar && <VoltarPerfilSalao salaoId={saloes.some(s => String(s.id) === salaoFiltro) ? salaoFiltro : ''} />}
         <div className="admin-boas-vindas">
           <h1>Gerenciar Equipe</h1>
           <p>{podeGerenciar
@@ -137,7 +143,14 @@ const GerenciarFuncionarios = () => {
 
         {podeGerenciar && saloes.length > 0 && (
           <div style={{ marginBottom: 20 }}>
-            <button className="btn-primary" onClick={() => setCadastrando(true)}>
+            <div className="form-group"><label htmlFor="equipe-salao">Salão</label>
+              <select id="equipe-salao" value={salaoFiltro} onChange={event => setParams(event.target.value ? { salaoId: event.target.value } : {})}>
+                <option value="">Todos os meus salões</option>
+                {salaoFiltro && !saloes.some(s => String(s.id) === salaoFiltro) && <option value={salaoFiltro} disabled>Salão indisponível</option>}
+                {saloes.map(s => <option key={s.id} value={s.id}>{s.nome}</option>)}
+              </select>
+            </div>
+            <button className="btn-primary" onClick={() => { setNovoForm({ ...formVazio, salaoId: saloes.some(s => String(s.id) === salaoFiltro) ? salaoFiltro : '' }); setCadastrando(true); }}>
               <Plus size={16} />Novo Funcionário
             </button>
           </div>
@@ -158,11 +171,11 @@ const GerenciarFuncionarios = () => {
                 <span>Nome</span><span>Email</span><span>Função</span><span>Status</span><span>Ações</span>
               </div>
 
-              {funcionarios.length === 0 && (
+              {funcionariosVisiveis.length === 0 && (
                 <p style={{ padding: '24px 20px', color: 'var(--text-soft)', fontSize: 13 }}>Nenhum funcionário cadastrado.</p>
               )}
 
-              {funcionarios.map(f => (
+              {funcionariosVisiveis.map(f => (
                 <div key={f.id} className="tabela-linha" style={{ gridTemplateColumns: '2fr 2fr 1.5fr 1fr 1.8fr' }}>
                   {podeGerenciar && editando === f.id ? (
                     <>

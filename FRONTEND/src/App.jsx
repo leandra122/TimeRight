@@ -17,6 +17,8 @@ const GerenciarFuncionarios = lazy(() => import('./pages/GerenciarFuncionarios')
 const CadastroSalaoGerente = lazy(() => import('./pages/CadastroSalaoGerente'));
 const AgendaFuncionario = lazy(() => import('./pages/AgendaFuncionario'));
 const HorariosFuncionamento = lazy(() => import('./pages/HorariosFuncionamento'));
+const MeusSaloes = lazy(() => import('./pages/MeusSaloes'));
+const PerfilSalaoGerente = lazy(() => import('./pages/PerfilSalaoGerente'));
 
 const destinoPorTipo = {
   admin: '/admin',
@@ -50,6 +52,8 @@ function App() {
             <Route path="/admin/funcionarios" element={<RotaProtegida tipo="admin"><GerenciarFuncionarios /></RotaProtegida>} />
 
             <Route path="/manager" element={<RotaProtegida tipo="manager"><DashboardAdmin /></RotaProtegida>} />
+            <Route path="/manager/saloes" element={<RotaProtegida tipo="manager"><MeusSaloes /></RotaProtegida>} />
+            <Route path="/manager/saloes/:salaoId" element={<RotaProtegida tipo="manager"><PerfilSalaoGerente /></RotaProtegida>} />
             <Route path="/manager/cadastro-salao" element={<RotaProtegida tipo="manager"><CadastroSalaoGerente /></RotaProtegida>} />
             <Route path="/manager/atualizar-salao" element={<RotaProtegida tipo="manager"><AtualizarSalao /></RotaProtegida>} />
             <Route path="/manager/fotos" element={<RotaProtegida tipo="manager"><FotosSalao /></RotaProtegida>} />

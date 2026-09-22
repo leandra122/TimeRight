@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import VoltarPerfilSalao from '../components/VoltarPerfilSalao';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../context/AuthContext';
 import { atualizarSalao, listarMeusSaloes, listarSaloes } from '../service/api';
@@ -16,6 +18,8 @@ const campos = [
   ['pontoReferencia', 'Ponto de referência (opcional)', 150],
 ];
 const formulario = (salao) => Object.fromEntries(campos.map(([nome]) => [nome, salao[nome] || '']));
+const informacoes = [['nome', 'Nome do salão', 100], ['email', 'E-mail', 100], ['telefone', 'Telefone', 20]];
+const formularioCompleto = salao => ({ ...formulario(salao), ...Object.fromEntries(informacoes.map(([nome]) => [nome, salao[nome] || ''])) });
 const completo = (form) => [
   form.logradouro, form.numero, form.complemento, form.bairro, form.cidade, form.uf,
   form.pontoReferencia.trim() ? 'Referência: ' + form.pontoReferencia.trim() : '',
@@ -27,6 +31,8 @@ const mensagem = (error) => {
 
 export default function AtualizarSalao() {
   const { user } = useAuth();
+  const [params] = useSearchParams();
+  const salaoSolicitado = user.tipo === 'manager' ? params.get('salaoId') : null;
   const [saloes, setSaloes] = useState([]);
   const [selecionado, setSelecionado] = useState('');
   const [form, setForm] = useState(null);
@@ -50,20 +56,21 @@ export default function AtualizarSalao() {
     listar().then(({ data }) => {
       if (cancelado) return;
       setSaloes(data);
-      setSelecionado(data[0] ? String(data[0].id) : '');
-      setForm(data[0] ? formulario(data[0]) : null);
+      const inicial = salaoSolicitado ? data.find(item => String(item.id) === salaoSolicitado) : data[0];
+      setSelecionado(inicial ? String(inicial.id) : '');
+      setForm(inicial ? formularioCompleto(inicial) : null);
     }).catch(() => {
       if (!cancelado) setErro('Não foi possível carregar os salões. Tente novamente.');
     }).finally(() => {
       if (!cancelado) setCarregando(false);
     });
     return () => { cancelado = true; ativo.current = false; };
-  }, [user.tipo, tentativa]);
+  }, [user.tipo, tentativa, salaoSolicitado]);
 
   function selecionar(event) {
     const id = event.target.value;
     setSelecionado(id);
-    setForm(formulario(saloes.find(item => String(item.id) === id)));
+    setForm(formularioCompleto(saloes.find(item => String(item.id) === id)));
     setErro('');
     setSucesso('');
   }
@@ -73,6 +80,10 @@ export default function AtualizarSalao() {
     if (enviando.current || !form || !selecionado) return;
     setErro('');
     setSucesso('');
+    if (user.tipo === 'manager' && informacoes.some(([nome]) => !form[nome].trim())) {
+      setErro('Preencha nome, e-mail e telefone do salão.');
+      return;
+    }
     if (!form.logradouro.trim()) {
       setErro('Informe o logradouro do salão.');
       return;
@@ -84,12 +95,13 @@ export default function AtualizarSalao() {
     enviando.current = true;
     setSalvando(true);
     try {
-      const dados = Object.fromEntries(Object.entries(form).map(([chave, valor]) => [chave, valor.trim()]));
+      const camposEditaveis = user.tipo === 'manager' ? [...informacoes, ...campos] : campos;
+      const dados = Object.fromEntries(camposEditaveis.map(([chave]) => [chave, form[chave].trim()]));
       const { data } = await atualizarSalao(selecionado, dados);
       if (!ativo.current) return;
       setSaloes(atuais => atuais.map(item => String(item.id) === selecionado ? data : item));
-      setForm(formulario(data));
-      setSucesso('Endereço atualizado com sucesso.');
+      setForm(formularioCompleto(data));
+      setSucesso('Informações atualizadas com sucesso.');
     } catch (error) {
       if (ativo.current) setErro(mensagem(error));
     } finally {
@@ -103,9 +115,10 @@ export default function AtualizarSalao() {
     <div className="admin-page">
       <Navbar />
       <div className="admin-container">
+        {user.tipo === 'manager' && <VoltarPerfilSalao salaoId={selecionado} />}
         <div className="admin-header">
           <h1>Atualizar Salão</h1>
-          <p>Consulte e edite o endereço do seu estabelecimento.</p>
+          <p>Consulte e edite as informações do seu estabelecimento.</p>
         </div>
         {erro && <div className="msg-erro" role="alert">{erro}</div>}
         {sucesso && <div className="msg-sucesso" role="status">{sucesso}</div>}
@@ -123,6 +136,11 @@ export default function AtualizarSalao() {
             <p><strong>Endereço cadastrado:</strong> {salao.endereco}</p>
             {!salao.logradouro && <p className="aviso-unico-cadastro">Este endereço foi cadastrado em texto livre. Confira o endereço acima e preencha rua, número e demais campos separadamente para atualizá-lo.</p>}
             <form onSubmit={salvar} className="salao-form">
+              {user.tipo === 'manager' && informacoes.map(([nome, label, limite]) => <div className="form-group" key={nome}>
+                <label htmlFor={'informacao-' + nome}>{label}</label>
+                <input id={'informacao-' + nome} name={nome} type={nome === 'email' ? 'email' : 'text'} value={form[nome]} maxLength={limite}
+                  required disabled={salvando} onChange={event => { setForm(atual => ({ ...atual, [nome]: event.target.value })); setSucesso(''); }} />
+              </div>)}
               {campos.map(([nome, label, limite]) => (
                 <div className="form-group" key={nome}>
                   <label htmlFor={'endereco-' + nome}>{label}</label>
