@@ -30,9 +30,14 @@ const mensagem = (error) => {
 };
 
 export default function AtualizarSalao() {
-  const { user } = useAuth();
   const [params] = useSearchParams();
-  const salaoSolicitado = user.tipo === 'manager' ? params.get('salaoId') : null;
+  return <EdicaoSalao key={JSON.stringify(params.get('salaoId'))} />;
+}
+
+function EdicaoSalao() {
+  const { user } = useAuth();
+  const [params, setParams] = useSearchParams();
+  const salaoSolicitado = params.get('salaoId');
   const [saloes, setSaloes] = useState([]);
   const [selecionado, setSelecionado] = useState('');
   const [form, setForm] = useState(null);
@@ -56,7 +61,10 @@ export default function AtualizarSalao() {
     listar().then(({ data }) => {
       if (cancelado) return;
       setSaloes(data);
-      const inicial = salaoSolicitado ? data.find(item => String(item.id) === salaoSolicitado) : data[0];
+      const inicial = salaoSolicitado !== null ? data.find(item => String(item.id) === salaoSolicitado) : data[0];
+      if (inicial && salaoSolicitado === null) {
+        setParams(atuais => { const proximos = new URLSearchParams(atuais); proximos.set('salaoId', String(inicial.id)); return proximos; }, { replace: true });
+      }
       setSelecionado(inicial ? String(inicial.id) : '');
       setForm(inicial ? formularioCompleto(inicial) : null);
     }).catch(() => {
@@ -69,10 +77,8 @@ export default function AtualizarSalao() {
 
   function selecionar(event) {
     const id = event.target.value;
-    setSelecionado(id);
-    setForm(formularioCompleto(saloes.find(item => String(item.id) === id)));
-    setErro('');
-    setSucesso('');
+    if (enviando.current || !saloes.some(item => String(item.id) === id)) return;
+    setParams(atuais => { const proximos = new URLSearchParams(atuais); proximos.set('salaoId', id); return proximos; });
   }
 
   async function salvar(event) {
@@ -124,7 +130,7 @@ export default function AtualizarSalao() {
         {sucesso && <div className="msg-sucesso" role="status">{sucesso}</div>}
         {carregando ? <p role="status">Carregando salões...</p> : !form ? (
           erro ? <button className="btn-secondary" onClick={() => setTentativa(valor => valor + 1)}>Tentar novamente</button>
-            : <p className="aviso-unico-cadastro">Nenhum salão disponível para edição.</p>
+            : <p className="aviso-unico-cadastro">{salaoSolicitado !== null ? 'Salão indisponível para edição. Volte à lista de salões.' : 'Nenhum salão disponível para edição.'}</p>
         ) : (
           <div className="card admin-card">
             <div className="form-group">

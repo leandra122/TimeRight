@@ -89,6 +89,11 @@ function Galeria({ salaoId }) {
 }
 export default function FotosSalao() {
   const [params] = useSearchParams();
+  return <FotosDoSalao key={JSON.stringify(params.get('salaoId'))} />;
+}
+
+function FotosDoSalao() {
+  const [params, setParams] = useSearchParams();
   const salaoSolicitado = params.get('salaoId');
   const [saloes, setSaloes] = useState([]);
   const [id, setId] = useState('');
@@ -100,7 +105,10 @@ export default function FotosSalao() {
     setCarregando(true); setErro('');
     listarMeusSaloes().then(({ data }) => { if (ativo) {
       setSaloes(data);
-      const inicial = salaoSolicitado ? data.find(item => String(item.id) === salaoSolicitado) : data[0];
+      const inicial = salaoSolicitado !== null ? data.find(item => String(item.id) === salaoSolicitado) : data[0];
+      if (inicial && salaoSolicitado === null) {
+        setParams(atuais => { const proximos = new URLSearchParams(atuais); proximos.set('salaoId', String(inicial.id)); return proximos; }, { replace: true });
+      }
       setId(String(inicial?.id || ''));
     } })
       .catch(() => { if (ativo) setErro('Não foi possível carregar seus salões.'); })
@@ -113,8 +121,12 @@ export default function FotosSalao() {
     {carregando && <p role="status">Carregando salões...</p>}
     {erro && <div role="alert" className="msg-erro">{erro}<button onClick={() => setTentativa(v => v + 1)}>Tentar novamente</button></div>}
     {!carregando && !erro && !saloes.length && <p>Cadastre um salão antes de enviar fotos.</p>}
+    {!carregando && !erro && salaoSolicitado !== null && !id && <p role="alert">Salão indisponível entre os seus estabelecimentos.</p>}
     {saloes.length > 0 && <div className="form-group"><label htmlFor="salao-fotos">Salão</label>
-      <select id="salao-fotos" value={id} onChange={e => setId(e.target.value)}>
+      <select id="salao-fotos" value={id} onChange={e => {
+        const novoId = e.target.value;
+        if (saloes.some(s => String(s.id) === novoId)) setParams(atuais => { const proximos = new URLSearchParams(atuais); proximos.set('salaoId', novoId); return proximos; });
+      }}>
         <option value="" disabled>Selecione um dos seus salões</option>
         {saloes.map(s => <option key={s.id} value={s.id}>{s.nome}</option>)}
       </select></div>}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import ServicosSalao from '../components/ServicosSalao';
 import LocalizacaoSalao from '../components/LocalizacaoSalao';
@@ -28,67 +28,91 @@ const atalhosManager = [
 ];
 
 const DashboardAdmin = () => {
-  const { user, salao, desativarSalao } = useAuth();
+  const { user } = useAuth();
+  const [params, setParams] = useSearchParams();
+  const salaoSolicitado = params.get('salaoId');
   const atalhos = user?.tipo === 'manager' ? atalhosManager : atalhosAdmin;
-  const [confirmDesativar, setConfirmDesativar] = useState(false);
-  const [desativado, setDesativado] = useState(false);
   const [stats, setStats] = useState(null);
   const [loadingStats, setLoadingStats] = useState(true);
   const [saloes, setSaloes] = useState([]);
   const [salvandoServico, setSalvandoServico] = useState(false);
   const [revisaoServicos, setRevisaoServicos] = useState(0);
   const [erroSaloes, setErroSaloes] = useState('');
-  const [salaoSelecionadoId, setSalaoSelecionadoId] = useState('');
+  const [statsPara, setStatsPara] = useState(null);
+  const [erroStats, setErroStats] = useState('');
+  const salaoSelecionado = saloes.find(item => String(item.id) === salaoSolicitado);
+  const salaoSelecionadoId = salaoSelecionado ? String(salaoSelecionado.id) : '';
+  const statsAtuais = user?.tipo !== 'manager' || statsPara === salaoSelecionadoId;
+  const carregandoStatsAtuais = user?.tipo === 'manager'
+    ? !!salaoSelecionadoId && (loadingStats || !statsAtuais)
+    : loadingStats;
 
   useEffect(() => {
+    if (user?.tipo === 'manager' && salaoSolicitado === null && saloes.length) {
+      setParams(atuais => {
+        const proximos = new URLSearchParams(atuais);
+        proximos.set('salaoId', String(saloes[0].id));
+        return proximos;
+      }, { replace: true });
+    }
+  }, [user?.tipo, salaoSolicitado, saloes, setParams]);
+
+  useEffect(() => {
+    setSalvandoServico(false);
+  }, [salaoSolicitado]);
+
+  useEffect(() => {
+    let ativo = true;
     if (user?.tipo !== 'manager') {
       getDashboardStats()
-        .then(({ data }) => setStats(data))
-        .catch(() => setStats(null))
-        .finally(() => setLoadingStats(false));
-      return;
+        .then(({ data }) => { if (ativo) setStats(data); })
+        .catch(() => { if (ativo) { setStats(null); setErroStats('Não foi possível carregar os indicadores.'); } })
+        .finally(() => { if (ativo) setLoadingStats(false); });
+      return () => { ativo = false; };
     }
 
     listarMeusSaloes()
       .then(({ data }) => {
+        if (!ativo) return;
         setSaloes(data);
-        setSalaoSelecionadoId(data[0]?.id?.toString() || '');
-        if (!data.length) setLoadingStats(false);
+        setLoadingStats(false);
       })
       .catch((error) => {
+        if (!ativo) return;
         setErroSaloes(error.response?.data?.error || error.response?.data?.message || 'Não foi possível carregar seus salões.');
         setSaloes([]);
         setStats(null);
         setLoadingStats(false);
       });
+    return () => { ativo = false; };
   }, [user?.tipo]);
 
   useEffect(() => {
     if (user?.tipo !== 'manager' || !salaoSelecionadoId) return;
+    let ativo = true;
 
     const carregarStatsSalao = async () => {
       setLoadingStats(true);
+      setErroStats('');
+      setStats(null);
       try {
         const { data } = await getSalaoStats(salaoSelecionadoId);
+        if (!ativo) return;
         setStats(data);
       } catch {
+        if (!ativo) return;
         setStats(null);
+        setErroStats('Não foi possível carregar os indicadores deste salão.');
       } finally {
-        setLoadingStats(false);
+        if (ativo) { setStatsPara(salaoSelecionadoId); setLoadingStats(false); }
       }
     };
 
     carregarStatsSalao();
+    return () => { ativo = false; };
   }, [salaoSelecionadoId, user?.tipo, revisaoServicos]);
 
-  const handleDesativar = () => {
-    desativarSalao();
-    setConfirmDesativar(false);
-    setDesativado(true);
-    setTimeout(() => setDesativado(false), 3000);
-  };
-
-  const fmt = (val) => (loadingStats ? '...' : val ?? '0');
+  const fmt = (val) => (carregandoStatsAtuais ? '...' : !statsAtuais || erroStats || (user?.tipo === 'manager' && !salaoSelecionadoId) ? '—' : val ?? '0');
 
   return (
     <div className="admin-page">
@@ -103,8 +127,6 @@ const DashboardAdmin = () => {
           </div>
         </div>
 
-        {desativado && <div className="msg-sucesso">Salão desativado com sucesso.</div>}
-
         {user?.tipo === 'manager' && saloes.length > 0 && (
           <div className="form-group">
             <label htmlFor="salao-dashboard">Salão exibido no painel</label>
@@ -112,8 +134,9 @@ const DashboardAdmin = () => {
               disabled={salvandoServico}
               id="salao-dashboard"
               value={salaoSelecionadoId}
-              onChange={(event) => setSalaoSelecionadoId(event.target.value)}
+              onChange={(event) => setParams(atuais => { const proximos = new URLSearchParams(atuais); proximos.set('salaoId', event.target.value); return proximos; })}
             >
+              {!salaoSelecionadoId && <option value="" disabled>Selecione um dos seus salões</option>}
               {saloes.map((item) => (
                 <option key={item.id} value={item.id}>{item.nome}</option>
               ))}
@@ -122,6 +145,8 @@ const DashboardAdmin = () => {
         )}
 
         {erroSaloes && <div className="msg-erro" role="alert">{erroSaloes}</div>}
+        {salaoSolicitado !== null && saloes.length > 0 && !salaoSelecionadoId && <div className="msg-erro" role="alert">Salão indisponível entre os seus estabelecimentos.</div>}
+        {statsAtuais && erroStats && <div className="msg-erro" role="alert">{erroStats}</div>}
         {user?.tipo === 'manager' && !erroSaloes && !loadingStats && saloes.length === 0 && (
           <div className="aviso-unico-cadastro">
             Nenhum salão cadastrado. Use o atalho abaixo para criar seu primeiro estabelecimento.
@@ -183,7 +208,7 @@ const DashboardAdmin = () => {
             <div>
               <p className="stat-label">Avaliação média</p>
               <p className="stat-value">
-                {loadingStats ? '...' : stats?.mediaAvaliacoes != null
+                {carregandoStatsAtuais ? '...' : !statsAtuais || erroStats || (user?.tipo === 'manager' && !salaoSelecionadoId) ? '—' : stats?.mediaAvaliacoes != null
                   ? Number(stats.mediaAvaliacoes).toFixed(1)
                   : 'Sem avaliações'}
               </p>
@@ -205,8 +230,8 @@ const DashboardAdmin = () => {
         ))}
         <div className="admin-section-title">Acesso rápido</div>
         <div className="admin-atalhos">
-          {atalhos.map((a, i) => (
-            <Link key={i} to={a.to} className="atalho-card">
+          {atalhos.filter(a => user?.tipo !== 'manager' || salaoSelecionadoId || a.to === '/manager/cadastro-salao').map((a, i) => (
+            <Link key={i} to={user?.tipo === 'manager' && a.to !== '/manager/cadastro-salao' ? `${a.to}?salaoId=${encodeURIComponent(salaoSelecionadoId)}` : a.to} className="atalho-card">
               <div className="atalho-icon">{a.icon}</div>
               <div>
                 <strong>{a.titulo}</strong>
@@ -215,32 +240,19 @@ const DashboardAdmin = () => {
             </Link>
           ))}
 
-          <button
+          {user?.tipo === 'manager' && <button
             className="atalho-card atalho-card--danger"
-            onClick={() => setConfirmDesativar(true)}
-            disabled={salao && !salao.ativo}
+            disabled
           >
             <div className="atalho-icon atalho-icon--danger"><PowerOff size={24} /></div>
             <div>
               <strong>Desativar Salão</strong>
-              <span>{salao && !salao.ativo ? 'Salão já desativado' : 'Suspenda temporariamente'}</span>
+              <span>Indisponível: o fluxo de reativação ainda não está disponível.</span>
             </div>
-          </button>
+          </button>}
         </div>
       </div>
 
-      {confirmDesativar && (
-        <div className="modal-overlay" onClick={() => setConfirmDesativar(false)}>
-          <div className="modal-card card" onClick={e => e.stopPropagation()}>
-            <h3>Desativar Salão</h3>
-            <p className="modal-subtitulo">Tem certeza? Seu salão ficará invisível para os clientes.</p>
-            <div className="modal-botoes">
-              <button className="btn-secondary" onClick={() => setConfirmDesativar(false)}>Cancelar</button>
-              <button className="btn-danger" onClick={handleDesativar}>Desativar</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

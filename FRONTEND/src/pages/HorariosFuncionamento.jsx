@@ -11,6 +11,11 @@ const mensagemErro = (error, padrao) => error.response?.data?.error || error.res
 
 const HorariosFuncionamento = () => {
   const [params] = useSearchParams();
+  return <HorariosDoSalao key={JSON.stringify(params.get('salaoId'))} />;
+};
+
+const HorariosDoSalao = () => {
+  const [params, setParams] = useSearchParams();
   const salaoSolicitado = params.get('salaoId');
   const [saloes, setSaloes] = useState([]);
   const [salaoId, setSalaoId] = useState('');
@@ -26,7 +31,10 @@ const HorariosFuncionamento = () => {
     listarMeusSaloes().then(({ data }) => {
       if (!ativo) return;
       setSaloes(data);
-      const inicial = salaoSolicitado ? data.find(item => String(item.id) === salaoSolicitado) : data[0];
+      const inicial = salaoSolicitado !== null ? data.find(item => String(item.id) === salaoSolicitado) : data[0];
+      if (inicial && salaoSolicitado === null) {
+        setParams(atuais => { const proximos = new URLSearchParams(atuais); proximos.set('salaoId', String(inicial.id)); return proximos; }, { replace: true });
+      }
       setSalaoId(inicial?.id?.toString() || '');
       if (!inicial) setCarregando(false);
     }).catch((error) => {
@@ -63,12 +71,8 @@ const HorariosFuncionamento = () => {
   };
 
   const trocarSalao = (novoSalaoId) => {
-    setDias(semanaVazia());
-    setConfiguracaoCarregadaPara(null);
-    setCarregando(true);
-    setErro('');
-    setSucesso('');
-    setSalaoId(novoSalaoId);
+    if (salvando || !saloes.some(salao => String(salao.id) === novoSalaoId)) return;
+    setParams(atuais => { const proximos = new URLSearchParams(atuais); proximos.set('salaoId', novoSalaoId); return proximos; });
   };
   const alternarFechado = (dia) => alterarDia(dia.diaSemana, (atual) => ({
     ...atual, periodos: atual.periodos.length ? [] : [{ horaInicio: '09:00', horaFim: '18:00' }],
@@ -132,6 +136,7 @@ const HorariosFuncionamento = () => {
         </select>
       </div>}
       {erro && <div className="msg-erro" role="alert">{erro}</div>}
+      {!carregando && !erro && salaoSolicitado !== null && !salaoSelecionado && <p role="alert">Salão indisponível entre os seus estabelecimentos.</p>}
       {sucesso && <div className="msg-sucesso" role="status">{sucesso}</div>}
       {carregando && <p>Carregando horários...</p>}
       {!carregando && saloes.length === 0 && <div className="aviso-unico-cadastro">Cadastre um salão antes de configurar horários.</div>}

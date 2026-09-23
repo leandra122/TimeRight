@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import VoltarPerfilSalao from '../components/VoltarPerfilSalao';
 import Navbar from '../components/Navbar';
@@ -15,6 +15,11 @@ import './DashboardAdmin.css';
 const formVazio = { nome: '', email: '', senha: '', funcao: '', observacoes: '', salaoId: '' };
 
 const GerenciarFuncionarios = () => {
+  const [params] = useSearchParams();
+  return <EquipeSalao key={JSON.stringify(params.get('salaoId'))} />;
+};
+
+const EquipeSalao = () => {
   const { user } = useAuth();
   const podeGerenciar = user?.tipo === 'manager';
   const [params, setParams] = useSearchParams();
@@ -31,6 +36,10 @@ const GerenciarFuncionarios = () => {
   const [servicosSelecionados, setServicosSelecionados] = useState(new Set());
   const [carregandoServicos, setCarregandoServicos] = useState(false);
   const [erroServicos, setErroServicos] = useState('');
+  const [funcionarioCarregado, setFuncionarioCarregado] = useState(null);
+  const [salvandoAssociacoes, setSalvandoAssociacoes] = useState(false);
+  const consultaServicos = useRef(0);
+  const envioAssociacoes = useRef(false);
   const [mensagem, setMensagem] = useState(null);
   const [erro, setErro] = useState(null);
   const [carregando, setCarregando] = useState(true);
@@ -61,6 +70,7 @@ const GerenciarFuncionarios = () => {
   }, [podeGerenciar]);
 
   useEffect(() => { carregar(); }, [carregar]);
+  useEffect(() => () => { consultaServicos.current += 1; }, []);
 
   const iniciarEdicao = (f) => {
     setEditando(f.id);
@@ -84,29 +94,62 @@ const GerenciarFuncionarios = () => {
   };
 
   const abrirGerenciarServicos = async (funcionario) => {
+    if (envioAssociacoes.current) return;
+    const consulta = ++consultaServicos.current;
     setGerenciandoServicos(funcionario);
+    setFuncionarioCarregado(null);
+    setServicosSelecionados(new Set());
     setCarregandoServicos(true);
     setErroServicos('');
     try {
       const { data } = await listarServicosFuncionario(funcionario.id);
+      if (consulta !== consultaServicos.current) return;
       setServicosSelecionados(new Set((data.servicos || []).map(servico => servico.id)));
+      setFuncionarioCarregado(funcionario.id);
     } catch (err) {
+      if (consulta !== consultaServicos.current) return;
       setErroServicos(err.response?.data?.error || 'Não foi possível carregar os serviços deste funcionário.');
-    } finally { setCarregandoServicos(false); }
+    } finally { if (consulta === consultaServicos.current) setCarregandoServicos(false); }
   };
 
-  const alternarServico = (servicoId) => setServicosSelecionados(atual => {
-    const proximo = new Set(atual);
-    if (proximo.has(servicoId)) proximo.delete(servicoId); else proximo.add(servicoId);
-    return proximo;
-  });
+  const fecharServicos = () => {
+    if (envioAssociacoes.current) return;
+    consultaServicos.current += 1;
+    setGerenciandoServicos(null);
+    setFuncionarioCarregado(null);
+    setServicosSelecionados(new Set());
+  };
+
+  const alternarServico = (servicoId) => {
+    if (envioAssociacoes.current || funcionarioCarregado !== gerenciandoServicos?.id) return;
+    setServicosSelecionados(atual => {
+      const proximo = new Set(atual);
+      if (proximo.has(servicoId)) proximo.delete(servicoId); else proximo.add(servicoId);
+      return proximo;
+    });
+  };
 
   const salvarAssociacoes = async () => {
+    if (envioAssociacoes.current || !gerenciandoServicos || carregandoServicos || erroServicos
+      || funcionarioCarregado !== gerenciandoServicos.id) return;
+    const consulta = consultaServicos.current;
+    const funcionarioId = gerenciandoServicos.id;
+    const selecao = [...servicosSelecionados];
+    envioAssociacoes.current = true;
+    setSalvandoAssociacoes(true);
     try {
-      await salvarServicosFuncionario(gerenciandoServicos.id, [...servicosSelecionados]);
+      await salvarServicosFuncionario(funcionarioId, selecao);
+      if (consulta !== consultaServicos.current) return;
+      consultaServicos.current += 1;
       setGerenciandoServicos(null);
+      setFuncionarioCarregado(null);
       exibirMensagem('Serviços do funcionário atualizados com sucesso.');
-    } catch (err) { exibirMensagem(err.response?.data?.error || 'Erro ao salvar serviços.', 'erro'); }
+    } catch (err) {
+      if (consulta === consultaServicos.current) exibirMensagem(err.response?.data?.error || 'Erro ao salvar serviços.', 'erro');
+    } finally {
+      envioAssociacoes.current = false;
+      setSalvandoAssociacoes(false);
+    }
   };
 
   const servicosAtivosDoSalao = gerenciandoServicos
@@ -144,7 +187,11 @@ const GerenciarFuncionarios = () => {
         {podeGerenciar && saloes.length > 0 && (
           <div style={{ marginBottom: 20 }}>
             <div className="form-group"><label htmlFor="equipe-salao">Salão</label>
-              <select id="equipe-salao" value={salaoFiltro} onChange={event => setParams(event.target.value ? { salaoId: event.target.value } : {})}>
+              <select id="equipe-salao" value={salaoFiltro} disabled={salvandoAssociacoes} onChange={event => {
+                const id = event.target.value;
+                if (id && !saloes.some(s => String(s.id) === id)) return;
+                setParams(atuais => { const proximos = new URLSearchParams(atuais); if (id) proximos.set('salaoId', id); else proximos.delete('salaoId'); return proximos; });
+              }}>
                 <option value="">Todos os meus salões</option>
                 {salaoFiltro && !saloes.some(s => String(s.id) === salaoFiltro) && <option value={salaoFiltro} disabled>Salão indisponível</option>}
                 {saloes.map(s => <option key={s.id} value={s.id}>{s.nome}</option>)}
@@ -260,7 +307,7 @@ const GerenciarFuncionarios = () => {
       )}
 
       {podeGerenciar && gerenciandoServicos && (
-        <div className="modal-overlay" onClick={() => setGerenciandoServicos(null)}>
+        <div className="modal-overlay" onClick={fecharServicos}>
           <div className="modal-card card modal-servicos" onClick={e => e.stopPropagation()}>
             <div className="modal-servicos-cabecalho">
               <div className="modal-servicos-icone"><BriefcaseBusiness size={20} /></div>
@@ -282,7 +329,7 @@ const GerenciarFuncionarios = () => {
                 const selecionado = servicosSelecionados.has(servico.id);
                 return (
                   <label key={servico.id} className={`modal-servico-item ${selecionado ? 'selecionado' : ''}`}>
-                    <span className="modal-servico-check"><input type="checkbox" checked={selecionado} onChange={() => alternarServico(servico.id)} /></span>
+                    <span className="modal-servico-check"><input type="checkbox" checked={selecionado} disabled={salvandoAssociacoes} onChange={() => alternarServico(servico.id)} /></span>
                     <span className="modal-servico-conteudo">
                       <span className="modal-servico-nome">{servico.nome}</span>
                       <span className="modal-servico-meta"><span><CircleDollarSign size={14} />{formatarPreco(servico.preco)}</span><span><Clock3 size={14} />{servico.duracao} min</span></span>
@@ -292,8 +339,8 @@ const GerenciarFuncionarios = () => {
               })}
             </div>
             <div className="modal-botoes modal-servicos-rodape">
-              <button className="btn-secondary" onClick={() => setGerenciandoServicos(null)}>Cancelar</button>
-              <button className="btn-primary" onClick={salvarAssociacoes} disabled={carregandoServicos || !!erroServicos}>Salvar alterações</button>
+              <button className="btn-secondary" disabled={salvandoAssociacoes} onClick={fecharServicos}>Cancelar</button>
+              <button className="btn-primary" onClick={salvarAssociacoes} disabled={salvandoAssociacoes || carregandoServicos || !!erroServicos || funcionarioCarregado !== gerenciandoServicos.id}>{salvandoAssociacoes ? 'Salvando...' : 'Salvar alterações'}</button>
             </div>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Calendar, X } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../context/AuthContext';
@@ -13,11 +14,18 @@ const Painel = () => {
   const [equipe, setEquipe] = useState([]);
   const [erro, setErro] = useState(null);
   const [carregando, setCarregando] = useState(true);
-  const [salaoId, setSalaoId] = useState('');
+  const [params, setParams] = useSearchParams();
   const [funcionarioId, setFuncionarioId] = useState('');
   const [selecionado, setSelecionado] = useState(null);
   const role = user?.nivelAcesso?.nome?.toUpperCase();
   const isAdmin = user?.tipo === 'admin' || role === 'ADMIN' || role === 'ADM';
+  const salaoId = isAdmin ? '' : params.get('salaoId') || '';
+  const salaoIndisponivel = !!salaoId && !saloesCadastrados.some(item => String(item.id) === salaoId);
+  const trocarSalao = (id) => {
+    if (id && !saloesCadastrados.some(item => String(item.id) === id)) return;
+    setParams(atuais => { const proximos = new URLSearchParams(atuais); if (id) proximos.set('salaoId', id); else proximos.delete('salaoId'); return proximos; });
+  };
+  useEffect(() => { setFuncionarioId(''); setSelecionado(null); }, [salaoId]);
   const carregar = useCallback(async () => {
     setCarregando(true); setErro(null);
     try {
@@ -45,7 +53,7 @@ const Painel = () => {
   const horario = (valor) => new Intl.DateTimeFormat('pt-BR', { timeStyle: 'short' }).format(new Date(valor));
   const fim = selecionado ? new Date(new Date(selecionado.dataHora).getTime() + (selecionado.duracao || 0) * 60000) : null;
 
-  return <div className="admin-page"><Navbar /><div className="admin-container"><div className="admin-header"><h1><Calendar size={26} /> Agenda de atendimentos</h1><p>Acompanhe os atendimentos dos seus salões.</p></div>{erro && <div className="msg-erro" role="alert">{erro} <button className="btn-secondary" onClick={carregar}>Tentar novamente</button></div>}{!isAdmin && !carregando && <div className="cal-filtros"><select aria-label="Filtrar por salão" value={salaoId} onChange={event => { setSalaoId(event.target.value); setFuncionarioId(''); }}><option value="">Todos os salões</option>{saloes.map(([id, nome]) => <option value={id} key={id}>{nome}</option>)}</select><select aria-label="Filtrar por profissional" value={funcionarioId} onChange={event => setFuncionarioId(event.target.value)}><option value="">Todos os profissionais</option>{funcionarios.map(({id, nome}) => <option value={id} key={id}>{nome}</option>)}</select></div>}{carregando ? <p style={{ color: 'var(--text-soft)', fontSize: 14 }}>Carregando...</p> : !erro && <CalendarioAgenda agendamentos={filtrados} profissionais={isAdmin ? undefined : profissionaisVisiveis} onSelecionar={setSelecionado} />}</div>
+  return <div className="admin-page"><Navbar /><div className="admin-container"><div className="admin-header"><h1><Calendar size={26} /> Agenda de atendimentos</h1><p>Acompanhe os atendimentos dos seus salões.</p></div>{erro && <div className="msg-erro" role="alert">{erro} <button className="btn-secondary" onClick={carregar}>Tentar novamente</button></div>}{!isAdmin && !carregando && <div className="cal-filtros"><select aria-label="Filtrar por salão" value={salaoId} onChange={event => trocarSalao(event.target.value)}><option value="">Todos os salões</option>{salaoIndisponivel && <option value={salaoId} disabled>Salão indisponível</option>}{saloes.map(([id, nome]) => <option value={id} key={id}>{nome}</option>)}</select><select aria-label="Filtrar por profissional" value={funcionarioId} onChange={event => setFuncionarioId(event.target.value)}><option value="">Todos os profissionais</option>{funcionarios.map(({id, nome}) => <option value={id} key={id}>{nome}</option>)}</select></div>}{carregando ? <p style={{ color: 'var(--text-soft)', fontSize: 14 }}>Carregando...</p> : !erro && (salaoIndisponivel ? <p role="alert">Salão indisponível entre os seus estabelecimentos.</p> : <CalendarioAgenda agendamentos={filtrados} profissionais={isAdmin ? undefined : profissionaisVisiveis} onSelecionar={setSelecionado} />)}</div>
   {selecionado && <div className="modal-overlay" onClick={() => setSelecionado(null)}><div className="modal-card card" onClick={event => event.stopPropagation()}><h3>Detalhes do atendimento</h3><div className="detalhes-atendimento"><p><strong>Cliente</strong><span>{selecionado.usuario?.nome}</span></p><p><strong>Serviço</strong><span>{selecionado.servico?.nome}</span></p><p><strong>Profissional</strong><span>{selecionado.funcionario?.nome}</span></p><p><strong>Salão</strong><span>{selecionado.funcionario?.salao?.nome}</span></p><p><strong>Data</strong><span>{data(selecionado.dataHora)}</span></p><p><strong>Horário</strong><span>{horario(selecionado.dataHora)} – {horario(fim)}</span></p><p><strong>Duração</strong><span>{selecionado.duracao} min</span></p><p><strong>Status</strong><span className={`status-badge ${selecionado.status?.toLowerCase()}`}>{selecionado.status}</span></p></div><div className="modal-botoes"><button className="btn-secondary" onClick={() => setSelecionado(null)}><X size={15} />Fechar</button></div></div></div>}</div>;
 };
 
