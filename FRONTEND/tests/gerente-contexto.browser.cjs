@@ -51,7 +51,7 @@ async function fixture(browser, base, run) {
     if (state.handler && await state.handler(route, call)) return;
     let data;
     if (call.path === '/saloes/me' || call.path === '/saloes') data = salons;
-    else if (/^\/dashboard\/stats\/salao\/\d+$/.test(call.path)) data = { agendamentosHoje: Number(call.path.split('/').at(-1)) * 111 };
+    else if (/^\/dashboard\/stats\/salao\/\d+$/.test(call.path)) data = { totalFuncionariosAtivos: Number(call.path.split('/').at(-1)) * 111, totalServicosAtivos: 3, totalAvaliacoes: 2, mediaAvaliacoes: 4.5 };
     else if (call.path === '/dashboard/stats') data = {};
     else if (call.path === '/funcionarios/me') data = employees;
     else if (call.path === '/servicos/me') data = services;
@@ -119,14 +119,17 @@ async function fixture(browser, base, run) {
     });
     await test('atalhos contextuais transportam o salão escolhido', async page => {
       for (const [url, selector] of pages.slice(1)) {
-        await page.goto(base + '/manager?salaoId=2');
+        await page.goto(base + '/manager/saloes/2');
         const link = page.locator(`a[href="${url}?salaoId=2"]`);
         await link.click();
         await until(async () => await page.locator(selector).count() && await page.locator(selector).inputValue() === '2');
       }
       await page.goto(base + '/manager?salaoId=2');
       await page.locator('#salao-dashboard').waitFor();
-      assert.equal(await page.locator('a[href="/manager/cadastro-salao"]').count(), 1);
+      await page.getByRole('link', { name: /Gerenciar salão/ }).click();
+      await page.waitForURL('**/manager/saloes/2');
+      await page.getByRole('link', { name: 'Ver indicadores', exact: true }).waitFor();
+      assert.equal(await page.locator('a[href="/manager?salaoId=2"]').count(), 1);
     });
     await test('ID não autorizado não carrega dados nem oferece mutação contextual', async (page, state) => {
       for (const [url] of pages) {
@@ -148,9 +151,9 @@ async function fixture(browser, base, run) {
         await until(() => pending.length === 1);
         await page.locator('#salao-dashboard').selectOption('2');
         await until(() => pending.length === 2);
-        await json(pending[1].route, { agendamentosHoje: 222 });
+        await json(pending[1].route, { totalFuncionariosAtivos: 222 });
         await until(async () => await page.locator('.stat-value').first().innerText() === '222');
-        await json(pending[0].route, oldStatus === 200 ? { agendamentosHoje: 111 } : { error: 'Falha antiga' }, oldStatus);
+        await json(pending[0].route, oldStatus === 200 ? { totalFuncionariosAtivos: 111 } : { error: 'Falha antiga' }, oldStatus);
         await page.waitForLoadState('networkidle');
         assert.equal(await page.locator('.stat-value').first().innerText(), '222');
         assert.equal(await page.getByRole('alert').count(), 0);
@@ -159,8 +162,8 @@ async function fixture(browser, base, run) {
     await test('desativação indisponível não abre confirmação, não envia alteração e não mostra sucesso', async (page, state) => {
       for (const status of ['ATIVO', 'INATIVO']) {
         state.salons[1].status = status;
-        await page.goto(base + '/manager?salaoId=2');
-        await page.locator('#salao-dashboard').waitFor();
+        await page.goto(base + '/manager/saloes/2');
+        await page.getByRole('heading', { name: 'Salao 2', exact: true }).waitFor();
         const button = page.getByRole('button', { name: /Desativar Salão/ });
         assert.equal(await button.isDisabled(), true);
         await page.getByText('Indisponível: o fluxo de reativação ainda não está disponível.', { exact: true }).waitFor();
@@ -178,14 +181,14 @@ async function fixture(browser, base, run) {
         pending = route; return true;
       };
       await page.goto(base + '/manager?salaoId=2');
-      await page.locator('#salao-dashboard').selectOption('1');
+      await page.getByRole('link', { name: /Gerenciar salão/ }).click();
       await page.getByRole('button', { name: 'Novo serviço', exact: true }).click();
       await page.getByLabel('Nome', { exact: true }).fill('Novo corte');
       await page.getByLabel('Preço (R$)', { exact: true }).fill('40');
       await page.getByLabel('Duração (minutos)', { exact: true }).fill('30');
       await page.getByRole('button', { name: 'Salvar serviço', exact: true }).click();
       await until(() => !!pending);
-      assert.equal(await page.locator('#salao-dashboard').isDisabled(), true);
+      assert.equal(await page.getByRole('button', { name: 'Salvando...', exact: true }).isDisabled(), true);
       await page.goBack();
       await until(async () => await page.locator('#salao-dashboard').inputValue() === '2');
       assert.equal(await page.locator('#salao-dashboard').isEnabled(), true);
@@ -230,6 +233,62 @@ async function fixture(browser, base, run) {
         assert.equal(state.calls.filter(call => call.method === 'PUT').length, 1);
       });
     }
+    await test('Início consulta indicadores reais sem editores ou chamadas extras', async (page, state) => {
+      await page.goto(base + '/manager?salaoId=2');
+      await until(async () => await page.locator('.stat-value').first().innerText() === '222');
+      assert.deepEqual(await page.locator('.stat-label').allTextContents(), ['Funcionários ativos', 'Serviços ativos', 'Avaliações recebidas', 'Avaliação média']);
+      assert.equal(await page.locator('form').count(), 0);
+      assert.equal(await page.getByRole('button', { name: 'Novo serviço', exact: true }).count(), 0);
+      assert.equal(state.calls.some(c => c.path.includes('/servicos') || c.path.includes('/localizacao')), false);
+      await page.getByRole('link', { name: /Abrir agenda/ }).click();
+      await until(async () => await page.locator('select[aria-label="Filtrar por salão"]').inputValue() === '2');
+    });
+    await test('indicadores carregando, erro, recuperação e zero real', async (page, state) => {
+      let pending;
+      state.handler = (route, call) => { if (!call.path.startsWith('/dashboard/stats/salao/')) return false; pending = route; return true; };
+      await page.goto(base + '/manager?salaoId=1'); await until(() => !!pending);
+      await page.getByRole('status').filter({ hasText: 'Carregando indicadores' }).waitFor();
+      assert.deepEqual(await page.locator('.stat-value').allTextContents(), ['…','…','…','…']);
+      await json(pending, {error:'Falha'}, 500);
+      await page.getByRole('alert').waitFor();
+      assert.deepEqual(await page.locator('.stat-value').allTextContents(), ['—','—','—','—']);
+      pending = null; await page.getByRole('button',{name:'Tentar novamente'}).click(); await until(()=>!!pending);
+      await json(pending, {totalFuncionariosAtivos:0,totalServicosAtivos:0,totalAvaliacoes:0,mediaAvaliacoes:null});
+      await until(async()=>await page.locator('.stat-value').first().innerText()==='0');
+      assert.deepEqual(await page.locator('.stat-value').allTextContents(), ['0','0','0','Sem avaliações']);
+    });
+    await test('dados ausentes não viram zero', async (page, state) => {
+      state.handler = (route, call) => { if (!call.path.startsWith('/dashboard/stats/salao/')) return false; json(route,{}); return true; };
+      await page.goto(base + '/manager?salaoId=1'); await page.getByText(/Alguns indicadores estão indisponíveis/).waitFor();
+      assert.deepEqual(await page.locator('.stat-value').allTextContents(), ['—','—','—','—']);
+    });
+    await test('lista de salões com erro, recuperação e estado vazio', async (page, state) => {
+      let fail = true;
+      state.handler = (route, call) => { if(call.path !== '/saloes/me') return false; json(route,fail ? {error:'Falha'} : [],fail ? 500 : 200);return true; };
+      await page.goto(base + '/manager'); await page.getByRole('alert').waitFor();
+      assert.equal(await page.locator('.stat-card').count(),0);
+      assert.equal(await page.getByText('Seu primeiro salão começa aqui').count(),0);
+      fail=false;await page.getByRole('button',{name:'Tentar novamente'}).click();
+      await page.getByRole('link',{name:'Cadastrar salão',exact:true}).waitFor();
+      assert.equal(await page.locator('.stat-card').count(),0);
+    });
+    await test('perfil centraliza cadastro, fotos e serviços e se adapta a tela estreita', async page => {
+      await page.goto(base + '/manager/saloes/2');
+      await page.getByRole('button',{name:'Novo serviço',exact:true}).waitFor();
+      assert.equal(await page.locator('a[href="/manager/atualizar-salao?salaoId=2"]').count(),1);
+      assert.equal(await page.locator('a[href="/manager/fotos?salaoId=2"]').count(),1);
+      assert.equal(await page.locator('form').count(),0);
+      await page.getByRole('link',{name:'Ver indicadores',exact:true}).click();
+      await until(async()=>await page.locator('#salao-dashboard').inputValue()==='2');
+      for(const width of [390,768,1280]) {
+        await page.setViewportSize({width,height:900});
+        for(const url of ['/manager?salaoId=2','/manager/saloes/2']) {
+          await page.goto(base+url);await page.locator('main h1').waitFor();await page.waitForLoadState('networkidle');
+          assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,'Sem rolagem horizontal em '+width);
+          if(width===390 && process.env.UX_SCREENSHOTS) await page.screenshot({path:require('node:path').join(process.env.UX_SCREENSHOTS,url.includes('/saloes/')?'perfil-390.png':'inicio-390.png'),fullPage:true});
+        }
+      }
+    });
     console.log(`${passed} cenários passaram; nenhuma API real foi acessada.`);
   } finally { await browser.close(); }
 })().catch(error => { console.error(error); process.exitCode = 1; }).finally(() => server.close());
