@@ -5,14 +5,16 @@ const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
 
 // --- Reducer ---
-const tokenSalvo = localStorage.getItem('token');
-const usuarioSalvo = localStorage.getItem('usuario');
-
-const initialState = {
-  user: tokenSalvo && usuarioSalvo ? JSON.parse(usuarioSalvo) : null,
-  token: tokenSalvo,
-  salao: null,
-};
+function initialState() {
+  try {
+    const token = localStorage.getItem('token');
+    const user = JSON.parse(localStorage.getItem('usuario'));
+    if (token && ['admin', 'manager', 'employee'].includes(user?.tipo)) {
+      return { user, token, salao: null };
+    }
+  } catch { /* Invalid local session must allow public access. */ }
+  return { user: null, token: null, salao: null };
+}
 
 function authReducer(state, action) {
   switch (action.type) {
@@ -21,7 +23,7 @@ function authReducer(state, action) {
     case 'ATUALIZAR_PERFIL':
       return { ...state, user: { ...state.user, ...action.payload } };
     case 'LOGOUT':
-      return { ...state, user: null, token: null };
+      return { ...state, user: null, token: null, salao: null };
     case 'SALVAR_SALAO':
       return { ...state, salao: { ...action.payload, ativo: true } };
     case 'ATUALIZAR_SALAO':
@@ -34,7 +36,7 @@ function authReducer(state, action) {
 }
 
 export const AuthProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(authReducer, initialState);
+  const [state, dispatch] = useReducer(authReducer, undefined, initialState);
   const { user, token, salao } = state;
 
   useEffect(() => {
@@ -53,9 +55,6 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const handleSessionExpired = () => {
       dispatch({ type: 'LOGOUT' });
-      if (window.location.pathname !== '/login') {
-        window.location.assign('/login');
-      }
     };
 
     window.addEventListener('timeright:session-expired', handleSessionExpired);
@@ -66,11 +65,17 @@ export const AuthProvider = ({ children }) => {
     type: 'SET_USER',
     payload: { user: usuario, token: authToken },
   });
-  const login = (usuario, authToken) => dispatch({
-    type: 'SET_USER',
-    payload: { user: usuario, token: authToken },
-  });
-  const logout = () => dispatch({ type: 'LOGOUT' });
+  const login = (usuario, authToken) => {
+    // Disponível para as requisições da página de destino antes dos efeitos React.
+    localStorage.setItem('token', authToken);
+    localStorage.setItem('usuario', JSON.stringify(usuario));
+    dispatch({ type: 'SET_USER', payload: { user: usuario, token: authToken } });
+  };
+  const logout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('usuario');
+    dispatch({ type: 'LOGOUT' });
+  };
   const atualizarPerfil = (dados) => dispatch({ type: 'ATUALIZAR_PERFIL', payload: dados });
   const salvarSalao = (dados) => dispatch({ type: 'SALVAR_SALAO', payload: dados });
   const atualizarSalao = (dados) => dispatch({ type: 'ATUALIZAR_SALAO', payload: dados });

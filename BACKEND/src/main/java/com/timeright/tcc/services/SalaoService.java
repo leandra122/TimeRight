@@ -11,6 +11,9 @@ import com.timeright.tcc.dto.ServicoDTO;
 import com.timeright.tcc.dto.ConfiguracaoAgendamentoSalaoRequest;
 import com.timeright.tcc.dto.ConfiguracaoAgendamentoSalaoResponse;
 import com.timeright.tcc.exception.ResourceNotFoundException;
+import com.timeright.tcc.exception.ConflictException;
+import org.springframework.dao.DataIntegrityViolationException;
+import java.sql.SQLException;
 import com.timeright.tcc.integration.CnpjConsultaGateway;
 import com.timeright.tcc.integration.CnpjConsultaResultado;
 import com.timeright.tcc.model.entity.Salao;
@@ -71,18 +74,36 @@ public class SalaoService {
         if (!CnpjValidator.isValid(dto.cnpj))
             throw new IllegalArgumentException("CNPJ inválido.");
 
-        CnpjConsultaResultado consulta = cnpjGateway.consultar(dto.cnpj);
+        String cnpj = dto.cnpj.replaceAll("[^0-9]", "");
+        verificarDuplicidade(cnpj);
+        validarCadastro(dto);
+        CnpjConsultaResultado consulta = cnpjGateway.consultar(cnpj);
 
         Salao salao = new Salao();
         salao.setNome(dto.nome);
-        salao.setCnpj(consulta.getCnpj());
+        salao.setCnpj(cnpj);
         salao.setEmail(dto.email);
         salao.setTelefone(dto.telefone);
         salao.setStatus(dto.status != null ? dto.status : "ATIVO");
         salao.setGerente(gerente);
         preencherDadosCadastrais(salao, dto);
 
-        Salao salaoSalvo = salaoRepository.save(salao);
+        // A situação externa vem apenas do gateway, nunca do formulário.
+        salao.setSituacaoCadastral(consulta.getSituacaoCadastral());
+        Salao salaoSalvo;
+        try {
+            salaoSalvo = salaoRepository.saveAndFlush(salao);
+        } catch (DataIntegrityViolationException exception) {
+            // O INSERT de Salao tem apenas CNPJ como chave única de negócio.
+            for (Throwable cause = exception; cause != null; cause = cause.getCause()) {
+                if (cause instanceof SQLException sql
+                        && ("23505".equals(sql.getSQLState())
+                            || sql.getErrorCode() == 2601 || sql.getErrorCode() == 2627)) {
+                    throw new ConflictException("Este CNPJ já está cadastrado no TimeRight.");
+                }
+            }
+            throw exception;
+        }
 
         if (dto.servicos != null) {
             for (ServicoDTO s : dto.servicos) {
@@ -100,6 +121,45 @@ public class SalaoService {
         }
 
         return salaoSalvo;
+    }
+
+    public CnpjConsultaResultado consultarCnpj(String cnpj) {
+        CnpjConsultaResultado resultado = cnpjGateway.consultar(cnpj);
+        verificarDuplicidade(resultado.getCnpj());
+        return resultado;
+    }
+
+    private void verificarDuplicidade(String cnpj) {
+        String mascara = cnpj.substring(0, 2) + "." + cnpj.substring(2, 5) + "."
+                + cnpj.substring(5, 8) + "/" + cnpj.substring(8, 12) + "-" + cnpj.substring(12);
+        if (salaoRepository.existsByCnpj(cnpj) || salaoRepository.existsByCnpj(mascara)) {
+            throw new ConflictException("Este CNPJ já está cadastrado no TimeRight.");
+        }
+    }
+
+    private void validarCadastro(SalaoServicosDTO dto) {
+        obrigatorio(dto.nome, 100, "Nome");
+        obrigatorio(dto.email, 100, "E-mail");
+        obrigatorio(dto.telefone, 20, "Telefone");
+        validarTamanho(dto.razaoSocial, 150, "Razão social");
+        validarTamanho(dto.nomeFantasia, 150, "Nome fantasia");
+        if (dto.status != null && !"ATIVO".equals(dto.status)) {
+            throw new IllegalArgumentException("O salão deve ser cadastrado como ATIVO.");
+        }
+        if (dto.servicos != null) for (ServicoDTO servico : dto.servicos) {
+            if (servico == null) throw new IllegalArgumentException("Serviço inválido.");
+            obrigatorio(servico.nome, 100, "Nome do serviço");
+            validarTamanho(servico.descricao, 255, "Descrição do serviço");
+            if (servico.preco == null || !Double.isFinite(servico.preco) || servico.preco < 0
+                    || servico.duracao == null || servico.duracao <= 0) {
+                throw new IllegalArgumentException("Informe preço não negativo e duração positiva para o serviço.");
+            }
+        }
+    }
+
+    private void obrigatorio(String valor, int limite, String campo) {
+        if (limpar(valor) == null) throw new IllegalArgumentException(campo + " é obrigatório.");
+        validarTamanho(valor, limite, campo);
     }
 
     private void preencherDadosCadastrais(Salao salao, SalaoServicosDTO dto) {

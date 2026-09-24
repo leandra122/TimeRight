@@ -30,6 +30,14 @@ class SecurityMatrixIntegrationTest {
     @Autowired private ObjectMapper objectMapper;
 
     @Test
+    void estatisticasDaHomeSaoPublicasEDashboardPermanecePrivado() throws Exception {
+        mockMvc.perform(get("/dashboard/stats/plataforma")).andExpect(status().isOk());
+        mockMvc.perform(get("/dashboard/stats")).andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/dashboard/stats/plataforma").header("Authorization", bearer(token("MANAGER"))))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     void loginPermanecePublico() throws Exception {
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.timeright.tcc.model.entity.Salao;
 
 public interface SalaoRepository extends JpaRepository<Salao, Long> {
+    boolean existsByCnpj(String cnpj);
     List<Salao> findByGerenteId(Long gerenteId);
 
     boolean existsByIdAndGerenteId(Long salaoId, Long gerenteId);

@@ -50,7 +50,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET,
                         "/saloes",
                         "/avaliacoes/salao/**",
-                        "/actuator/health").permitAll()
+                        "/actuator/health", "/dashboard/stats/plataforma").permitAll()
                 .requestMatchers(HttpMethod.GET, "/catalogo/saloes/*/funcionarios").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/client/disponibilidade").hasRole("USER")
                 .requestMatchers("/api/client/agendamentos/**").hasRole("USER")
@@ -77,7 +77,7 @@ public class SecurityConfig {
                     .hasRole("ADMIN")
                 .requestMatchers("/dashboard/stats/salao/**")
                     .hasAnyRole("ADMIN", "MANAGER")
-                .requestMatchers("/dashboard/stats", "/dashboard/stats/plataforma")
+                .requestMatchers("/dashboard/stats")
                     .hasRole("ADMIN")
                 .requestMatchers(HttpMethod.GET, "/funcionarios")
                     .hasRole("ADMIN")

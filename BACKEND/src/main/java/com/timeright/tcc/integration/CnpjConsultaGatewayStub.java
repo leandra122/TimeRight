@@ -33,7 +33,7 @@ public class CnpjConsultaGatewayStub implements CnpjConsultaGateway {
             digits,
             null,   // razão social: preenchida pelo usuário ou por serviço externo
             null,   // nome fantasia: idem
-            "ATIVA" // situação padrão enquanto não há integração real
+            null // Situação externa não consultada
         );
     }
 }

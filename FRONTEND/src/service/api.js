@@ -6,7 +6,7 @@ export const api = axios.create({ baseURL: BASE_URL });
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
-  if (token) {
+  if (token && !config.publicRequest) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
@@ -16,7 +16,10 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     const isLogin = error.config?.url?.includes('/api/auth/login');
-    if (error.response?.status === 401 && !isLogin) {
+    const token = localStorage.getItem('token');
+    const sentAuthorization = error.config?.headers?.Authorization;
+    if (error.response?.status === 401 && !isLogin && token
+        && sentAuthorization === `Bearer ${token}`) {
       localStorage.removeItem('token');
       localStorage.removeItem('usuario');
       window.dispatchEvent(new Event('timeright:session-expired'));
@@ -89,5 +92,5 @@ export const criarAvaliacao = (dados) => api.post('/avaliacoes', dados);
 
 // DASHBOARD
 export const getDashboardStats = () => api.get('/dashboard/stats');
-export const getPlataformaStats = () => api.get('/dashboard/stats/plataforma');
+export const getPlataformaStats = () => api.get('/dashboard/stats/plataforma', { publicRequest: true });
 export const getSalaoStats = (salaoId) => api.get(`/dashboard/stats/salao/${salaoId}`);

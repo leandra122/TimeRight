@@ -42,13 +42,19 @@ public class SalaoController {
         this.horarioFuncionamentoSalaoService = horarioFuncionamentoSalaoService;
     }
 
+    @org.springframework.web.bind.annotation.ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+    public ResponseEntity<Object> cadastroInconsistente() {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("error", "Não foi possível salvar o salão. Confira os dados informados."));
+    }
+
     // =========================
     // CONSULTAR CNPJ
     // =========================
     @GetMapping("/cnpj/{cnpj}")
     public ResponseEntity<Object> consultarCnpj(@PathVariable String cnpj) {
         try {
-            return ResponseEntity.ok(cnpjGateway.consultar(cnpj));
+            return ResponseEntity.ok(salaoService.consultarCnpj(cnpj));
         } catch (CnpjConsultaException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }

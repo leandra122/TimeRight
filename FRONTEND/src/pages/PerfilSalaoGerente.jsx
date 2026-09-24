@@ -61,7 +61,7 @@ export default function PerfilSalaoGerente() {
           </div>
         </section>
         <section className="saloes-dados" aria-labelledby="dados-salao"><h2 id="dados-salao">Informações cadastradas</h2>
-          <dl>{campos.map(([campo, label]) => <div key={campo}><dt>{label}</dt><dd>{salao[campo] || 'Não informado'}</dd></div>)}</dl>
+          <dl>{campos.map(([campo, label]) => <div key={campo}><dt>{label}</dt><dd>{campo === 'situacaoCadastral' ? 'Não verificada em fonte externa' : salao[campo] || 'Não informado'}</dd></div>)}</dl>
         </section>
         <div id="servicos-salao"><ServicosSalao key={salao.id} salaoId={salao.id} salaoNome={salao.nome} onSalvandoChange={noop} onSalvo={noop} /></div>
       </>}

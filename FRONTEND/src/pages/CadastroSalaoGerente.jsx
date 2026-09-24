@@ -49,6 +49,7 @@ const CadastroSalaoGerente = () => {
   const debounceRef = useRef(null);
 
   useEffect(() => {
+    let ativa = true;
     const digits = apenasDigitos(salao.cnpj);
 
     if (digits.length < 14) {
@@ -65,6 +66,7 @@ const CadastroSalaoGerente = () => {
     debounceRef.current = setTimeout(async () => {
       try {
         const { data } = await consultarCnpj(digits);
+        if (!ativa) return;
         setCnpjStatus('valido');
         setCamposDoServico({
           razaoSocial: !!data.razaoSocial,
@@ -74,22 +76,24 @@ const CadastroSalaoGerente = () => {
           ...prev,
           razaoSocial:       data.razaoSocial       ?? prev.razaoSocial,
           nomeFantasia:      data.nomeFantasia       ?? prev.nomeFantasia,
-          situacaoCadastral: data.situacaoCadastral  ?? prev.situacaoCadastral,
+          situacaoCadastral: data.situacaoCadastral ?? '',
         }));
       } catch (err) {
+        if (!ativa) return;
         setCnpjStatus('invalido');
-        setCnpjErro(err.response?.data?.error || 'CNPJ inválido ou não encontrado.');
+        setCnpjErro([400, 409].includes(err.response?.status) ? (err.response?.data?.error || 'Confira o CNPJ informado.') : 'Não foi possível validar o CNPJ. Tente novamente.');
         setCamposDoServico({ razaoSocial: false, nomeFantasia: false });
       }
     }, 600);
 
-    return () => clearTimeout(debounceRef.current);
+    return () => { ativa = false; clearTimeout(debounceRef.current); };
   }, [salao.cnpj]);
 
   const handleChange = (e) => setSalao(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
   const handleCnpj = (e) => {
-    setSalao(prev => ({ ...prev, cnpj: mascararCnpj(e.target.value) }));
+    setCnpjStatus('idle');
+    setSalao(prev => ({ ...prev, cnpj: mascararCnpj(e.target.value), situacaoCadastral: '' }));
   };
 
   const buscarCEP = async (valor) => {
@@ -169,7 +173,7 @@ const CadastroSalaoGerente = () => {
 
       navigate(`/manager/saloes/${data.data.id}`, { replace: true, state: { cadastrado: true } });
     } catch (err) {
-      setErroSalvar(err.response?.data?.error || err.message);
+      setErroSalvar([400, 409].includes(err.response?.status) ? (err.response?.data?.error || 'Confira os dados informados.') : 'Não foi possível cadastrar o salão. Tente novamente.');
     } finally {
       enviando.current = false;
       setSalvando(false);
@@ -220,9 +224,9 @@ const CadastroSalaoGerente = () => {
                 {cnpjStatus === 'invalido' && (
                   <p style={{ fontSize: 12, color: '#d93025', marginTop: 5 }}>{cnpjErro}</p>
                 )}
-                {cnpjStatus === 'valido' && salao.situacaoCadastral && (
+                {cnpjStatus === 'valido' && (
                   <p style={{ fontSize: 12, color: '#16a34a', marginTop: 5 }}>
-                    Situação cadastral: {salao.situacaoCadastral}
+                    Formato e dígitos verificadores válidos. CNPJ disponível no TimeRight no momento da validação. Situação cadastral externa não consultada.
                   </p>
                 )}
               </div>
