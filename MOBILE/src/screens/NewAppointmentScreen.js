@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Screen from '../components/Screen';
-import { Badge, Button, Card, Field, SectionHeader, Title, uiStyles } from '../components/UI';
+import { Badge, Button, Card, SectionHeader, Title, uiStyles } from '../components/UI';
 import { appointmentsApi } from '../api/services';
 import { getApiError } from '../api/client';
 import { money } from '../utils/format';
@@ -66,7 +66,6 @@ export default function NewAppointmentScreen({ route, navigation }) {
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
   const [availabilityError, setAvailabilityError] = useState('');
 
-  const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -285,7 +284,7 @@ export default function NewAppointmentScreen({ route, navigation }) {
         funcionarioId: submittedContext.funcionarioId,
         servicoId: submittedContext.servicoId,
         dataHora: `${submittedContext.data}T${submittedTime}`,
-        observacoes: notes.trim() || null,
+        observacoes: null,
       });
 
       if (
@@ -548,15 +547,6 @@ export default function NewAppointmentScreen({ route, navigation }) {
           </Badge>
         ) : null}
       </View>
-
-      <Field
-        label="Observações (opcional)"
-        value={notes}
-        onChangeText={setNotes}
-        multiline
-        maxLength={255}
-        editable={!submitting}
-      />
 
       {error ? (
         <Text style={uiStyles.error}>
