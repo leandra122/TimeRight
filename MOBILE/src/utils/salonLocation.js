@@ -23,8 +23,8 @@ export function locationCoordinates(result) {
 
 export function googleMapsUrl(salon, result) {
   const coordinates = locationCoordinates(result);
-  const query = coordinates
+  const query = salonAddress(salon) || (coordinates
     ? coordinates.latitude + ',' + coordinates.longitude
-    : salonAddress(salon);
+    : '');
   return query ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query) : null;
 }

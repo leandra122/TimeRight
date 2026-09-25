@@ -12,7 +12,7 @@ Na pasta MOBILE:
 
 ## Homologação em casa
 
-1. Abrir um salão com localização encontrada: o mapa OpenStreetMap continua visível e o botão Google Maps usa as coordenadas retornadas, indicadas como aproximadas.
+1. Abrir um salão com endereço e localização encontrada: o mapa OpenStreetMap continua visível e o botão Google Maps pesquisa o endereço cadastrado. As coordenadas retornadas são usadas no link somente quando não há endereço suficiente.
 2. Abrir um salão com endereço, mas sem coordenadas: o botão pesquisa o endereço cadastrado. Conferir número, cidade e resultado da busca.
 3. Conferir endereço legado, localização incompleta, falha de rede e nova tentativa. Não deve surgir um marcador inventado.
 4. No iPhone, tocar no botão com Google Maps instalado e sem o aplicativo instalado; verificar a abertura pelo iOS e o retorno ao TimeRight. No navegador, conferir a nova aba.

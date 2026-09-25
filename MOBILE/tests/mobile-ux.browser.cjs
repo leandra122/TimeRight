@@ -74,12 +74,18 @@ async function until(check) {
   async function openSalon(page){await page.goto(base);await page.getByRole('button').filter({hasText:'Salão Teste'}).click();await page.getByText('1. Escolha o serviço',{exact:true}).waitFor();}
   async function newAppointment(page){await openSalon(page);await page.getByRole('button').filter({hasText:'Corte Teste'}).click();await page.getByRole('button').filter({hasText:'Profissional Teste'}).click();await page.getByRole('button',{name:/Continuar para data e horário/}).click();await page.getByRole('button',{name:'Selecionar horário 10:00',exact:true}).waitFor();}
   try{
-    await test('mapa existente preservado e Google Maps usa coordenadas',async page=>{
+    await test('mapa existente preservado e Google Maps prioriza endereço sobre coordenadas',async page=>{
+      await openSalon(page);await page.locator('iframe').waitFor();
+      assert.ok((await page.locator('iframe').getAttribute('src')).includes('marker=-23.55,-46.63'));
+      await page.getByRole('button',{name:/Abrir no Google Maps/}).click();
+      assert.equal(new URL((await page.evaluate(()=>window.mapCalls))[0]).searchParams.get('query'),'Rua São José, 42, São Paulo, SP');
+    });
+    await test('somente coordenadas preserva mapa e usa fallback no Google Maps',async page=>{
       await openSalon(page);await page.locator('iframe').waitFor();
       assert.ok((await page.locator('iframe').getAttribute('src')).includes('marker=-23.55,-46.63'));
       await page.getByRole('button',{name:/Abrir no Google Maps/}).click();
       assert.equal(new URL((await page.evaluate(()=>window.mapCalls))[0]).searchParams.get('query'),'-23.55,-46.63');
-    });
+    },{logradouro:null,numero:null,cidade:null,uf:null,endereco:null});
     await test('falha de localização usa endereço real',async(page,state)=>{
       state.locationStatus=503;await openSalon(page);await page.getByText('Localização temporariamente indisponível.',{exact:true}).waitFor();
       await page.getByRole('button',{name:/Abrir no Google Maps/}).click();assert.equal(new URL((await page.evaluate(()=>window.mapCalls))[0]).searchParams.get('query'),'Rua São José, 42, São Paulo, SP');assert.equal(await page.locator('iframe').count(),0);

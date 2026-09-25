@@ -8,9 +8,23 @@ before(async () => {
   maps = await import('data:text/javascript;base64,' + Buffer.from(source).toString('base64'));
 });
 const salon = { logradouro:'Rua São José', numero:'42', bairro:'Centro', cidade:'São Paulo', uf:'SP', cep:'01000-000', endereco:'Endereço legado' };
-test('prioriza coordenadas reais da consulta bem-sucedida',()=>{
+test('endereço e coordenadas priorizam o endereço completo cadastrado',()=>{
   const url = new URL(maps.googleMapsUrl(salon,{status:'FOUND',latitude:-23.55,longitude:-46.63}));
-  assert.equal(url.origin,'https://www.google.com');assert.equal(url.searchParams.get('api'),'1');assert.equal(url.searchParams.get('query'),'-23.55,-46.63');
+  assert.equal(url.origin,'https://www.google.com');assert.equal(url.searchParams.get('api'),'1');assert.equal(url.searchParams.get('query'),'Rua São José, 42, Centro, São Paulo, SP, 01000-000');
+});
+test('somente coordenadas usa o resultado da API sem alterá-lo',()=>{
+  const result = Object.freeze({status:'FOUND',latitude:-23.55,longitude:-46.63});
+  for (const address of [{}, {logradouro:'Rua Teste',cidade:'São Paulo'}, {endereco:'  '}]) {
+    assert.equal(new URL(maps.googleMapsUrl(address,result)).searchParams.get('query'),'-23.55,-46.63');
+  }
+  assert.deepEqual(result,{status:'FOUND',latitude:-23.55,longitude:-46.63});
+});
+test('sem endereço nem coordenadas não gera link',()=>{
+  assert.equal(maps.googleMapsUrl({},null),null);
+  assert.equal(maps.googleMapsUrl({},{status:'INCOMPLETE'}),null);
+});
+test('endereço legado também tem prioridade sobre coordenadas',()=>{
+  assert.equal(new URL(maps.googleMapsUrl({endereco:'Rua Teste, 10, São Paulo - SP'},{status:'FOUND',latitude:-23.55,longitude:-46.63})).searchParams.get('query'),'Rua Teste, 10, São Paulo - SP');
 });
 test('endereço estruturado inclui número, cidade, UF e caracteres escapados',()=>{
   const url=new URL(maps.googleMapsUrl({...salon,logradouro:'Rua São José & João #1'},null));
