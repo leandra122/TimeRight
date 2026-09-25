@@ -5,7 +5,7 @@ import Screen from '../components/Screen';
 import { Badge, Button, Card, SectionHeader, Title, uiStyles } from '../components/UI';
 import { appointmentsApi } from '../api/services';
 import { getApiError } from '../api/client';
-import { money } from '../utils/format';
+import { money, formatDuration } from '../utils/format';
 import { colors, radius, spacing } from '../styles/theme';
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
@@ -358,7 +358,7 @@ export default function NewAppointmentScreen({ route, navigation }) {
             </Text>
 
             <Text style={uiStyles.subtitle}>
-              {service.duracao} min · {money(service.preco)}
+              {formatDuration(service.duracao)} · {money(service.preco)}
             </Text>
           </View>
         </View>
@@ -519,6 +519,10 @@ export default function NewAppointmentScreen({ route, navigation }) {
       <SectionHeader title="5. Confira e confirme" />
 
       <View style={styles.finalSummary}>
+        <View>
+          <Text style={styles.summaryLabel}>Duração</Text>
+          <Text style={styles.finalValue}>{formatDuration(service.duracao)}</Text>
+        </View>
         <View>
           <Text style={styles.summaryLabel}>
             Data

@@ -15,7 +15,7 @@ import {
 } from '../components/UI';
 import { catalogApi } from '../api/services';
 import { getApiError } from '../api/client';
-import { isActive, money } from '../utils/format';
+import { isActive, money, formatDuration } from '../utils/format';
 import { colors, radius, spacing } from '../styles/theme';
 
 export default function SalonDetailsScreen({ route, navigation }) {
@@ -251,7 +251,7 @@ export default function SalonDetailsScreen({ route, navigation }) {
               </Badge>
 
               <Text style={styles.duration}>
-                {item.duracao} min
+                {formatDuration(item.duracao)}
               </Text>
             </View>
           </Card>

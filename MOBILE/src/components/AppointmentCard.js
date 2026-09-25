@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Badge, Card, uiStyles } from './UI';
-import { dateTime, money } from '../utils/format';
+import { dateTime, money, formatDuration } from '../utils/format';
 import { colors, spacing } from '../styles/theme';
 
 function statusTone(status) {
@@ -25,7 +25,7 @@ export default function AppointmentCard({ item, onPress }) {
         <Badge tone={statusTone(item.status)}>{item.status}</Badge>
       </View>
       <View style={styles.divider} />
-      <Text style={styles.service}>{item.servico?.nome} · {item.duracao} min</Text>
+      <Text style={styles.service}>{item.servico?.nome} · {formatDuration(item.duracao)}</Text>
       <Text style={uiStyles.subtitle}>Com {item.funcionario?.nome}</Text>
       <Text style={styles.price}>{money(item.servico?.preco)}</Text>
       {item.observacoes ? <Text style={uiStyles.subtitle} numberOfLines={2}>{item.observacoes}</Text> : null}

@@ -6,3 +6,12 @@ export const toApiDateTime = (date) => {
 };
 
 export const isActive = (item) => !item?.status || String(item.status).toUpperCase() === 'ATIVO';
+
+export const formatDuration = (value) => {
+  const minutes = Number(value);
+  if (!Number.isInteger(minutes) || minutes <= 0) return '—';
+  const hours = Math.floor(minutes / 60);
+  const remainder = minutes % 60;
+  if (!hours) return `${minutes} min`;
+  return remainder ? `${hours}h${String(remainder).padStart(2, '0')}` : `${hours}h`;
+};

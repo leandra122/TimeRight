@@ -21,6 +21,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -96,7 +97,7 @@ class ClienteAgendamentoIntegrationTest {
         cliente = usuario("Cliente", email("cliente"), userRole, "ATIVO");
         salao = salao("Salao Principal", "ATIVO", 120, 60);
         funcionario = funcionario("Ana", salao, "ATIVO");
-        servico = servico("Corte", salao, "ATIVO", 45);
+        servico = servico("Corte", salao, "ATIVO", 30);
         for (int dia = 1; dia <= 7; dia++) {
             horario(salao, dia, LocalTime.MIN, LocalTime.of(23, 59, 59));
         }
@@ -118,7 +119,7 @@ class ClienteAgendamentoIntegrationTest {
         Agendamento salvo = agendamentoRepository.findById(json.get("id").asLong()).orElseThrow();
 
         assertThat(salvo.getUsuario().getId()).isEqualTo(cliente.getId());
-        assertThat(salvo.getDuracao()).isEqualTo(45);
+        assertThat(salvo.getDuracao()).isEqualTo(30);
         assertThat(salvo.getStatus()).isEqualTo("AGENDADO");
         assertThat(salvo.getObservacoes()).isEqualTo("Preferência discreta");
         assertThat(json.has("usuario")).isFalse();
@@ -322,7 +323,7 @@ class ClienteAgendamentoIntegrationTest {
         JsonNode json = disponibilidade(cliente, funcionario, servico, data.toLocalDate(), 200);
 
         assertThat(json.get("fusoHorario").asText()).isEqualTo("America/Sao_Paulo");
-        assertThat(json.get("intervaloMinutos").asInt()).isEqualTo(30);
+        assertThat(json.get("intervaloMinutos").asInt()).isEqualTo(60);
         assertThat(json.get("salaoId").asLong()).isEqualTo(salao.getId());
         java.util.List<String> horarios = horarios(json);
         assertThat(horarios)
@@ -430,9 +431,11 @@ class ClienteAgendamentoIntegrationTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {30, 60, 75})
+    @ValueSource(ints = {30, 60, 75, 90})
     void disponibilidadeECriacaoConsideramDuracaoReal(int duracao) throws Exception {
         LocalDateTime inicio = NOW.plusDays(1).withHour(14);
+        horarioRepository.deleteAll();
+        horario(salao, inicio.getDayOfWeek().getValue(), LocalTime.of(14, 0), LocalTime.of(19, 0));
         servico.setDuracao(duracao);
         servicoRepository.saveAndFlush(servico);
         String auth = token(cliente);
@@ -458,14 +461,36 @@ class ClienteAgendamentoIntegrationTest {
             criar(auth, request(funcionario, servico, inicio.minusMinutes(30), null), 409);
         }
 
-        // Para 75 minutos, um período às 15:15 permite testar o limite exato
-        // sem mudar a grade de 30 minutos da aplicação.
-        if (duracao == 75) {
-            horario(salao, fim.getDayOfWeek().getValue(), fim.toLocalTime(), LocalTime.of(18, 0));
-        }
         assertThat(horarios(disponibilidade(cliente, funcionario, servico,
                 inicio.toLocalDate(), 200))).contains(fim.toLocalTime().toString() + ":00");
         criar(auth, request(funcionario, servico, fim, null), 201);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "30, '14:00:00 14:30:00 15:00:00 15:30:00 16:00:00 16:30:00 17:00:00 17:30:00'",
+        "60, '14:00:00 15:00:00 16:00:00 17:00:00'",
+        "75, '14:00:00 15:15:00 16:30:00'",
+        "90, '14:00:00 15:30:00'"
+    })
+    void geraGradePelaDuracaoRespeitaFechamentoEFiltraConflito(int duracao, String esperados) throws Exception {
+        LocalDateTime inicio = NOW.plusDays(1).withHour(14);
+        horarioRepository.deleteAll();
+        horario(salao, inicio.getDayOfWeek().getValue(), LocalTime.of(14, 0), LocalTime.of(18, 0));
+        servico.setDuracao(duracao);
+        servicoRepository.saveAndFlush(servico);
+        JsonNode resposta = disponibilidade(cliente, funcionario, servico, inicio.toLocalDate(), 200);
+        assertThat(resposta.get("intervaloMinutos").asInt()).isEqualTo(duracao);
+        assertThat(horarios(resposta)).containsExactly(esperados.split(" "));
+
+        // Ocupação parcial dentro do segundo candidato, sem deslocar a grade.
+        agendamento(cliente, funcionario, servico, inicio.plusMinutes(duracao + 10), 10, "AGENDADO");
+        java.util.List<String> livres = new java.util.ArrayList<>(java.util.List.of(esperados.split(" ")));
+        livres.remove(1);
+        assertThat(horarios(disponibilidade(cliente, funcionario, servico, inicio.toLocalDate(), 200)))
+                .containsExactlyElementsOf(livres);
+        criar(token(cliente), request(funcionario, servico, inicio.plusMinutes(duracao), null), 409);
+        criar(token(cliente), request(funcionario, servico, inicio, null), 201);
     }
 
     private String criar(String token, String body, int expectedStatus) throws Exception {

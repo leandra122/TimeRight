@@ -22,7 +22,6 @@ import com.timeright.tcc.model.repository.HorarioFuncionamentoSalaoRepository;
 @Service
 public class DisponibilidadeAgendamentoService {
 
-    private static final int INTERVALO_MINUTOS = 30;
     private static final String FUSO_HORARIO = "America/Sao_Paulo";
 
     private final HorarioFuncionamentoSalaoRepository horarioRepository;
@@ -45,7 +44,7 @@ public class DisponibilidadeAgendamentoService {
         List<LocalTime> horarios = gerarHorarios(funcionario, servico, data);
         return new ClienteDisponibilidadeResponse(
                 salao.getId(), funcionario.getId(), servico.getId(), data,
-                FUSO_HORARIO, INTERVALO_MINUTOS, horarios);
+                FUSO_HORARIO, servico.getDuracao(), horarios);
     }
 
     public LocalDateTime validarParaCriacao(
@@ -80,7 +79,7 @@ public class DisponibilidadeAgendamentoService {
             LocalTime fimPeriodo = normalizar(periodo.getHoraFim());
             for (LocalDateTime candidato = LocalDateTime.of(data, inicioPeriodo);
                     !candidato.plusMinutes(duracao).isAfter(LocalDateTime.of(data, fimPeriodo));
-                    candidato = candidato.plusMinutes(INTERVALO_MINUTOS)) {
+                    candidato = candidato.plusMinutes(duracao)) {
                 LocalDateTime inicio = normalizar(candidato);
                 LocalDateTime fim = normalizar(inicio.plusMinutes(duracao));
                 if (inicio.isBefore(agora) || inicio.isBefore(minimo) || inicio.isAfter(maximo)) {

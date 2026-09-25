@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Screen from '../components/Screen';
 import { Button, Card, Title, uiStyles } from '../components/UI';
-import { dateTime, money } from '../utils/format';
+import { dateTime, money, formatDuration } from '../utils/format';
 import { colors, spacing } from '../styles/theme';
 
 export default function AppointmentConfirmationScreen({ route, navigation }) {
@@ -17,7 +17,7 @@ export default function AppointmentConfirmationScreen({ route, navigation }) {
         <View style={styles.divider} />
         <Text style={styles.date}>{dateTime(appointment.dataHora)}</Text>
         <Text style={uiStyles.subtitle}>Profissional: {appointment.funcionario?.nome}</Text>
-        {appointment.duracao ? <Text style={uiStyles.subtitle}>Duração: {appointment.duracao} min</Text> : null}
+        {appointment.duracao ? <Text style={uiStyles.subtitle}>Duração: {formatDuration(appointment.duracao)}</Text> : null}
         {appointment.servico?.preco != null ? <Text style={styles.price}>{money(appointment.servico.preco)}</Text> : null}
       </Card>
       <Button title="Visualizar agendamento" icon="calendar-outline" onPress={() => navigation.replace('AppointmentDetails', { appointment })} />

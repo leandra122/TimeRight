@@ -5,7 +5,7 @@ import Screen from '../components/Screen';
 import { Badge, Button, Card, Title, uiStyles } from '../components/UI';
 import { appointmentsApi } from '../api/services';
 import { getApiError } from '../api/client';
-import { dateTime, money } from '../utils/format';
+import { dateTime, money, formatDuration } from '../utils/format';
 import { colors, radius, spacing } from '../styles/theme';
 
 export default function AppointmentDetailsScreen({ route, navigation }) {
@@ -70,7 +70,7 @@ export default function AppointmentDetailsScreen({ route, navigation }) {
         <View style={styles.header}><View style={styles.icon}><Ionicons name="calendar-outline" size={25} color={colors.primaryDark} /></View><View style={styles.headerText}><Text style={styles.service}>{item.servico?.nome}</Text><Text style={styles.date}>{dateTime(item.dataHora)}</Text></View><Badge tone={statusTone}>{item.status}</Badge></View>
         <View style={styles.divider} />
         <View style={styles.detailRow}><Ionicons name="person-outline" size={19} color={colors.secondary} /><Text style={styles.detail}>Profissional: <Text style={styles.strong}>{item.funcionario?.nome}</Text></Text></View>
-        <View style={styles.detailRow}><Ionicons name="time-outline" size={19} color={colors.secondary} /><Text style={styles.detail}>Duração: <Text style={styles.strong}>{item.duracao} min</Text></Text></View>
+        <View style={styles.detailRow}><Ionicons name="time-outline" size={19} color={colors.secondary} /><Text style={styles.detail}>Duração: <Text style={styles.strong}>{formatDuration(item.duracao)}</Text></Text></View>
         <View style={styles.detailRow}><Ionicons name="wallet-outline" size={19} color={colors.secondary} /><Text style={styles.detail}>Preço: <Text style={styles.strong}>{money(item.servico?.preco)}</Text></Text></View>
         {item.observacoes ? <View style={styles.notes}><Text style={styles.notesLabel}>Observações</Text><Text style={uiStyles.subtitle}>{item.observacoes}</Text></View> : null}
       </Card>
