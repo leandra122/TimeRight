@@ -19,6 +19,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -425,6 +427,45 @@ class ClienteAgendamentoIntegrationTest {
         assertThat(horarios(antes)).contains("14:00:00");
         agendamento(cliente, segundo, servico, data.withHour(14), 60, "AGENDADO");
         criar(token(cliente), request(segundo, servico, data.withHour(14), null), 409);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {30, 60, 75})
+    void disponibilidadeECriacaoConsideramDuracaoReal(int duracao) throws Exception {
+        LocalDateTime inicio = NOW.plusDays(1).withHour(14);
+        servico.setDuracao(duracao);
+        servicoRepository.saveAndFlush(servico);
+        String auth = token(cliente);
+        String resposta = criar(auth, request(funcionario, servico, inicio, null), 201);
+        assertThat(objectMapper.readTree(resposta).get("duracao").asInt()).isEqualTo(duracao);
+        LocalDateTime fim = inicio.plusMinutes(duracao);
+
+        // A consulta real do banco usa intervalos abertos no término.
+        assertThat(agendamentoRepository.contarConflitosCliente(
+                funcionario.getId(), fim.minusMinutes(1), fim.plusMinutes(30))).isEqualTo(1);
+        assertThat(agendamentoRepository.contarConflitosCliente(
+                funcionario.getId(), fim, fim.plusMinutes(30))).isZero();
+
+        java.util.List<String> disponiveis = horarios(disponibilidade(
+                cliente, funcionario, servico, inicio.toLocalDate(), 200));
+        for (int minuto = 0; minuto < duracao; minuto += 30) {
+            LocalDateTime ocupado = inicio.plusMinutes(minuto);
+            assertThat(disponiveis).doesNotContain(ocupado.toLocalTime().toString() + ":00");
+            criar(auth, request(funcionario, servico, ocupado, null), 409);
+        }
+        if (duracao > 30) {
+            assertThat(disponiveis).doesNotContain("13:30:00");
+            criar(auth, request(funcionario, servico, inicio.minusMinutes(30), null), 409);
+        }
+
+        // Para 75 minutos, um período às 15:15 permite testar o limite exato
+        // sem mudar a grade de 30 minutos da aplicação.
+        if (duracao == 75) {
+            horario(salao, fim.getDayOfWeek().getValue(), fim.toLocalTime(), LocalTime.of(18, 0));
+        }
+        assertThat(horarios(disponibilidade(cliente, funcionario, servico,
+                inicio.toLocalDate(), 200))).contains(fim.toLocalTime().toString() + ":00");
+        criar(auth, request(funcionario, servico, fim, null), 201);
     }
 
     private String criar(String token, String body, int expectedStatus) throws Exception {

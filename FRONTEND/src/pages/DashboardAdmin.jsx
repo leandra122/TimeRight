@@ -112,8 +112,6 @@ const DashboardAdmin = () => {
     const indicadores = [
       { titulo: 'Funcionários ativos', valor: numero('totalFuncionariosAtivos'), Icone: UserCog },
       { titulo: 'Serviços ativos', valor: numero('totalServicosAtivos'), Icone: Scissors },
-      { titulo: 'Avaliações recebidas', valor: numero('totalAvaliacoes'), Icone: Users },
-      { titulo: 'Avaliação média', valor: !disponivel ? '—' : stats.totalAvaliacoes === 0 ? 'Sem avaliações' : Number.isFinite(stats.mediaAvaliacoes) ? stats.mediaAvaliacoes.toFixed(1) : '—', Icone: Star },
     ];
     return <div className="admin-page"><Navbar /><main className="admin-container saloes-page gerente-inicio">
       <header className="saloes-cabecalho"><div><span className="saloes-sobretitulo">Visão geral</span>
@@ -134,7 +132,7 @@ const DashboardAdmin = () => {
           </div>
           {!salaoSelecionado ? <p className="msg-erro" role="alert">Salão indisponível entre os seus estabelecimentos.</p> : <>
             <section aria-labelledby="indicadores-salao" aria-busy={carregandoStatsAtuais}>
-              <div className="gerente-secao-cabecalho"><div><h2 id="indicadores-salao">Resumo de {salaoSelecionado.nome}</h2><p>Equipe, serviços e avaliações deste estabelecimento.</p></div></div>
+              <div className="gerente-secao-cabecalho"><div><h2 id="indicadores-salao">Resumo de {salaoSelecionado.nome}</h2><p>Equipe e serviços deste estabelecimento.</p></div></div>
               {carregandoStatsAtuais ? <p className="gerente-indicadores-estado" role="status">Carregando indicadores…</p>
                 : erroStats ? <div className="msg-erro" role="alert">{erroStats} <button className="btn-secondary" onClick={() => setTentativaStats(v => v + 1)}>Tentar novamente</button></div>
                 : <p className="gerente-indicadores-estado">{!stats || indicadores.some(item => item.valor === '—') ? 'Alguns indicadores estão indisponíveis. — indica um dado não informado.' : 'Dados do salão selecionado.'}</p>}

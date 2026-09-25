@@ -67,7 +67,7 @@
 .gerente-secao-cabecalho h2 { font-size: 19px; margin-bottom: 6px; overflow-wrap: anywhere; }
 .gerente-secao-cabecalho p, .gerente-indicadores-estado { color: var(--text-soft); font-size: 13px; line-height: 1.6; }
 .gerente-indicadores-estado { margin: 0 0 16px; }
-.gerente-inicio .admin-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.gerente-inicio .admin-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .gerente-inicio .stat-card { align-items: flex-start; padding: 18px; }
 .gerente-inicio .stat-card > div:last-child { min-width: 0; }
 .gerente-inicio .stat-value { overflow-wrap: anywhere; }

@@ -1,3 +1,5 @@
+import CamposValorServico from '../components/CamposValorServico';
+import { converterDuracao, converterPreco } from '../utils/servicoForm';
 import React, { useState, useEffect, useRef } from 'react';
 import Navbar from '../components/Navbar';
 import { Store, Plus, Trash2, CheckCircle, XCircle, Loader } from 'lucide-react';
@@ -29,7 +31,8 @@ const CadastroSalao = () => {
   const [salaoSalvo, setSalaoSalvo] = useState(false);
   const [erroSalvar, setErroSalvar] = useState('');
   const [modalAberto, setModalAberto] = useState(false);
-  const [servicoTemp, setServicoTemp] = useState({ nome: '', descricao: '', preco: '', duracao: '' });
+  const [erroServico, setErroServico] = useState('');
+  const [servicoTemp, setServicoTemp] = useState({ nome: '', descricao: '', preco: '', horas: '0', minutos: '0' });
   const debounceRef = useRef(null);
 
   // Dispara consulta quando CNPJ atinge 14 dígitos
@@ -99,16 +102,22 @@ const CadastroSalao = () => {
   const handleServicoChange = (e) => setServicoTemp(prev => ({ ...prev, [e.target.name]: e.target.value }));
 
   const adicionarServico = () => {
-    if (!servicoTemp.nome || !servicoTemp.duracao) return;
+    const preco = converterPreco(servicoTemp.preco);
+    const duracao = converterDuracao(servicoTemp.horas, servicoTemp.minutos);
+    if (!servicoTemp.nome.trim() || !Number.isFinite(preco) || !Number.isFinite(duracao)) {
+      setErroServico('Informe nome, preço válido (ex.: 35,00) e duração maior que zero, com horas inteiras e minutos de 0 a 59.');
+      return;
+    }
+    setErroServico('');
     setSalao(prev => ({
       ...prev,
       servicos: [...prev.servicos, {
         ...servicoTemp,
-        preco:   Number(servicoTemp.preco)   || 0,
-        duracao: Number(servicoTemp.duracao) || 0,
+        preco,
+        duracao,
       }],
     }));
-    setServicoTemp({ nome: '', descricao: '', preco: '', duracao: '' });
+    setServicoTemp({ nome: '', descricao: '', preco: '', horas: '0', minutos: '0' });
     setModalAberto(false);
   };
 
@@ -332,16 +341,8 @@ const CadastroSalao = () => {
               <label>Descrição</label>
               <input name="descricao" placeholder="Descrição breve" value={servicoTemp.descricao} onChange={handleServicoChange} />
             </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label>Preço (R$)</label>
-                <input name="preco" type="number" placeholder="0,00" value={servicoTemp.preco} onChange={handleServicoChange} />
-              </div>
-              <div className="form-group">
-                <label>Duração (min)</label>
-                <input name="duracao" type="number" placeholder="60" value={servicoTemp.duracao} onChange={handleServicoChange} />
-              </div>
-            </div>
+            <CamposValorServico form={servicoTemp} onChange={handleServicoChange} />
+            {erroServico && <p className="msg-erro" role="alert">{erroServico}</p>}
             <div className="modal-botoes">
               <button type="button" className="btn-secondary" onClick={() => setModalAberto(false)}>Cancelar</button>
               <button type="button" className="btn-primary" onClick={adicionarServico}>Adicionar</button>

@@ -1,3 +1,5 @@
+import CamposValorServico from './CamposValorServico';
+import { separarDuracao, converterDuracao, formatarPrecoInput, converterPreco } from '../utils/servicoForm';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Pencil, Plus } from 'lucide-react';
 import { atualizarServico, cadastrarServico, listarServicosPorSalao } from '../service/api';
@@ -47,17 +49,17 @@ export default function ServicosSalao({ salaoId, salaoNome, onSalvandoChange, on
   const abrir = (servico = vazio) => {
     setErro('');
     setSucesso('');
-    setForm({ ...servico, descricao: servico.descricao || '' });
+    setForm({ ...servico, descricao: servico.descricao || '', ...separarDuracao(servico.duracao), preco: formatarPrecoInput(servico.preco), precoOriginal: servico.preco });
   };
 
   const salvar = async (event) => {
     event.preventDefault();
     if (enviando.current || !form || !carregado) return;
-    const dados = { nome: form.nome.trim(), descricao: form.descricao.trim(), preco: Number(form.preco), duracao: Number(form.duracao) };
+    const dados = { nome: form.nome.trim(), descricao: form.descricao.trim(), preco: form.id && form.preco === formatarPrecoInput(form.precoOriginal) ? Number(form.precoOriginal) : converterPreco(form.preco), duracao: converterDuracao(form.horas, form.minutos) };
     if (!dados.nome || String(form.preco).trim() === '' || !Number.isFinite(dados.preco)
       || dados.preco < 0 || !Number.isInteger(dados.duracao)
       || dados.duracao <= 0 || dados.duracao > 2147483647) {
-      setErro('Informe nome, preço não negativo e duração inteira positiva em minutos.');
+      setErro('Informe nome, preço válido (ex.: 35,00) e duração maior que zero, com horas inteiras e minutos de 0 a 59.');
       return;
     }
     enviando.current = true;
@@ -119,16 +121,7 @@ export default function ServicosSalao({ salaoId, salaoNome, onSalvandoChange, on
             <label htmlFor="servico-nome">Nome</label>
             <input id="servico-nome" name="nome" value={form.nome} onChange={alterar} maxLength={100} required disabled={salvando} />
           </div>
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="servico-preco">Preço (R$)</label>
-              <input id="servico-preco" name="preco" type="number" min="0" step="0.01" value={form.preco} onChange={alterar} required disabled={salvando} />
-            </div>
-            <div className="form-group">
-              <label htmlFor="servico-duracao">Duração (minutos)</label>
-              <input id="servico-duracao" name="duracao" type="number" min="1" max="2147483647" step="1" value={form.duracao} onChange={alterar} required disabled={salvando} />
-            </div>
-          </div>
+          <CamposValorServico form={form} onChange={alterar} disabled={salvando} />
           <div className="form-group">
             <label htmlFor="servico-descricao">Descrição (opcional)</label>
             <input id="servico-descricao" name="descricao" value={form.descricao} onChange={alterar} maxLength={255} disabled={salvando} />
