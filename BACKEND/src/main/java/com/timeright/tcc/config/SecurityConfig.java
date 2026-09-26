@@ -183,9 +183,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of(
-                "http://localhost:3000",
-                "http://localhost:5173",
-                "http://localhost:8081"));
+                "http://localhost:*",
+                "https://*.app.github.dev"));
         config.setAllowedMethods(List.of(
                 "GET",
                 "POST",
